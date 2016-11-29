@@ -1,0 +1,61 @@
+package edu.msg.flightmanager.backend.model;
+
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "fligtTemplate")
+public class FlightTemplate extends BaseEntity {
+
+	private static final long serialVersionUID = 2500982579028031851L;
+
+	@ManyToOne(targetEntity = Airport.class)
+	@JoinColumn(name = "departureId")
+	private Airport departure;
+
+	@ManyToOne(targetEntity = Airport.class)
+	@JoinColumn(name = "arrivalId")
+	private Airport arrival;
+
+	@ManyToOne(targetEntity = Itinerary.class)
+	@JoinColumn(name = "itineraryId")
+	private Itinerary itinerary;
+
+	public FlightTemplate() {
+		this(null, null, null);
+	}
+
+	public FlightTemplate(Airport departure, Airport arrival, Itinerary itinerary) {
+		super();
+		this.departure = departure;
+		this.arrival = arrival;
+		this.itinerary = itinerary;
+	}
+
+	public Airport getDeparture() {
+		return departure;
+	}
+
+	public void setDeparture(Airport departure) {
+		this.departure = departure;
+	}
+
+	public Airport getArrival() {
+		return arrival;
+	}
+
+	public void setArrival(Airport arrival) {
+		this.arrival = arrival;
+	}
+
+	public Itinerary getItinerary() {
+		return itinerary;
+	}
+
+	public void setItinerary(Itinerary itinerary) {
+		this.itinerary = itinerary;
+	}
+
+}

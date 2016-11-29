@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="addUserForm">
+		<p:growl showDetail="true" />
+			<div class="valign-wrapper" id="add-user-page"
+				style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="ui-fluid">
+							<p:panelGrid columns="2" cellpadding="5">
+
+								<p:outputLabel for="firstName" value="First name" />
+								<p:inputText id="firstName" value="#{usersBean.userToInsert.firstName}"/>
+
+								<p:outputLabel for="lastName" value="Last name" />
+								<p:inputText id="lastName" value="#{usersBean.userToInsert.lastName}"/>
+
+								<p:outputLabel for="email" value="Email" />
+								<p:inputText id="email" value="#{usersBean.userToInsert.email}"/>
+								
+								<p:outputLabel for="phoneNumber" value="Phone number" />
+								<p:inputText id="phoneNumber" value="#{usersBean.userToInsert.phoneNumber}"/>
+								
+								<p:outputLabel for="userName" value="User name" />
+								<p:inputText id="userName" value="#{usersBean.userToInsert.userName}"/>
+
+								<p:outputLabel for="password" value="Password" />
+								<p:password id="password" feedback="true" value="#{usersBean.userToInsert.password}"/>
+
+								<p:outputLabel for="passwordTwo" value="Retype password" />
+								<p:password id="passwordTwo" feedback="true" />
+								
+								<p:outputLabel for="typeMenu" value="Type" />
+								<p:selectOneMenu id="typeMenu" value="#{usersBean.userToInsert.type}">
+									<f:selectItems value="#{usersBean.allTypes}" var="type" itemValue="#{type}" itemLabel="#{type}" />
+								</p:selectOneMenu>
+
+								<p:outputLabel for="companyMenu" value="Company" />
+								<p:selectOneMenu id="companyMenu" value="#{usersBean.userToInsert.companyName}">
+									<f:selectItems value="#{companiesBean.allCompanies}" var="company" itemValue="#{company.name}" itemLabel="#{company.name}" />
+								</p:selectOneMenu>
+
+							</p:panelGrid>
+							
+							<p:commandButton value="Save" icon="ui-icon-disk" id="save" actionListener="#{usersBean.addUser()}" update="addUserForm" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+
+</html>

@@ -1,0 +1,11 @@
+package edu.msg.flightmanager.backend.util;
+
+import edu.msg.flightmanager.backend.model.FlightTemplate;
+
+public class FlightTemplateValidator {
+
+	public static void validateFlightTemplate(FlightTemplate flightTemplate) {
+		// validate airport and intinerary using their specific validators
+	}
+
+}

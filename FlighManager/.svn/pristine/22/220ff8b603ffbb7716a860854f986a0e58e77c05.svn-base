@@ -1,0 +1,143 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.faces.validator.ValidatorException;
+
+import edu.msg.flightmanager.backend.assembler.UserAssembler;
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.model.Company;
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.model.UserType;
+import edu.msg.flightmanager.backend.repository.CompanyRepository;
+import edu.msg.flightmanager.backend.repository.PasswordEncryptingException;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.repository.UserRepository;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.service.UserService;
+import edu.msg.flightmanager.backend.util.PasswordEncrypter;
+import edu.msg.flightmanager.backend.util.UserValidator;
+import edu.msg.flightmanager.backend.util.ValidationException;
+
+@Stateless(name = "UserService", mappedName = "ejb/UserService")
+public class UserServiceBean implements UserService {
+
+	@EJB
+	private UserRepository userRepository;
+
+	@EJB
+	private CompanyRepository companyRepository;
+
+	@Override
+	public List<UserDto> getAll() throws ServiceException {
+		try {
+			List<UserDto> usersDto = new ArrayList<UserDto>();
+			for (User user : userRepository.getAll()) {
+				usersDto.add(UserAssembler.modelToDto(user));
+			}
+			return usersDto;
+		} catch (RepositoryException e) {
+			throw new ServiceException("The users selection failed");
+		}
+	}
+
+	@Override
+	public User getByUserName(String userName) throws ServiceException {
+		try {
+			return userRepository.getByUserName(userName);
+		} catch (RepositoryException e) {
+			throw new ServiceException("Get by username failed");
+		}
+	}
+
+	@Override
+	public UserDto update(UserDto userDto) throws ServiceException {
+		User user = UserAssembler.dtoToModel(userDto);
+		try {
+			user.setCompany(companyRepository.getByName(userDto.getCompanyName()));
+			if (user.getPassword() != null) {
+				user.setPassword(PasswordEncrypter.generateHashedPassword(user.getPassword()));
+			} else {
+				try {
+					User userById = userRepository.getById(user.getId());
+					user.setPassword(userById.getPassword());
+				} catch (RepositoryException e) {
+					throw new ServiceException(e.getMessage());
+				}
+			}
+			// validate the user only after the password was set
+			try {
+				UserValidator.validateUser(user);
+			} catch (ValidationException e) {
+				throw new ServiceException(e.getMessage());
+			}
+			user = userRepository.update(user);
+			return UserAssembler.modelToDto(user);
+		} catch (RepositoryException e) {
+			throw new ServiceException("User update failed");
+		} catch (PasswordEncryptingException pex) {
+			throw new ServiceException("Password encrypting failed");
+		}
+	}
+
+	@Override
+	public UserDto insert(UserDto userDto) throws ServiceException {
+		User user = UserAssembler.dtoToModel(userDto);
+		// encrypt the password before saving the user into the database
+		user.setPassword(PasswordEncrypter.generateHashedPassword(user.getPassword()));
+		try {
+			Company company = companyRepository.getByName(userDto.getCompanyName());
+			user.setCompany(company);
+			UserValidator.validateUser(user);
+			user = userRepository.insert(user);
+			UserDto insertedUser = UserAssembler.modelToDto(user);
+			return insertedUser;
+		} catch (ValidatorException e) {
+			throw new ServiceException(e.getMessage());
+		} catch (RepositoryException e) {
+			throw new ServiceException(e.getMessage());
+		}
+
+	}
+
+	@Override
+	public void delete(UserDto userDto) throws ServiceException {
+		User user = UserAssembler.dtoToModel(userDto);
+		try {
+			// get the company by name so that the reference to company is
+			// managed
+			Company company = companyRepository.getByName(userDto.getCompanyName());
+			user.setCompany(company);
+			userRepository.delete(user);
+		} catch (RepositoryException e) {
+			throw new ServiceException(e.getMessage());
+		}
+	}
+
+	@Override
+	public void activate(UserDto userDto) throws ServiceException {
+		User user = UserAssembler.dtoToModel(userDto);
+		try {
+			// get the company by name so that the reference to company is
+			// managed
+			Company company = companyRepository.getByName(userDto.getCompanyName());
+			user.setCompany(company);
+			userRepository.activate(user);
+		} catch (RepositoryException e) {
+			throw new ServiceException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<String> getAllTypes() {
+		List<String> types = new ArrayList<>();
+		for (int i = 0; i < UserType.values().length; i++) {
+			types.add(UserType.values()[i].toString());
+		}
+		return types;
+	}
+
+}

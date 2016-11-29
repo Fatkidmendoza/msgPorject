@@ -1,0 +1,20 @@
+package edu.msg.flightmanager.backend.repository;
+
+import java.util.List;
+
+import javax.ejb.Local;
+
+import edu.msg.flightmanager.backend.model.Flight;
+import edu.msg.flightmanager.backend.model.FlightTemplate;
+import edu.msg.flightmanager.backend.model.Plane;
+import edu.msg.flightmanager.backend.model.User;
+
+@Local
+public interface FlightRepository extends BaseRepository<Flight, Long> {
+
+	public List<Flight> getTheFlightsOfAUser(User user);
+
+	public List<Flight> getFlightsThatHaveAFlightTemplate(FlightTemplate flightTemplate);
+
+	public List<Flight> getFlightsThatHaveAPlane(Plane plane);
+}

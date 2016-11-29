@@ -1,0 +1,166 @@
+package edu.msg.flightmanager.web.beans;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.TimeZone;
+
+import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+
+import edu.msg.flightmanager.backend.dto.AirportDto;
+import edu.msg.flightmanager.backend.dto.CompanyDto;
+import edu.msg.flightmanager.backend.service.AirportService;
+import edu.msg.flightmanager.backend.service.CompanyService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.web.util.Constants;
+
+@ManagedBean
+@ViewScoped
+public class AirportsBean implements Serializable {
+
+	private static final long serialVersionUID = -9019271203851116552L;
+
+	@EJB
+	private AirportService airportService;
+	private AirportDto airportToInsert = new AirportDto();
+	private AirportDto airportToUpdate;
+	private String companyName = "";
+
+	@EJB
+	private CompanyService companyService;
+
+	private List<AirportDto> filteredAirports;
+
+	public AirportDto getAirportToUpdate() {
+		return airportToUpdate;
+	}
+
+	public void setAirportToUpdate(AirportDto airportToUpdate) {
+		this.airportToUpdate = airportToUpdate;
+	}
+
+	public List<AirportDto> getAllAirports() {
+		List<AirportDto> allAirports = new ArrayList<>();
+		String role = UsersBean.userInSession().getType();
+		try {
+			if (role.equals(Constants.ADMIN)) {
+				allAirports = airportService.getAll();
+			} else {
+				String companyName = UsersBean.userInSession().getCompanyName();
+				CompanyDto companyDto = companyService.getByName(companyName);
+				allAirports = companyDto.getAirports();
+			}
+			Collections.sort(allAirports);
+			return allAirports;
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+					"The airports list could not be retrieved.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return new ArrayList<>();
+		}
+	}
+
+	public List<AirportDto> getAirportsBySelectedOrCurrentCompany() {
+		try {
+			if (UsersBean.userInSession().getType().equals(Constants.FLIGHT_MANAGER)) {
+				return this.getAllAirports();
+			} else if (UsersBean.userInSession().getType().equals(Constants.ADMIN)) {
+				List<AirportDto> listOfAirports = new ArrayList<AirportDto>();
+				CompanyDto companyDto = companyService.getByName(companyName);
+				listOfAirports = companyDto.getAirports();
+				Collections.sort(listOfAirports);
+				return listOfAirports;
+			}
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+					"The airports list could not be retrieved.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+		return new ArrayList<>();
+	}
+
+	public List<AirportDto> getFilteredAirports() {
+		return filteredAirports;
+	}
+
+	public void setFilteredAirports(List<AirportDto> filteredAirports) {
+		this.filteredAirports = filteredAirports;
+	}
+
+	public String addAirport() {
+		if (airportToInsert.getTimezone() == null || airportToInsert.getTimezone().equals("")) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "No timezone was selected.",
+					"Please select a timezone.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "addAirport";
+		}
+		try {
+			airportService.insert(airportToInsert);
+			airportToInsert = new AirportDto();
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Insert Successful.",
+					"The airport was inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Insert Failed.",
+					"The airport was not inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "addAirport";
+		}
+		return "addAirport";
+	}
+
+	public AirportDto getAirportToInsert() {
+		return airportToInsert;
+	}
+
+	public void setAirportToInsert(AirportDto airportToInsert) {
+		this.airportToInsert = airportToInsert;
+	}
+
+	public void deleteAirport(AirportDto airportDto) {
+		try {
+			airportService.delete(airportDto);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Delete Successful.",
+					"The airport was deleted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Delete Failed.",
+					"The airport was not deleted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+	}
+
+	public void updateAirport() {
+		try {
+			airportService.update(airportToUpdate);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Successful.",
+					"The airport was updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Failed.",
+					"The airport was not updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+	}
+
+	public List<String> getTimeZones() {
+		List<String> timeZones = new ArrayList<String>();
+		for (String timeZone : TimeZone.getAvailableIDs()) {
+			timeZones.add(timeZone);
+		}
+		return timeZones;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+}

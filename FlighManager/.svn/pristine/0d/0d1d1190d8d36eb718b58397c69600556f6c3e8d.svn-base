@@ -1,0 +1,46 @@
+package edu.msg.flightmanager.beans;
+
+import java.io.Serializable;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+
+@ManagedBean
+@SessionScoped
+public class HomeBean implements Serializable {
+
+	private static final long serialVersionUID = -7890525712292995929L;
+
+	public String getUserDetails() {
+		return "details.xhtml";
+	}
+
+	public String getFlightPage() {
+		return "flights.xhtml";
+	}
+
+	public String getFlightTemplatesPage() {
+		return "flightTemplates.xhtml";
+	}
+
+	public String getAirportPage() {
+		return "airports.xhtml";
+	}
+
+	public String getItineraryPage() {
+		return "itineraries.xhtml";
+	}
+
+	public String getCompamyPage() {
+		return "companies.xhtml";
+	}
+
+	public String getPlanePage() {
+		return "planes.xhtml";
+	}
+
+	public String getUsersPage() {
+		return "users.xhtml";
+	}
+
+}

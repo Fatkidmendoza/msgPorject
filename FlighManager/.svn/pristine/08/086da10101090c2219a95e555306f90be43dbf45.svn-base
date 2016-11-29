@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<f:view locale="#{languageBean.currentLocale}"></f:view>
+<h:head>
+	<title>Export data</title>
+</h:head>
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="manageFiles">
+			<p:growl id="messages" showDetail="true" />
+			<p:tabView id="manageFiles">
+				<p:tab title="Export data">
+					<p:commandLink id="exportFlight" value="Export flights data"
+						update=":manageFiles:flightsExportDetail"
+						oncomplete="PF('flightsExportDialog').show()" />
+					<br />
+					<p:commandLink id="exportPlane" value="Export planes data"
+						update=":manageFiles:planesExportDetail"
+						oncomplete="PF('planesExportDialog').show()" />
+				</p:tab>
+
+				<p:tab title="Import Data">
+					<p:panelGrid columns="1">
+						<p:fileUpload
+							fileUploadListener="#{manageDataBean.handleFileUpload}"
+							mode="advanced" dragDropSupport="false"
+							update=":manageFiles:messages" auto="true"
+							allowTypes="/(\.|\/)(csv)$/" label="Flights" />
+							
+						<p:fileUpload
+							fileUploadListener="#{manageDataBean.handlePlaneFileUpload}"
+							mode="advanced" dragDropSupport="false"
+							update=":manageFiles:messages" auto="true"
+							allowTypes="/(\.|\/)(csv)$/" label="Planes" />
+					</p:panelGrid>
+				</p:tab>
+			</p:tabView>
+
+			<!-- pop-up for export flights -->
+			<p:dialog header="Flights detail" widgetVar="flightsExportDialog"
+				modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+				<p:outputPanel id="flightsExportDetail" style="text-align:center;">
+					<p:panelGrid columns="2">
+						<h:panelGrid columns="2" cellpadding="10">
+							<p:outputLabel for="startDate" value="Start Date:" />
+							<p:calendar id="startDate" value="#{manageDataBean.startDate}"
+								mode="inline" />
+						</h:panelGrid>
+						<h:panelGrid columns="2" cellpadding="10">
+							<p:outputLabel for="endDate" value="End Date:" />
+							<p:calendar id="endDate" value="#{manageDataBean.endDate}"
+								mode="inline" />
+						</h:panelGrid>
+					</p:panelGrid>
+					<p:commandButton value="Download" ajax="false"
+						onclick="PrimeFaces.monitorDownload(start, stop);"
+						icon="ui-icon-arrowthick-1-s">
+						<p:fileDownload value="#{manageDataBean.file}" />
+					</p:commandButton>
+				</p:outputPanel>
+			</p:dialog>
+
+			<!-- pop-up for export planes -->
+			<p:dialog header="Planes detail" widgetVar="planesExportDialog"
+				modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+				<p:outputPanel id="planesExportDetail" style="text-align:center;">
+					<p:panelGrid columns="2">
+						<h:panelGrid columns="2" cellpadding="10">
+							<p:outputLabel for="companyMenu" value="Company name" />
+							<p:selectOneMenu id="companyMenu"
+								value="#{manageDataBean.companyDto.name}">
+								<f:selectItem itemLabel="Select One" itemValue=""
+									noSelectionOption="true" />
+								<f:selectItems value="#{companiesBean.allCompanies}"
+									var="company" itemValue="#{company.name}"
+									itemLabel="#{company.name}" />
+							</p:selectOneMenu>
+						</h:panelGrid>
+					</p:panelGrid>
+					<p:commandButton value="Download" ajax="false"
+						onclick="PrimeFaces.monitorDownload(start, stop);"
+						icon="ui-icon-arrowthick-1-s">
+						<p:fileDownload value="#{manageDataBean.planeFile}" />
+					</p:commandButton>
+				</p:outputPanel>
+			</p:dialog>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+</html>

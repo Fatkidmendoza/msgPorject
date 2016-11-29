@@ -1,0 +1,58 @@
+login.username = Felhasználónév
+login.password = Jelszó
+login.loginButton = Bejelentkezés
+login.forgotPassword = Elfelejtette a jelszavát?
+
+home.flights = Repülések
+home.flightTemplates = Repülési sablon
+home.Itineraries = Útiterv
+home.planes = Repül\u0151k
+home.airports = Repül\u0151terek
+home.companies = Vállalatok
+home.personalData = Személyes adatok
+home.manageData = Adatok kezelése
+
+
+pers.edit = Szerkesztés
+pers.back = Vissza
+pars.save = Mentés
+pers.cancel = Mégse
+pers.firstName = Keresztnév
+pers.lastName = Családnév
+pers.email = Email
+pers.phone = Telefon
+pers.role = Szerepkör
+pers.yourPass = Jelszavad
+pers.newPass = Új jelszó
+pers.confirmPass = Jelszó meger\u0151sítése
+
+flights.date = Dátum
+flights.company = Vállalat
+flights.departure = Indulás
+flights.arrival = Érkezés
+
+general.delete = Törlés
+general.update = Frissítés
+general.logout = Kijelentkezés
+general.operations = M\u0171veletek
+
+flightTemplate.duration = Id\u0151tartam
+
+itineraries.periodicity = Periódus
+
+planes.compName = Vállalat név
+planes.nrOfPlaces = Helyek
+planes.type = Típus
+
+airport.name = Név
+airport.country = Ország
+airport.city = Város
+airport.address = Cím
+
+companies.companyDetails = Vállalat adatok
+
+manage.import = Import
+manage.export = Export
+
+
+

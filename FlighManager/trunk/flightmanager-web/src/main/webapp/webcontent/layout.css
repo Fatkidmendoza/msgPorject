@@ -1,0 +1,40 @@
+.code {
+  background:  #ffffff;
+  transition: box-shadow .25s;
+  border-radius: 6px;
+  color: #2196F3;
+  display: block;
+  font: 14px/24px "Source Code Pro", Inconsolata, "Lucida Console", Terminal, "Courier New", Courier;
+  padding: 10px 5px;
+  text-align: center;
+}
+header,
+section,
+aside,
+footer {
+  margin: 0 1% 10px 1%;
+} 
+section {
+  background:  #2196F3;
+  float: left;
+  width: 15%;
+  height: 70%;
+  position: relative;
+}
+aside {
+  background:  #ffffff;
+  float: right;
+  width: 80%;
+  height: 70%; 
+  position: relative;
+}
+footer {
+  clear: both;
+  margin-bottom: 0;
+  height: 15%;
+}
+
+body{
+	background: #2196F3;
+}
+

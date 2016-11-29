@@ -1,0 +1,56 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import edu.msg.flightmanager.backend.assembler.UserAssembler;
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.repository.UserRepository;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.service.UserService;
+
+@Stateless(name = "UserService", mappedName = "ejb/UserService")
+public class UserServiceBean implements UserService {
+
+	@EJB
+	private UserRepository userRepository;
+
+	@Override
+	public List<UserDto> getAll() throws ServiceException {
+		try {
+			List<UserDto> usersDto = new ArrayList<UserDto>();
+			for (User user : userRepository.getAll()) {
+				usersDto.add(UserAssembler.modelToDto(user));
+			}
+			return usersDto;
+		} catch (RepositoryException e) {
+			throw new ServiceException("The users selection failed", e);
+		}
+	}
+
+	@Override
+	public User getByUserName(String userName) {
+		try {
+			return userRepository.getByUserName(userName);
+		} catch (RepositoryException e) {
+			throw new ServiceException("Get by username failed", e);
+		}
+	}
+
+	@Override
+	public UserDto update(UserDto userDto) {
+		User user = UserAssembler.dtoToModel(userDto);
+		try {
+			user = userRepository.update(user);
+			return UserAssembler.modelToDto(user);
+		} catch (RepositoryException e) {
+			throw new ServiceException("User update failed" + e.getMessage(), e);
+		}
+	}
+
+}

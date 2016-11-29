@@ -1,0 +1,22 @@
+package edu.msg.flightmanager.backend.service;
+
+import java.util.List;
+
+import javax.ejb.Local;
+
+import edu.msg.flightmanager.backend.dto.FlightTemplateDto;
+
+@Local
+public interface FlightTemplateService {
+
+	List<FlightTemplateDto> getAll() throws ServiceException;
+
+	FlightTemplateDto update(FlightTemplateDto flightTemplateDto) throws ServiceException;
+
+	FlightTemplateDto insert(FlightTemplateDto flightTemplateDto) throws ServiceException;
+
+	void delete(FlightTemplateDto flightTemplateDto) throws ServiceException;
+
+	void activate(FlightTemplateDto flightTemplateDto) throws ServiceException;
+
+}

@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+	<f:view locale="#{languageBean.locale}"></f:view>
+<h:head>
+	<title>login</title>
+	<!-- Compiled and minified CSS -->
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css" />
+	<!-- Compiled and minified JavaScript -->
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+</h:head>
+<h:body styleClass="blue light">
+
+<div class ="valign-wrapper" >
+	<div class="container">
+		<div class = "right-align">
+		<h:form>
+			<h:commandButton image="resources/us.png" action="#{languageBean.setLanguage('')}"></h:commandButton>
+			<h:commandButton image="resources/de.png" action="#{languageBean.setLanguage('de')}"></h:commandButton>
+			<h:commandButton image="resources/ro.png" action="#{languageBean.setLanguage('ro')}"></h:commandButton>
+			<h:commandButton image="resources/hu.png" action="#{languageBean.setLanguage('hu')}"></h:commandButton>
+		</h:form>
+		</div>
+		<div class="corner-align">
+			<div class="row">
+				<div class="col s5 offset-s3">
+					<div class="card">
+						<div class="card-content">
+							<img height="65" width="65"
+								src="http://www.kephost.com/images/2016/08/31/globe-airplane.png"
+								alt="globe-airplane.png" border="0" id = "logo-img" />
+								<h:outputLabel for="logo-img" value = "Flight Manager" style="font-size:20; font-weight: bold"/>
+								<div class="left-align">
+								<h:form>
+									<p:growl autoUpdate="true"/>
+									<div class="row ">
+										<div class="col s12 input-field">
+											<h:inputText id="username" value="#{loginBean.userDto.userName}">
+												<f:validator validatorId="userNameValidator" />
+											</h:inputText>
+											<h:outputLabel for="username" value="#{msg['login.username']}" />
+											
+										</div>
+										<div class="col s12 input-field">
+											<h:inputSecret id="password" value="#{loginBean.userDto.password}" >
+												</h:inputSecret>
+											<h:outputLabel for="password" value="#{msg['login.password']}" />
+										</div>
+										<div class="col s12 input-field">
+											<h:commandLink value="#{msg['login.loginButton']}" styleClass="btn btn-large" action="#{loginBean.processLogin}" />
+										</div>
+										<div class="col s12 input-field">
+												<p:link value="#{msg['login.forgotPassword']}" outcome="/forgotPassword" immediate="true" />
+										</div> 
+									</div>
+								</h:form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</h:body>
+</html>

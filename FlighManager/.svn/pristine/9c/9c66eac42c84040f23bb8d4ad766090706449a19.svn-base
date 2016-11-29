@@ -1,0 +1,73 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import edu.msg.flightmanager.backend.assembler.FlightTemplateAssembler;
+import edu.msg.flightmanager.backend.dto.FlightTemplateDto;
+import edu.msg.flightmanager.backend.model.FlightTemplate;
+import edu.msg.flightmanager.backend.repository.FlightTemplateRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.service.FlightTemplateService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.util.FlightTemplateValidator;
+import edu.msg.flightmanager.backend.util.ValidationException;
+
+@Stateless(name = "FlightTemplateService", mappedName = "ejb/FlightTemplateService")
+public class FlightTemplateServiceBean implements FlightTemplateService {
+
+	@EJB
+	private FlightTemplateRepository flightTemplateRepository;
+
+	@Override
+	public List<FlightTemplateDto> getAll() throws ServiceException {
+		try {
+			List<FlightTemplateDto> templates = new ArrayList<FlightTemplateDto>();
+			for (FlightTemplate flightTemplate : flightTemplateRepository.getAll()) {
+				templates.add(FlightTemplateAssembler.modelToDto(flightTemplate));
+			}
+			return templates;
+		} catch (RepositoryException e) {
+			throw new ServiceException("The flight templates selection failed");
+		}
+	}
+
+	@Override
+	public FlightTemplateDto insert(FlightTemplateDto flightTemplateDto) throws ServiceException {
+		FlightTemplate flightTemplate = FlightTemplateAssembler.dtoToModel(flightTemplateDto);
+		try {
+			FlightTemplateValidator.validateFlightTemplate(flightTemplate);
+			flightTemplate = flightTemplateRepository.insert(flightTemplate);
+			FlightTemplateDto insertedFlightTemplate = FlightTemplateAssembler.modelToDto(flightTemplate);
+			return insertedFlightTemplate;
+		} catch(ValidationException e){
+			throw new ServiceException(e.getMessage());
+		} catch (RepositoryException e) {
+			throw new ServiceException("Flight Template insertion failed.");
+		}
+	}
+
+	@Override
+	public void delete(FlightTemplateDto flightTemplateDto) throws ServiceException {
+		FlightTemplate flightTemplate = FlightTemplateAssembler.dtoToModel(flightTemplateDto);
+		try {
+			flightTemplateRepository.delete(flightTemplate);
+		} catch (RepositoryException e) {
+			throw new ServiceException("Flight Template deletion failed.");
+		}
+	}
+
+	@Override
+	public void activate(FlightTemplateDto flightTemplateDto) throws ServiceException {
+		FlightTemplate flightTemplate = FlightTemplateAssembler.dtoToModel(flightTemplateDto);
+		try {
+			flightTemplateRepository.activate(flightTemplate);
+		} catch (RepositoryException e) {
+			throw new ServiceException("Flight Template activation failed.");
+		}
+	}
+
+}

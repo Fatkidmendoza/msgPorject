@@ -1,0 +1,85 @@
+package edu.msg.flightmanager.backend.repository.bean;
+
+import javax.ejb.Stateless;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
+import javax.persistence.TypedQuery;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.repository.UserRepository;
+
+@Stateless(name = "UserRepository", mappedName = "ejb/UserRepository")
+public class UserRepositoryBean extends BaseRepositoryBean<User, Long> implements UserRepository {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserRepositoryBean.class);
+
+	public UserRepositoryBean() {
+		super(User.class);
+	}
+
+	@Override
+	public User getByUserName(String userName) throws RepositoryException {
+		try {
+			LOGGER.info("Try to select an user by its user name.");
+			TypedQuery<User> users = entityManager.createQuery("SELECT u FROM User u WHERE u.userName= :userName",User.class);
+			users.setParameter("userName", userName);
+			User user =  users.getSingleResult();
+			LOGGER.info("User selection by user name successful.");
+			return user;
+		} catch (NoResultException e) {
+			LOGGER.error("User selection by user name failed.", e);
+			throw new RepositoryException("User selection by user name failed.");
+		} catch (PersistenceException ex) {
+			LOGGER.error("User selection by user name failed.", ex);
+			throw new RepositoryException("User selection by user name failed.");
+		}
+	}
+
+	@Override
+	public User update(User user) throws RepositoryException {
+		try {
+			LOGGER.info("Try to update an user.");
+			User userByUserName = getByUserName(user.getUserName());
+			if (user.getId() == userByUserName.getId()) {
+				User updatedUser = updateHelper(user);
+				LOGGER.info("User update successful");
+				return updatedUser;
+			} else {
+				LOGGER.error("The user name already exists");
+				throw new RepositoryException("The user name already exists");
+			}
+		} catch (RepositoryException ex) {
+			LOGGER.error("User update failed.", ex);
+			return updateHelper(user);
+		}
+	}
+
+	private User updateHelper(User user) {
+		if(user.getPassword() == null ){
+			try{
+				LOGGER.info("Try to select an user by id.");
+				User userById = getById(user.getId());
+				LOGGER.info("User selection by id successful.");
+				user.setPassword(userById.getPassword());
+			} catch (RepositoryException re) {
+				LOGGER.error("User selection by id failed.", re);
+				throw new RepositoryException(re.getMessage());
+			}
+		}
+		try {
+			LOGGER.info("Try to select an user by id.");
+			User userById = getById(user.getId());
+			LOGGER.info("User selection by id successful.");
+			user.setUuid(userById.getUuid());
+			return super.update(user);
+		} catch (RepositoryException e) {
+			LOGGER.error("User selection by id failed", e);
+			throw new RepositoryException(e.getMessage());
+		}
+	}
+
+}

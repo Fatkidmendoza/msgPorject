@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+<h:head></h:head>
+<h:body>
+	<h:form>
+		<p:editor />
+		<hr />
+
+		<p:inputText value="#{loginBean.someValue}" />
+		<hr />
+
+		<p:calendar value="#{loginBean.someDate}" />
+		<hr />
+
+		<p:carousel rows="1" itemStyle="height:200px;width:600px;">
+			<p:tab title="Godfather Part I">
+				<h:panelGrid columns="1" cellpadding="10">
+					<h:outputText value="The story begins as Don Vito ..." />
+				</h:panelGrid>
+			</p:tab>
+			<p:tab title="Godfather Part II">
+				<h:panelGrid columns="1" cellpadding="10">
+					<h:outputText value="Francis Ford Coppola's ..." />
+				</h:panelGrid>
+			</p:tab>
+			<p:tab title="Godfather Part III">
+				<h:panelGrid columns="1" cellpadding="10">
+					<h:outputText value="After a break of ..." />
+				</h:panelGrid>
+			</p:tab>
+		</p:carousel>
+
+	</h:form>
+</h:body>
+</html>

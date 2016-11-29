@@ -1,0 +1,104 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<f:view locale="#{languageBean.currentLocale}"></f:view>
+
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<div class="valign-wrapper" id="login-page">
+			<div class="container">
+				<div class="corner-align">
+					<div class="row">
+						<div class="col s5 offset-s3">
+							<div class="card">
+								<div class="card-content">
+									<h:form id="detailsForm">
+										<p:growl autoUpdate="true" />
+										<h:panelGrid columns="2" id="detailsPanel" value="#{usersBean.userInSession}"
+											var="user" >
+											<f:facet name="header">
+												<h:outputText value="#{usersBean.userInSession.userName}" />
+											</f:facet>
+											<h:outputLabel for="fName" value="#{msg['pers.firstName']}"></h:outputLabel>
+											<h:outputText value="#{usersBean.userInSession.firstName}" id="fName" rendered="#{!usersBean.userIsEditable}"/>
+											<h:inputText value="#{usersBean.userInSession.firstName}" binding="#{fNameInput}" rendered="#{usersBean.userIsEditable}">
+												<f:validator validatorId="nameValidator" />
+											</h:inputText>
+
+											<h:outputLabel for="lName" value="#{msg['pers.lastName']}"></h:outputLabel>
+											<h:outputText value="#{usersBean.userInSession.lastName}" id="lName" rendered="#{!usersBean.userIsEditable}"/>
+											<h:inputText value="#{usersBean.userInSession.lastName}" binding="#{lNameInput}" rendered="#{usersBean.userIsEditable}">
+												<f:validator validatorId="nameValidator" />
+											</h:inputText>
+
+											<h:outputLabel for="uName" value="#{msg['login.username']}"></h:outputLabel>
+											<h:outputText value="#{usersBean.userInSession.userName}" id="uName" rendered="#{!usersBean.userIsEditable}"/>
+											<h:inputText id="userNameText"  value="#{usersBean.userInSession.userName}" binding="#{uNameInput}" rendered="#{usersBean.userIsEditable}">
+												<f:validator validatorId="userNameValidator" />
+											</h:inputText>
+									
+											<h:outputLabel for="email" value="#{msg['pers.email']}"></h:outputLabel>
+											<h:outputText value="#{usersBean.userInSession.email}" id="email" rendered="#{!usersBean.userIsEditable}"/>
+											<h:inputText  value="#{usersBean.userInSession.email}" id="emailTxt" requiredMessage="NOT GOOD" binding="#{emailInput}" rendered="#{usersBean.userIsEditable}">
+												<f:validator  validatorId="emailValidator" />
+											</h:inputText>
+											
+											
+											<h:outputLabel for="phone" value="#{msg['pers.phone']}"></h:outputLabel>
+											<h:outputText value="#{usersBean.userInSession.phoneNumber}" id="phone" rendered="#{!usersBean.userIsEditable}"/>
+											<h:inputText value="#{usersBean.userInSession.phoneNumber}" binding="#{phoneInput}" rendered="#{usersBean.userIsEditable}">
+												<f:validator validatorId="phoneValidator" />
+											</h:inputText>
+
+											<h:outputLabel for="type" value="#{msg['pers.role']}"></h:outputLabel>
+											<h:outputText value="#{usersBean.userInSession.type}" id="type"></h:outputText>
+
+											<h:outputLabel for="pass" rendered="#{usersBean.userIsEditable}" value="#{msg['login.password']}"></h:outputLabel>
+											<p:selectBooleanCheckbox id="pass" rendered="#{usersBean.userIsEditable}" > 
+												<f:ajax listener="#{usersBean.changeVisibilityOfPassword}" render=" @form" />
+											</p:selectBooleanCheckbox>
+
+
+											<h:outputLabel for="oldPassword" rendered="#{usersBean.editPassword}" value="#{msg['pers.yourPass']}"></h:outputLabel>
+											<h:inputSecret id="oldPassword" binding="#{oldPass}" rendered="#{usersBean.editPassword}">
+												<f:validator validatorId="passwordValidator" />
+												<f:attribute name="newPassword" value="#{newPass}" />
+												<f:attribute name="chckPassword" value="#{confirmPass}" />
+											</h:inputSecret>
+
+											<h:outputLabel for="newPassword" rendered="#{usersBean.editPassword}" value="#{msg['pers.newPass']}"></h:outputLabel>
+											<h:inputSecret id="newPassword" binding="#{newPass}" rendered="#{usersBean.editPassword}" />
+
+											<h:outputLabel for="chckPassword" rendered="#{usersBean.editPassword}" value="#{msg['pers.confirmPass']}"></h:outputLabel>
+											<h:inputSecret id="chckPassword" binding="#{confirmPass}" rendered="#{usersBean.editPassword}" />
+
+
+											<p:commandButton  value="#{msg['pers.edit']}" update="detailsForm" styleClass="btn btn-large" action="#{usersBean.enableEdit}" rendered="#{!usersBean.userIsEditable}" />
+											<h:commandButton value="#{msg['pers.back']}"  styleClass="btn btn-large" action="#{loginBean.back}" rendered="#{!usersBean.userIsEditable}" />
+											<p:commandButton  value="#{msg['pers.save']}" update="detailsForm"  styleClass="btn btn-large" actionListener="#{usersBean.executeUpdate(fNameInput.value,lNameInput.value,emailInput.value,phoneInput.value,uNameInput.value,oldPass.value,newPass.value,confirmPass.value)}" rendered="#{usersBean.userIsEditable}" />
+											<p:commandButton value="#{msg['pers.cancel']}" update="detailsForm" styleClass="btn btn-large" action="#{usersBean.disableEdit}" rendered="#{usersBean.userIsEditable}" immediate="true" />
+
+										</h:panelGrid>
+									</h:form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</ui:define>
+
+</ui:composition>
+</html>
+
+
+
+
+
+

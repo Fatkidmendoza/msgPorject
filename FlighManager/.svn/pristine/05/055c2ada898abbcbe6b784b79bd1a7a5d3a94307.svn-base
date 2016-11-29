@@ -1,0 +1,73 @@
+package edu.msg.flightmanager.backend.model;
+
+
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+@Entity
+@Table(name = "itinerary")
+public class Itinerary extends BaseEntity {
+
+	private static final long serialVersionUID = -2862301088891646334L;
+	@Temporal(TemporalType.TIME)
+	@Column(name = "duration", nullable = false)
+	private  Date duration;
+
+	@Column(name = "periodicity", nullable = false)
+	@Enumerated(EnumType.STRING)
+	private PeriodicityType periodicity;
+
+	public Itinerary() {
+		this(null, null);
+	}
+
+	public Itinerary(Date duration, PeriodicityType periodicity) {
+		super();
+		this.duration = duration;
+		this.periodicity = periodicity;
+	}
+
+	public Date getDuration() {
+		return duration;
+	}
+
+	public void setDuration(Date duration) {
+		this.duration = duration;
+	}
+
+	public PeriodicityType getPeriodicity() {
+		return periodicity;
+	}
+
+	public void setPeriodicity(PeriodicityType periodicity) {
+		this.periodicity = periodicity;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (getClass() != obj.getClass())
+			return false;
+
+		Itinerary other = (Itinerary) obj;
+		Calendar calendar1 = Calendar.getInstance();
+		Calendar calendar2 = Calendar.getInstance();
+		calendar1.setTime(duration);
+		calendar2.setTime(other.duration);
+		if(calendar1.get(Calendar.MINUTE)==calendar2.get(Calendar.MINUTE) && calendar1.get(Calendar.HOUR_OF_DAY)==calendar2.get(Calendar.HOUR_OF_DAY) && periodicity.name().equals(other.periodicity.name())) {
+			return true;
+		}
+		return false;
+	}
+
+}

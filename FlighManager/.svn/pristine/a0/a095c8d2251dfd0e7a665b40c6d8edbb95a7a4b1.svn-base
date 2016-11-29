@@ -1,0 +1,130 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import edu.msg.flightmanager.backend.assembler.ItineraryAssembler;
+import edu.msg.flightmanager.backend.dto.ItineraryDto;
+import edu.msg.flightmanager.backend.model.Itinerary;
+import edu.msg.flightmanager.backend.model.PeriodicityType;
+import edu.msg.flightmanager.backend.repository.ItineraryRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.service.ItineraryService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.util.ItineraryValidator;
+import edu.msg.flightmanager.backend.util.ValidationException;
+
+@Stateless(name = "ItineraryService", mappedName = "ejb/ItineraryService")
+public class ItineraryServiceBean implements ItineraryService {
+
+	@EJB
+	private ItineraryRepository itineraryRepository;
+
+	@Override
+	public List<ItineraryDto> getAll() throws ServiceException {
+		try {
+			List<ItineraryDto> itineraries = new ArrayList<ItineraryDto>();
+			for (Itinerary itinerary : itineraryRepository.getAll()) {
+				itineraries.add(ItineraryAssembler.modelToDto(itinerary));
+			}
+			return itineraries;
+		} catch (RepositoryException e) {
+			throw new ServiceException("The itineraries selection failed");
+		}
+	}
+
+	@Override
+	public ItineraryDto insert(ItineraryDto itineraryDto) throws ServiceException {
+		Itinerary itinerary = ItineraryAssembler.dtoToModel(itineraryDto);
+		try {
+			ItineraryValidator.validate(itinerary);
+			if (isAvailableForInsert(itinerary)) {
+				itinerary = itineraryRepository.insert(itinerary);
+				itineraryDto = ItineraryAssembler.modelToDto(itinerary);
+				return itineraryDto;
+			} else {
+				throw new ServiceException("Itineray exists in database");
+			}
+		} catch (ValidationException e) {
+			throw new ServiceException(e.getMessage());
+		} catch (RepositoryException e) {
+			throw new ServiceException("Insert a new itinerary failed");
+		}
+	}
+
+	@Override
+	public void delete(ItineraryDto itineraryDto) throws ServiceException {
+		try {
+			Itinerary itinerary = ItineraryAssembler.dtoToModel(itineraryDto);
+			itineraryRepository.delete(itinerary);
+		} catch (RepositoryException e) {
+			throw new ServiceException("Delete user failed");
+		}
+	}
+
+	@Override
+	public void activate(ItineraryDto itineraryDto) throws ServiceException {
+		try {
+			Itinerary itinerary = ItineraryAssembler.dtoToModel(itineraryDto);
+			itineraryRepository.activate(itinerary);
+		} catch (RepositoryException e) {
+			throw new ServiceException(e.getMessage());
+		}
+
+	}
+
+	@Override
+	public List<String> getPeriodicityTypes() {
+		List<String> types = new ArrayList<String>();
+		for (int i = 0; i < PeriodicityType.values().length; i++) {
+			types.add(PeriodicityType.values()[i].toString());
+		}
+		return types;
+	}
+
+
+
+	@Override
+	public ItineraryDto update(ItineraryDto itineraryDto) throws ServiceException {
+		Itinerary itinerary = ItineraryAssembler.dtoToModel(itineraryDto);
+		try {
+			ItineraryValidator.validate(itinerary);
+			if (isAvailableForUpdate(itinerary)) {
+				itinerary = itineraryRepository.update(itinerary);
+				itineraryDto = ItineraryAssembler.modelToDto(itinerary);
+				return itineraryDto;
+			}
+			else{
+				throw new ServiceException("Itineray exists in database, you cann't have the same details");
+			}
+		} catch (ValidationException e) {
+			throw new ServiceException(e.getMessage());
+		} catch (RepositoryException e) {
+			throw new ServiceException("Insert a new itinerary failed");
+		}
+	}
+
+
+	public boolean isAvailableForInsert(Itinerary itinerary) {
+		for (Itinerary itineraryFromDB : itineraryRepository.getAll()) {
+			if (itinerary.equals(itineraryFromDB)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public boolean isAvailableForUpdate(Itinerary itinerary) {
+		for (Itinerary itineraryFromDB : itineraryRepository.getAll()) {
+			if (itinerary.equals(itineraryFromDB) && itinerary.getId()!=itineraryFromDB.getId()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+
+}

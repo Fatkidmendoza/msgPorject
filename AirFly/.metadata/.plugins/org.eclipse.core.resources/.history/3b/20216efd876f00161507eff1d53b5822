@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html">
+
+	<h:head>
+		<title>hide or show</title>
+	</h:head>
+	<h:form>
+		<h:commandButton value="Show" action ="#{userController.show()}">
+			<f:ajax execute="@form" render="@form"></f:ajax>
+		</h:commandButton>
+		<h:commandButton value="Hide" action ="#{userController.hide()}">
+			<f:ajax execute="@form" render="@form"></f:ajax>
+		</h:commandButton>
+		<br/>
+		<h:inputText rendered="#{userController.visible}"></h:inputText>
+	</h:form>
+	
+
+	
+	
+</html>

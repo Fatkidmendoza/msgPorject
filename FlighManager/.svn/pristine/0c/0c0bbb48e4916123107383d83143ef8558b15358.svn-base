@@ -1,0 +1,85 @@
+package edu.msg.flightmanager.web.beans;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+
+import edu.msg.flightmanager.backend.dto.AirportDto;
+import edu.msg.flightmanager.backend.model.Airport;
+import edu.msg.flightmanager.backend.service.AirportService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+
+@ManagedBean
+@ViewScoped
+public class AirportsBean implements Serializable {
+
+	private static final long serialVersionUID = -9019271203851116552L;
+
+	@EJB
+	private AirportService airportService;
+	private AirportDto airportToInsert = new AirportDto();
+	private AirportDto airportToUpdate;
+
+	public AirportDto getAirportToUpdate() {
+		return airportToUpdate;
+	}
+
+	public void setAirportToUpdate(AirportDto airportToUpdate) {
+		this.airportToUpdate = airportToUpdate;
+	}
+
+	public List<AirportDto> getAllAirports() {
+		return airportService.getAll();
+	}
+
+	public String addAirport() {
+		try {
+			airportService.insert(airportToInsert);
+			airportToInsert = new AirportDto();
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Insert Successful.",
+					"The airport was inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Insert Failed.",
+					"The airport was not inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "addAirport";
+		}
+		return "addAirport";
+	}
+
+	public AirportDto getAirportToInsert() {
+		return airportToInsert;
+	}
+
+	public void setAirportToInsert(AirportDto airportToInsert) {
+		this.airportToInsert = airportToInsert;
+	}
+
+	public void deleteAirport(Airport airport) {
+
+	}
+
+	public void updateAirport(Airport airport) {
+
+	}
+
+	public void updateAirport() {
+		try {
+			airportService.update(airportToUpdate);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Successful.",
+					"The airport was updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Failed.",
+					"The airport was not updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+	}
+
+}

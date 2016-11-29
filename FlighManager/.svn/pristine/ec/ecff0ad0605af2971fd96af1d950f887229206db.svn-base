@@ -1,0 +1,12 @@
+package edu.msg.flightmanager.backend.repository;
+
+import javax.ejb.Local;
+
+import edu.msg.flightmanager.backend.model.User;
+
+@Local
+public interface UserRepository extends BaseRepository<User, Long> {
+
+	User getByUserName(String userName) throws RepositoryException;
+
+}

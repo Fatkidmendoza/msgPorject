@@ -1,0 +1,57 @@
+package edu.msg.flightmanager.backend.repository.bean;
+
+import javax.ejb.Stateless;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.msg.flightmanager.backend.model.Token;
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.repository.TokenRepository;
+
+@Stateless(name = "TokenRepository", mappedName = "ejb/TokenRepository")
+public class TokenRepositoryBean extends BaseRepositoryBean<Token, Long> implements TokenRepository {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(TokenRepositoryBean.class);
+
+	public TokenRepositoryBean() {
+		super(Token.class);
+	}
+
+	@Override
+	public Token getByValue(String value) throws RepositoryException, NoResultException {
+		try {
+			LOGGER.info("Try to select an token by its value.");
+			TypedQuery<Token> tokens = entityManager.createQuery("SELECT t FROM Token t WHERE t.value= :value",
+					Token.class);
+			tokens.setParameter("value", value);
+			Token token = tokens.getSingleResult();
+			LOGGER.info("Token selection by value successful.");
+			return token;
+		} catch (PersistenceException ex) {
+			LOGGER.error("Token selection by value failed.", ex);
+			throw new RepositoryException("Token selection by value failed.");
+		}
+	}
+
+	@Override
+	public void deleteAllHavingUser(User user) throws RepositoryException {
+		try {
+			LOGGER.info("Try to delete all tokens with an specific user associated.");
+			Query query = entityManager.createQuery("DELETE FROM Token t WHERE t.user.id = :userId");
+			query.setParameter("userId", user.getId());
+			query.executeUpdate();
+			LOGGER.info("Delete all tokens with an given user");
+		} catch (PersistenceException ex) {
+			LOGGER.error("Flight templates that have a given itinerary selection failed.", ex);
+			throw new RepositoryException("Flight templates that have a given itinerary selection failed.");
+		}
+
+	}
+
+}

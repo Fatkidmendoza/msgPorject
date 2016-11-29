@@ -1,0 +1,15 @@
+package edu.msg.flightmanager.backend.repository.bean;
+
+import javax.ejb.Stateless;
+
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.repository.UserRepository;
+
+@Stateless(name = "UserRepository", mappedName = "ejb/UserRepository")
+public class UserRepositoryBean extends BaseRepositoryBean<User, Long> implements UserRepository {
+
+	public UserRepositoryBean() {
+		super(User.class);
+	}
+
+}

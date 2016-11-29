@@ -1,0 +1,5 @@
+Code,Deleted,StartTime,EndTime,NextDay,Periodicity
+ID1,false,10:00,11:00,false,DAILY
+ID3,false,13:00,19:00,false,ONCE
+IW3,false,02:00,true,WEEKLY
+ID2,false,13:00,19:00,false

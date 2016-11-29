@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+	<f:view locale="#{languageBean.currentLocale}"></f:view>
+<h:head>
+	<title>login</title>
+	<!-- Compiled and minified CSS -->
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css" />
+	<!-- Compiled and minified JavaScript -->
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+</h:head>
+<h:body styleClass="blue light">
+
+<div class ="valign-wrapper" >
+	<div class="container">
+		<div class="corner-align">
+			<div class="row">
+				<div class="col s5 offset-s3">
+					<div class="card">
+						<div class="card-content">
+							<img height="65" width="65"
+								src="http://www.kephost.com/images/2016/08/31/globe-airplane.png"
+								alt="globe-airplane.png" border="0" id = "logo-img" />
+								<h:outputLabel for="logo-img" value = "Flight Manager" style="font-size:20; font-weight: bold"/>
+								<div class="left-align">
+								<h:form>
+									<p:growl autoUpdate="true" />
+									<div class="row ">
+										<div class="col s12 input-field">
+											<h:inputText id="username" value="#{loginBean.userDto.userName}" binding="#{userName}"/>
+											
+											<h:outputLabel for="username" value="#{msg['login.username']}" />
+											
+										</div>
+										<div class="col s12 input-field">
+											<h:inputText id="email" value="#{loginBean.userDto.email}" binding="#{email}" />
+											<h:outputLabel for="email" value="#{msg['pers.email']}" />
+										</div>
+										
+										<div class="col s12 input-field">
+											<h:commandButton id="send" styleClass="btn btn-large" value="#{msg['login.sendPass']}" action="#{loginBean.sendEmail(userName.value,email.value)}" />
+										</div>
+									
+									</div>
+								</h:form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</h:body>
+</html>

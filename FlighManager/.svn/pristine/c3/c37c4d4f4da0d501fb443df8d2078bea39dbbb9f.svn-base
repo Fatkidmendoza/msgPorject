@@ -1,0 +1,159 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+	<title>FlightTemplate</title>
+</h:head>
+<ui:composition template="/template/commonLayout.xhtml">
+	<ui:define name="dynamicContent">
+		<h:form id="myId1">
+			<p:growl showDetail="true" />
+			<div class="valign-wrapper" id="FlightTemplates-page"
+				style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="row">
+							<div class="card">
+								<div class="card-content"
+									style="font-family: Helvetica; border: 1px solid black;">
+									<p:dataTable value="#{flightTemplatesBean.allFlightTemplates}"
+										var="flightTemplate" paginator="true"
+										paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+										<f:facet name="header">Flight templates</f:facet>
+
+										<p:column headerText="Departure">
+											<h:outputText value="#{flightTemplate.departure.name}" />
+										</p:column>
+
+										<p:column headerText="Arrival">
+											<h:outputText value="#{flightTemplate.arrival.name}" />
+										</p:column>
+
+										<p:column headerText="Duration">
+											<h:outputText value="#{flightTemplate.itinerary.duration}" />
+										</p:column>
+
+										<p:column headerText="Periodicity">
+											<h:outputText
+												value="#{flightTemplate.itinerary.periodicityName}" />
+										</p:column>
+
+										<p:column headerText="Delete?" style="width:130px">
+											<p:commandButton icon="ui-icon-trash" id="delete"
+												actionListener="#{flightTemplatesBean.deleteFlightTemplate(flightTemplate)}"
+												update="myId1" rendered="#{!flightTemplate.deleted}">
+												<p:confirm header="Confirm delete"
+													message="Are you sure you want to delete this flight template?"
+													icon="ui-icon-alert" />
+											</p:commandButton>
+										</p:column>
+
+										<p:column headerText="Update?" style="width:130px">
+											<p:commandButton update=":myId1:flightTemplateDetail"
+												oncomplete="PF('flightTemplateDialog').show()"
+												icon="ui-icon-pencil" title="View">
+												<f:setPropertyActionListener value="#{flightTemplate}"
+													target="#{flightTemplatesBean.flightTemplateToUpdate}" />
+											</p:commandButton>
+										</p:column>
+
+									</p:dataTable>
+
+									<p:confirmDialog global="true" showEffect="fade"
+										hideEffect="fade">
+										<p:commandButton value="Yes" type="button"
+											styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+										<p:commandButton value="No" type="button"
+											styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+									</p:confirmDialog>
+
+									<p:dialog header="Flight Template Info"
+										widgetVar="flightTemplateDialog" modal="true"
+										showEffect="fade" hideEffect="fade" resizable="false">
+										<p:outputPanel id="flightTemplateDetail"
+											style="text-align:center;">
+											<p:scrollPanel style="height:600px">
+												<p:dataTable id="idDeparture" var="departure"
+													value="#{airportsBean.allAirports}"
+													selection="#{flightTemplatesBean.flightTemplateToUpdate.departure}"
+													rowKey="#{departure.id}" style="margin-bottom:0">
+													<f:facet name="header">Departure</f:facet>
+													<p:column selectionMode="single"
+														style="width:50px;text-align:center" />
+													<p:column headerText="Name">
+														<h:outputText value="#{departure.name}" />
+													</p:column>
+													<p:column headerText="Country">
+														<h:outputText value="#{departure.country}" />
+													</p:column>
+													<p:column headerText="City">
+														<h:outputText value="#{departure.city}" />
+													</p:column>
+													<p:column headerText="Address">
+														<h:outputText value="#{departure.address}" />
+													</p:column>
+												</p:dataTable>
+
+												<p:dataTable id="idArrival" var="arrival"
+													value="#{airportsBean.allAirports}"
+													selection="#{flightTemplatesBean.flightTemplateToUpdate.arrival}"
+													rowKey="#{arrival.id}" style="margin-bottom:0">
+													<f:facet name="header">Arrival</f:facet>
+													<p:column selectionMode="single"
+														style="width:50px;text-align:center" />
+													<p:column headerText="Name">
+														<h:outputText value="#{arrival.name}" />
+													</p:column>
+													<p:column headerText="Country">
+														<h:outputText value="#{arrival.country}" />
+													</p:column>
+													<p:column headerText="City">
+														<h:outputText value="#{arrival.city}" />
+													</p:column>
+													<p:column headerText="Address">
+														<h:outputText value="#{arrival.address}" />
+													</p:column>
+												</p:dataTable>
+
+												<p:dataTable id="idItinerary" var="itinerary"
+													value="#{itinerariesBean.allItineraries}"
+													selection="#{flightTemplatesBean.flightTemplateToUpdate.itinerary}"
+													rowKey="#{itinerary.id}" style="margin-bottom:0">
+													<f:facet name="header">Itinerary</f:facet>
+													<p:column selectionMode="single"
+														style="width:50px;text-align:center" />
+													<p:column headerText="Duration">
+														<h:outputText value="#{itinerary.duration}" />
+													</p:column>
+													<p:column headerText="Periodicity">
+														<h:outputText value="#{itinerary.periodicityName}" />
+													</p:column>
+												</p:dataTable>
+
+												<p:outputLabel for="activateFlightTemplate"
+													value="Deactivated"
+													rendered="#{flightTemplatesBean.flightTemplateToUpdate.deleted}" />
+												<p:selectBooleanCheckbox id="activateFlightTemplate"
+													value="#{flightTemplatesBean.flightTemplateToUpdate.deleted}"
+													rendered="#{flightTemplatesBean.flightTemplateToUpdate.deleted}" />
+
+											</p:scrollPanel>
+											<p:commandButton value="Update" icon="ui-icon-pencil"
+												id="update"
+												actionListener="#{flightTemplatesBean.updateFlightTemplate()}"
+												update="myId1" />
+										</p:outputPanel>
+									</p:dialog>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>

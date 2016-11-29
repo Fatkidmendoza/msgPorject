@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<f:view locale="#{languageBean.currentLocale}"></f:view>
+<h:head>
+	<title>Export data</title>
+</h:head>
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="reports">
+			<p:growl id="messages" showDetail="true" />
+
+			<p:tabView>
+				<p:tab title="Employee">
+					<p:outputLabel
+						value="Get a report of the number of worked hours of all employees between two dates" />
+					<p:panelGrid columns="3">
+						<h:panelGrid columns="2" cellpadding="10">
+							<p:outputLabel for="startDate" value="Choose the start date:" />
+							<p:calendar id="startDate" value="#{reportsBean.startDate}"
+								mode="inline" />
+						</h:panelGrid>
+						<h:panelGrid columns="2" cellpadding="10">
+							<p:outputLabel for="endDate" value="Choose the end date:" />
+							<p:calendar id="endDate" value="#{reportsBean.endDate}"
+								mode="inline" />
+						</h:panelGrid>
+						<p:commandButton update=":reports:hourDetail"
+							oncomplete="PF('hourDialog').show()" value="Generate"
+							title="View" />
+					</p:panelGrid>
+				</p:tab>
+
+			</p:tabView>
+
+			<p:dialog header="Report" id="dialog"
+				widgetVar="hourDialog" modal="true" showEffect="fade"
+				hideEffect="fade" resizable="false">
+				<p:outputPanel id="hourDetail" style="text-align:center;">
+					<p:dataTable value="#{reportsBean.usersHours}" var="entry">
+						<f:facet name="header">
+							<h:outputText value="The number of hours worked by all users between #{reportsBean.formatedStartDate} and #{reportsBean.formatedEndDate} " />
+						</f:facet>
+					
+						<p:column headerText="User name" >
+							<p:outputLabel id="userName" value="#{entry.key.userName}" />
+						</p:column>
+						
+						<p:column headerText="Company name" >
+							<p:outputLabel id="companyName" value="#{entry.key.companyName}"/>
+						</p:column>
+						
+						<p:column headerText="Employee type">
+							<p:outputLabel id="employeeType" value="#{entry.key.type}"/>
+						</p:column>
+						
+						<p:column headerText="Minutes">
+							<p:outputLabel id="minutes" value="#{entry.value}" />
+						</p:column>
+					</p:dataTable>
+				</p:outputPanel>
+			</p:dialog>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+</html>

@@ -1,0 +1,25 @@
+package edu.msg.flightmanager.backend.dto;
+
+import java.time.Duration;
+
+import edu.msg.flightmanager.backend.model.PeriodicityType;
+
+public class ItineraryDto extends EntityDto {
+
+
+	private Duration duration;
+	private PeriodicityType periodicity;
+	public Duration getDuration() {
+		return duration;
+	}
+	public void setDuration(Duration duration) {
+		this.duration = duration;
+	}
+	public PeriodicityType getPeriodicity() {
+		return periodicity;
+	}
+	public void setPeriodicity(PeriodicityType periodicity) {
+		this.periodicity = periodicity;
+	}
+
+}

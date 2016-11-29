@@ -1,0 +1,36 @@
+package edu.msg.flightmanager.beans;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+
+import edu.msg.flightmanager.backend.model.Airport;
+import edu.msg.flightmanager.backend.service.AirportService;
+
+@ManagedBean
+@SessionScoped
+public class AirportsBean implements Serializable {
+
+	private static final long serialVersionUID = -9019271203851116552L;
+
+	private List<Airport> airportList;
+
+	@EJB
+	private AirportService airportService;
+
+	public List<Airport> getAllAirports() {
+		return airportService.getAll();
+	}
+
+	public void deleteAirport(Airport airport) {
+
+	}
+
+	public void updateAirport(Airport airport) {
+
+	}
+
+}

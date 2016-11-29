@@ -1,0 +1,62 @@
+package edu.msg.flightmanager.beans;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.service.UserService;
+
+@ManagedBean
+@SessionScoped
+public class UsersBean implements Serializable {
+
+	private static final long serialVersionUID = 4860933911207569401L;
+
+	private List<UserDto> usersList;
+
+	private User selectedUser;
+
+	@EJB
+	private UserService userService;
+
+	public List<UserDto> getAllUsers() {
+		usersList = userService.getAll();
+		return usersList;
+	}
+
+	public String deleteUser(User user) {
+		usersList.remove(user);
+		return "users";
+	}
+
+	public String enableModifyUser(User user) {
+		setSelectedUser(user);
+		return "users";
+	}
+
+	public String modifyUser() {
+		setSelectedUser(null);
+		return "users";
+	}
+
+	public boolean getShouldShow() {
+		return true;
+	}
+
+	public boolean getShouldShowEditUser() {
+		return selectedUser != null;
+	}
+
+	public User getSelectedUser() {
+		return selectedUser;
+	}
+
+	public void setSelectedUser(User selectedUser) {
+		this.selectedUser = selectedUser;
+	}
+}

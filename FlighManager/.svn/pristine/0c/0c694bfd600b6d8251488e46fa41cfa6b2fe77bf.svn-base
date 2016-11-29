@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<f:view locale="#{languageBean.currentLocale}"></f:view>
+<h:head>
+	<title>Flight History</title>
+</h:head>
+
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="historyForm">
+			<p:growl id="growl" showDetail="true" />
+			<div class="valign-wrapper" id="Flights-page" style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="row">
+							<div class="card">
+								<div class="card-content"
+									style="font-family: Helvetica; border: 1px solid black;">
+
+									<p:dataTable value="#{timerBean.flightsHistory}" var="flight">
+										<f:facet name="header">Flight history</f:facet>
+
+										<p:column headerText="Date">
+											<h:outputText value="#{flight.date}">
+												<f:convertDateTime pattern="d-M-yyyy" />
+											</h:outputText>
+										</p:column>
+
+										<p:column headerText="Company">
+											<h:outputText value="#{flight.plane.companyName}" />
+										</p:column>
+
+										<p:column headerText="Details" style="width:130px">
+											<p:commandButton update=":historyForm:historyDetail"
+												oncomplete="PF('historyDialog').show()" title="Flight info">
+												<f:setPropertyActionListener value="#{flight}"
+													target="#{timerBean.flightToView}" />
+											</p:commandButton>
+										</p:column>
+
+									</p:dataTable>
+
+									<p:dialog header="Flight Info" widgetVar="historyDialog"
+										modal="true" showEffect="fade" hideEffect="fade"
+										resizable="false" width="50%">
+										<p:outputPanel id="historyDetail" style="text-align:center;">
+											<p:panelGrid columns="2"
+												rendered="#{not empty timerBean.flightToView}"
+												columnClasses="label,value">
+												<p:outputLabel for="date" value="Date" />
+												<h:outputText id="date"
+													value="#{timerBean.flightToView.date}">
+													<f:convertDateTime pattern="d-M-yyyy" />
+												</h:outputText>
+
+												<p:outputLabel for="startTime" value="Start time" />
+												<h:outputText id="startTime"
+													value="#{timerBean.flightToView.template.itinerary.startTime}">
+													<f:converter converterId="timeConvertor" />
+												</h:outputText>
+
+												<p:outputLabel for="endTime" value="End time" />
+												<h:outputText id="endTime"
+													value="#{timerBean.flightToView.template.itinerary.endTime}">
+													<f:converter converterId="timeConvertor" />
+												</h:outputText>
+
+												<p:outputLabel for="companyMenu" value="Company" />
+												<h:outputText id="companyMenu"
+													value="#{timerBean.flightToView.plane.companyName}">
+
+												</h:outputText>
+
+												<p:outputLabel for="departureMenu" value="Departure" />
+												<h:outputText id="departureMenu"
+													value="#{timerBean.flightToView.template.departure.name}" />
+
+												<p:outputLabel for="arrivalMenu" value="Arrival" />
+												<h:outputText id="arrivalMenu"
+													value="#{timerBean.flightToView.template.arrival.name}" />
+
+											</p:panelGrid>
+
+											<p:dataTable value="#{timerBean.flightToView.aircrewUsers}"
+												var="employee" rows="5" paginator="true"
+												paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+												<f:facet name="header">
+													<h:outputText value="Aircrew"></h:outputText>
+												</f:facet>
+
+												<p:column headerText="#{msg['pers.firstName']}">
+													<h:outputText value="#{employee.firstName}" />
+												</p:column>
+
+												<p:column headerText="#{msg['pers.lastName']}">
+													<h:outputText value="#{employee.lastName}" />
+												</p:column>
+
+												<p:column headerText="#{msg['pers.role']}">
+													<h:outputText value="#{employee.type}" />
+												</p:column>
+
+											</p:dataTable>
+										</p:outputPanel>
+									</p:dialog>
+
+								</div>
+								<br />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+</html>

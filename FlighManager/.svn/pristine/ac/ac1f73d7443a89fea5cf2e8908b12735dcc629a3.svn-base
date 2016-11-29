@@ -1,0 +1,134 @@
+package edu.msg.flightmanager.web.beans;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+
+import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+
+import edu.msg.flightmanager.backend.dto.FlightTemplateDto;
+import edu.msg.flightmanager.backend.service.FlightTemplateService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+
+@ManagedBean
+@ViewScoped
+public class FlightTemplatesBean implements Serializable {
+
+	private static final long serialVersionUID = 9048236267728877625L;
+
+	@EJB
+	private FlightTemplateService flightTemplateService;
+
+	private FlightTemplateDto flightTemplateToInsert = new FlightTemplateDto();
+	private FlightTemplateDto flightTemplateToUpdate = new FlightTemplateDto();
+
+	private List<FlightTemplateDto> filteredFlightTemplates;
+
+	public List<FlightTemplateDto> getAllFlightTemplates() {
+		return flightTemplateService.getAll();
+	}
+
+	public List<FlightTemplateDto> getFilteredFlightTemplates() {
+		return filteredFlightTemplates;
+	}
+
+	public void setFilteredFlightTemplates(List<FlightTemplateDto> filteredFlightTemplates) {
+		this.filteredFlightTemplates = filteredFlightTemplates;
+	}
+
+	public void deleteFlightTemplate(FlightTemplateDto flightTemplateDto) {
+		try {
+			flightTemplateService.delete(flightTemplateDto);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Delete Successful.",
+					"The flight template was deleted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Delete Failed.",
+					"The flight template was not deleted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+	}
+
+	public void updateFlightTemplate() {
+		try {
+			flightTemplateService.update(flightTemplateToUpdate);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Successful.",
+					"The flight template was updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Failed.",
+					"The flight template was not updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+	}
+
+	public String addFlightTemplate() {
+		try {
+			flightTemplateService.insert(flightTemplateToInsert);
+			flightTemplateToInsert = new FlightTemplateDto();
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Insert Successful.",
+					"The flight template was inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Insert Failed.",
+					"The flight template was not inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "addFlightTemplate";
+		}
+		return "addFlightTemplate";
+	}
+
+	public FlightTemplateDto getFlightTemplateToInsert() {
+		return flightTemplateToInsert;
+	}
+
+	public void setFlightTemplateToInsert(FlightTemplateDto flightTemplateToInsert) {
+		this.flightTemplateToInsert = flightTemplateToInsert;
+	}
+
+	public FlightTemplateDto getFlightTemplateToUpdate() {
+		return flightTemplateToUpdate;
+	}
+
+	public void setFlightTemplateToUpdate(FlightTemplateDto flightTemplateToUpdate) {
+		this.flightTemplateToUpdate = flightTemplateToUpdate;
+	}
+
+	public Long computeDuration(FlightTemplateDto currentFlightTemplate) {
+		Date flightDate = currentFlightTemplate.getAvailableFrom();
+		LocalDate startLocalDate = new java.sql.Date(flightDate.getTime()).toLocalDate();
+		@SuppressWarnings("deprecation")
+		LocalTime startLocalTime = LocalTime.of(currentFlightTemplate.getItinerary().getStartTime().getHours(),
+				currentFlightTemplate.getItinerary().getStartTime().getMinutes());
+		LocalDateTime startDateTime = LocalDateTime.of(startLocalDate, startLocalTime);
+		ZonedDateTime startZonedDate = ZonedDateTime.of(startDateTime,
+				TimeZone.getTimeZone(currentFlightTemplate.getDeparture().getTimezone()).toZoneId());
+
+		LocalDate endLocalDate = new java.sql.Date(flightDate.getTime()).toLocalDate();
+		if (currentFlightTemplate.getItinerary().isNextDay()) {
+			endLocalDate = endLocalDate.plus(1, ChronoUnit.DAYS);
+		}
+		@SuppressWarnings("deprecation")
+		LocalTime endLocalTime = LocalTime.of(currentFlightTemplate.getItinerary().getEndTime().getHours(),
+				currentFlightTemplate.getItinerary().getEndTime().getMinutes());
+		LocalDateTime endDateTime = LocalDateTime.of(endLocalDate, endLocalTime);
+		ZonedDateTime endZonedDate = ZonedDateTime.of(endDateTime,
+				TimeZone.getTimeZone(currentFlightTemplate.getArrival().getTimezone()).toZoneId());
+		// convert to the zone of the departure
+		ZonedDateTime convertZone = endZonedDate.withZoneSameInstant(
+				TimeZone.getTimeZone(currentFlightTemplate.getDeparture().getTimezone()).toZoneId());
+
+		Long duration = ChronoUnit.MINUTES.between(startZonedDate, convertZone);
+		return duration;
+	}
+}

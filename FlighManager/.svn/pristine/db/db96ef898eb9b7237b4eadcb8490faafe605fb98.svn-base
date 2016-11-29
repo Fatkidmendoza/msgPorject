@@ -1,0 +1,164 @@
+package edu.msg.flightmanager.beans;
+
+import java.io.Serializable;
+import java.util.Properties;
+
+import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpSession;
+import javax.validation.ValidationException;
+
+import org.apache.commons.lang.RandomStringUtils;
+
+import edu.msg.flightmanager.backend.assembler.UserAssembler;
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.service.AuthenticationService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.service.UserService;
+
+@ManagedBean
+@SessionScoped
+public class LoginBean implements Serializable {
+
+	private static final long serialVersionUID = 6104922328402104850L;
+
+	private UserDto userDto = new UserDto();
+
+	@EJB
+	private UserService userService;
+
+	@EJB
+	private AuthenticationService authenticationService;
+
+	public String processLogin() {
+		try {
+			userDto = authenticationService.login(userDto.getUserName(), userDto.getPassword());
+			handleLoginSuccess();
+
+			HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext()
+					.getSession(false);
+			session.setAttribute("user", userDto);
+			return "loginSuccess";
+		} catch (ServiceException e) {
+			handleLoginFailed();
+			return "loginFailed";
+		}
+
+	}
+
+	public void handleLoginFailed() {
+		FacesContext.getCurrentInstance().addMessage(null,
+				new FacesMessage(FacesMessage.SEVERITY_ERROR, "Wrong username or password", "Login failed"));
+
+	}
+
+	public void handleLoginSuccess() {
+		FacesContext.getCurrentInstance().addMessage(null,
+				new FacesMessage(FacesMessage.SEVERITY_INFO, "Login sucess", "Ok"));
+		HttpSession session = getSession();
+		session.setAttribute("username", userDto);
+
+	}
+
+	public String back() {
+		System.out.println("fdsa");
+		return "home";
+	}
+
+	public String logout() {
+		HttpSession session = getSession();
+		session.invalidate();
+		return "login";
+	}
+
+	public String logoutXHTML() {
+		HttpSession session = getSession();
+		session.invalidate();
+		return "login.xhtml";
+	}
+
+	private HttpSession getSession() {
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+		return session;
+	}
+
+	public UserDto getUserDto() {
+		return userDto;
+	}
+
+	public void setUserDto(UserDto userDto) {
+		this.userDto = userDto;
+	}
+
+	public String forgotPasswordMethod() {
+		return "forgotPassword";
+	}
+
+	public String sendEmail(String userName, String email) {
+
+		Properties props = System.getProperties();
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.smtp.host", "smtp.gmail.com");
+		props.put("mail.smtp.port", "587");
+
+		Session session = Session.getInstance(props, new Authenticator() {
+
+			@Override
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication("flightmanager2016", "testflight");
+			}
+		});
+		try {
+			User tempUser = userService.getByUserName(userName); // change to
+																	// userDto
+			if (tempUser.getEmail().equals(email)) {
+				Message message = new MimeMessage(session);
+				message.setFrom(new InternetAddress("flightmanager2016@gmail.com"));
+				message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
+				message.setSubject("Password change request");
+				String randomPassword = getRandomPassword();
+				message.setText("Dear " + userName + ", \n\n Your new password is: " + randomPassword
+						+ "\n\n Please change it ate the first log in. \n\n ");
+				Transport transport = session.getTransport("smtp");
+				transport.connect("smtp.gmail.com", "flightmanager2016", "testflight");
+				transport.sendMessage(message, message.getAllRecipients());
+				transport.close();
+				tempUser.setPassword(randomPassword);
+				userService.update(UserAssembler.modelToDto(tempUser));
+			} else {
+				throw new ValidationException("Wrong username and email combination");
+			}
+		} catch (
+
+		ServiceException e) {
+			e.printStackTrace();
+		} catch (AddressException e) {
+			e.printStackTrace();
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
+		return "login";
+	}
+
+	private String getRandomPassword() {
+		StringBuilder randomPassword = new StringBuilder("");
+		randomPassword.append(RandomStringUtils.randomAlphanumeric(20));
+		return randomPassword.toString();
+
+	}
+
+}

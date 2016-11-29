@@ -1,0 +1,256 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+
+import edu.msg.flightmanager.backend.assembler.PlaneAssembler;
+import edu.msg.flightmanager.backend.dto.PlaneDto;
+import edu.msg.flightmanager.backend.exception.CsvException;
+import edu.msg.flightmanager.backend.model.Company;
+import edu.msg.flightmanager.backend.model.Flight;
+import edu.msg.flightmanager.backend.model.Plane;
+import edu.msg.flightmanager.backend.model.PlaneMake;
+import edu.msg.flightmanager.backend.model.PlaneType;
+import edu.msg.flightmanager.backend.repository.CompanyRepository;
+import edu.msg.flightmanager.backend.repository.FlightRepository;
+import edu.msg.flightmanager.backend.repository.PlaneRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.service.PlaneService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.util.CsvFileReader;
+import edu.msg.flightmanager.backend.util.CsvFileWriter;
+import edu.msg.flightmanager.backend.util.PlaneValidator;
+import edu.msg.flightmanager.backend.util.ValidationException;
+
+@Stateless(name = "PlaneService", mappedName = "ej/PlaneService")
+public class PlaneServiceBean implements PlaneService {
+
+	@EJB
+	private PlaneRepository planeRepository;
+
+	@EJB
+	private CompanyRepository companyRepository;
+
+	@EJB
+	private FlightRepository flightRepository;
+
+	@Override
+	public List<PlaneDto> getAll() throws ServiceException {
+		try {
+			List<PlaneDto> planesDto = new ArrayList<PlaneDto>();
+			for (Plane plane : planeRepository.getAll()) {
+				planesDto.add(PlaneAssembler.modelToDto(plane));
+			}
+			return planesDto;
+		} catch (RepositoryException e) {
+			throw new ServiceException("The planes selection failed");
+		}
+	}
+
+	@Override
+	public PlaneDto update(PlaneDto planeDto) throws ServiceException {
+		Plane plane = PlaneAssembler.dtoToModel(planeDto);
+		if (plane.getCode().equals("")) {
+			throw new ServiceException("Code can not be empty");
+		}
+		try {
+			Company company = companyRepository.getByName(planeDto.getCompanyName());
+			plane.setCompany(company);
+			PlaneValidator.validatePlane(plane);
+			planeRepository.update(plane);
+			return PlaneAssembler.modelToDto(plane);
+		} catch (ValidationException e) {
+			throw new ServiceException(e.getMessage());
+		} catch (RepositoryException e) {
+			throw new ServiceException("Plane update failed");
+		}
+	}
+
+	@Override
+	public PlaneDto insert(PlaneDto planeDto) throws ServiceException {
+		Plane plane = PlaneAssembler.dtoToModel(planeDto);
+		if (plane.getCode().equals("")) {
+			throw new ServiceException("Code can not be empty");
+		}
+		try {
+			Company company = companyRepository.getByName(planeDto.getCompanyName());
+			plane.setCompany(company);
+			PlaneValidator.validatePlane(plane);
+			plane = planeRepository.insert(plane);
+			PlaneDto insertedPlane = PlaneAssembler.modelToDto(plane);
+			return insertedPlane;
+		} catch (ValidationException e) {
+			throw new ServiceException(e.getMessage());
+		} catch (RepositoryException e) {
+			throw new ServiceException("Plane insertion failed.");
+		}
+	}
+
+	@Override
+	public void delete(PlaneDto planeDto) throws ServiceException {
+		Plane plane = PlaneAssembler.dtoToModel(planeDto);
+		try {
+			// get the company by name so that the reference to company is
+			// managed
+			Company company = companyRepository.getByName(planeDto.getCompanyName());
+			plane.setCompany(company);
+			List<Flight> flights = flightRepository.getFlightsThatHaveAPlane(plane);
+			boolean futureFlightsForThisPlaneExist = false;
+			for (Flight flight : flights) {
+				if (flight.getDate().compareTo(new Date()) > 0) {
+					futureFlightsForThisPlaneExist = true;
+				}
+			}
+			if (futureFlightsForThisPlaneExist) {
+				throw new ServiceException(
+						"The plane can not be deleted because there are future flights that use it.");
+			} else {
+				planeRepository.delete(plane);
+			}
+		} catch (RepositoryException e) {
+			throw new ServiceException("Plane deletion failed.");
+		}
+	}
+
+	@Override
+	public void activate(PlaneDto planeDto) throws ServiceException {
+		Plane plane = PlaneAssembler.dtoToModel(planeDto);
+		try {
+			// get the company by name so that the reference to company is
+			// managed
+			Company company = companyRepository.getByName(planeDto.getCompanyName());
+			plane.setCompany(company);
+			planeRepository.activate(plane);
+		} catch (RepositoryException e) {
+			throw new ServiceException("Plane activation failed.");
+		}
+	}
+
+	@Override
+	public List<String> getAllTypes() {
+		List<String> types = new ArrayList<>();
+		for (int i = 0; i < PlaneType.values().length; i++) {
+			types.add(PlaneType.values()[i].toString());
+		}
+		return types;
+	}
+
+	@Override
+	public List<PlaneDto> getByCompany(String companyName) throws ServiceException {
+		try {
+			List<PlaneDto> planesDto = new ArrayList<PlaneDto>();
+			for (Plane plane : planeRepository.getByCompany(companyName)) {
+				planesDto.add(PlaneAssembler.modelToDto(plane));
+			}
+			return planesDto;
+		} catch (RepositoryException e) {
+			throw new ServiceException("The plane selection by company failed");
+		}
+	}
+
+	@Override
+	public List<String> getAllMakes() {
+		List<String> makes = new ArrayList<>();
+		for (int i = 0; i < PlaneMake.values().length; i++) {
+			makes.add(PlaneMake.values()[i].toString());
+		}
+		return makes;
+	}
+
+	@Override
+	public File getCsvFileWithPlanes(String companyName) throws ServiceException {
+		List<Plane> planes;
+		try {
+			planes = planeRepository.getByCompany(companyName);
+		} catch (RepositoryException e) {
+			throw new ServiceException(e.getMessage());
+		}
+		List<List<String>> planesAsListsOfStrings = new ArrayList<>();
+		for (Plane plane : planes) {
+			List<String> planeAsString = new ArrayList<>();
+			planeAsString.add(plane.getCode());
+			planeAsString.add(String.valueOf(plane.isDeleted()));
+			planeAsString.add(plane.getMake().toString());
+			planeAsString.add(plane.getType().toString());
+			planeAsString.add(String.valueOf(plane.getNumberOfPlaces()));
+			planeAsString.add(plane.getCompany().getName());
+
+			planesAsListsOfStrings.add(planeAsString);
+		}
+		String fileHeader = "Code,Deleted,Make,Type,NumberOfPlaces,CompanyName";
+
+		File csvFile = new File("planes.csv");
+		try {
+			FileWriter fileWriter = new FileWriter(csvFile);
+			CsvFileWriter.writeCsvFile(fileWriter, fileHeader, planesAsListsOfStrings);
+			return csvFile;
+		} catch (IOException e) {
+			throw new ServiceException(e.getMessage());
+		}
+
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.NEVER)
+	public Map<String, Integer> readFromCsvFile(InputStream inputStream) {
+		List<List<String>> entities;
+		try {
+			entities = CsvFileReader.readCsvFile(inputStream);
+		} catch (CsvException e) {
+			Map<String, Integer> numberOfInserts = new HashMap<>();
+			numberOfInserts.put("successful", 0);
+			numberOfInserts.put("unsuccessful", 0);
+			return numberOfInserts;
+		}
+		// read the header
+		List<String> header = entities.get(0);
+		// get the position of the fields from the header
+		Map<String, Integer> positionOfFields = new HashMap<>();
+		for (int i = 0; i < header.size(); i++) {
+			positionOfFields.put(header.get(i), i);
+		}
+
+		// read the entities, which start from position 1
+		Integer numberOfSuccessfulInserts = 0;
+		Integer numberOfUnsuccessfulInserts = 0;
+		for (int i = 1; i < entities.size(); i++) {
+			List<String> entity = entities.get(i);
+			try {
+				String companyName = entity.get(positionOfFields.get("CompanyName"));
+				Company company = companyRepository.getByName(companyName);
+
+				Plane plane = new Plane();
+				plane.setCode(entity.get(positionOfFields.get("Code")));
+				plane.setDeleted(Boolean.valueOf(entity.get(positionOfFields.get("Deleted"))));
+				plane.setMake(PlaneMake.valueOf(entity.get(positionOfFields.get("Make"))));
+				plane.setType(PlaneType.valueOf(entity.get(positionOfFields.get("Type"))));
+				plane.setNumberOfPlaces(Integer.valueOf(entity.get(positionOfFields.get("NumberOfPlaces"))));
+				plane.setCompany(company);
+				planeRepository.insert(plane);
+
+				numberOfSuccessfulInserts++;
+			} catch (RepositoryException | NullPointerException | IndexOutOfBoundsException
+					| IllegalArgumentException e) {
+				numberOfUnsuccessfulInserts++;
+			}
+		}
+
+		Map<String, Integer> numberOfInserts = new HashMap<>();
+		numberOfInserts.put("successful", numberOfSuccessfulInserts);
+		numberOfInserts.put("unsuccessful", numberOfUnsuccessfulInserts);
+		return numberOfInserts;
+	}
+
+}

@@ -1,0 +1,149 @@
+package edu.msg.flightmanager.beans;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpSession;
+import javax.xml.bind.ValidationException;
+
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.service.UserService;
+
+@ManagedBean
+@SessionScoped // DON'T CHANGE!! :)))
+public class UsersBean implements Serializable {
+
+	private static final long serialVersionUID = 4860933911207569401L;
+
+	private boolean editable;
+
+	private boolean editPassword = false;
+
+	@EJB
+	private UserService userService;
+	private UserDto userDto = userInSession();
+
+	private UserDto userToInsert = new UserDto();
+
+	public String enableEdit() {
+		setEditable(true);
+		return "details";
+
+	}
+
+	public String executeUpdate(String firstName, String lastName, String email, String phoneNumber, String userName,
+			String oldPassword, String newPassword, String confirmPassword) throws ValidationException {
+		userDto.setFirstName(firstName);
+		userDto.setLastName(lastName);
+		userDto.setEmail(email);
+		userDto.setPhoneNumber(phoneNumber);
+		userDto.setUserName(userName);
+		userDto.setPassword(null);
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+
+		if (editPassword) {
+			if (!oldPassword.equals(userDto.getPassword())) {
+
+			}
+			if (!newPassword.equals(confirmPassword)) {
+				System.out.println(newPassword + " " + confirmPassword);
+			}
+			userDto.setPassword(newPassword);
+		}
+
+		session.setAttribute("user", userDto);
+		try {
+			userService.update(userDto);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Successful.",
+					"The data was updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Failed.",
+					"The data is not valid.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "details";
+		}
+		setEditPassword(false);
+		setEditable(false);
+		return "details";
+	}
+
+	public String addUser() {
+		try {
+			userService.insert(userToInsert);
+			userToInsert = new UserDto();
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Insert Successful.",
+					"The user was inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e){
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Insert Failed.",
+					"The user was not inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "addUser";
+		}
+		return "addUser";
+	}
+
+	public UserDto getUserToInsert() {
+		return userToInsert;
+	}
+
+	public void setUserToInsert(UserDto userToInsert) {
+		this.userToInsert = userToInsert;
+	}
+
+	public List<String> getAllTypes() {
+		return userService.getAllTypes();
+	}
+
+	public String disableEdit() {
+		setEditPassword(false);
+		setEditable(false);
+		return "details";
+	}
+
+	public List<UserDto> getAllUsers() {
+		return userService.getAll();
+	}
+
+	public boolean getUserIsEditable() {
+		return isEditable();
+	}
+
+	public static UserDto userInSession() {
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+		return (UserDto) session.getAttribute("user");
+
+	}
+
+	public UserDto getUserInSession() {
+		return userInSession();
+	}
+
+	public boolean isEditable() {
+		return editable;
+	}
+
+	public void setEditable(boolean edit) {
+		this.editable = edit;
+	}
+
+	public boolean isEditPassword() {
+		return editPassword;
+	}
+
+	public void setEditPassword(boolean editPassword) {
+		this.editPassword = editPassword;
+	}
+
+	public void changeVisibilityOfPassword() {
+		editPassword = !editPassword;
+	}
+
+}

@@ -1,0 +1,29 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import edu.msg.flightmanager.backend.model.Airport;
+import edu.msg.flightmanager.backend.repository.AirportRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.service.AirportService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+
+@Stateless(name = "AirportService", mappedName = "ejb/AirportService")
+public class AirportServiceBean implements AirportService {
+
+	@EJB
+	private AirportRepository airportRepository;
+
+	@Override
+	public List<Airport> getAll() throws ServiceException {
+		try {
+			return airportRepository.getAll();
+		} catch (RepositoryException e) {
+			throw new ServiceException("The airports selection failed", e);
+		}
+	}
+
+}

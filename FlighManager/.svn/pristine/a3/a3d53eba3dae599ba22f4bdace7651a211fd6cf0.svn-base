@@ -1,0 +1,89 @@
+login.username = Benutzername
+login.password = Passwort
+login.loginButton = Einloggen
+login.forgotPassword = Passwort vorgessen
+login.sendPass = Passwort senden
+
+home.flights = Flüge
+home.flightTemplates = Flug-Vorlage
+home.itineraries = Routen
+home.planes = Flugzeuge
+home.airports = Flughafen
+home.companies = Firmen
+home.personalData = Perosonenbezogen Daten
+home.manageData = Verwalten von Daten
+home.history = Historie
+home.users = Benutzer
+home.newEmployee = Neue Mitarbeiter
+home.employees = Employees
+
+pers.edit = Bearbeiten 
+pers.back = Zurück
+pers.save = Speichern
+pers.cancel = Beenden
+pers.firstName = Vorname
+pers.lastName = Familienname
+pers.email = Email
+pers.phone = Telefon
+pers.role = Role
+pers.yourPass = Ihre Passwort
+pers.newPass = Neues Passwort
+pers.confirmPass = Bestätigen Passwort
+pers.info = Persönliche Informationen
+pers.activate = Aktivieren
+
+users.addEmployee = Add Employee
+
+flights.date = Datum
+flights.company = Firma
+flights.departure = Abreise
+flights.arrival = Anreise
+
+general.delete = Löschen
+general.update = Aktualisieren
+general.logout = Ausloggen
+general.operations = Operationen
+general.view = Aussicht
+general.confirmDelete = Löschen bestätigen
+general.sureDeleteAi = Sind  Sie sicher, dass Sie diesen Flughafen löschen wollen?
+general.sureDeleteIt = Are you sure you want to delete this itinerary? 
+general.sureDeletePl = Are you sure you want to delete this plane? 
+general.yes = Ja
+general.no = Nein
+general.deactivates = Deaktiviert
+
+
+flightTemplate.duration = Dauer
+flightTemplate.itinerary = Itinerary 
+flightTemplate.info = Flight Template Information
+
+itineraries.periodicity = Periodizität
+itineraries.startTime = Start Time !!!
+itineraries.endTime = End TIme
+itineraries.startDate = Start Date
+itineraries.endDate = End Date
+itineraries.nextDay = Next Day
+itineraries.info = Itineraries information
+itineraries.add = Add itinerary !!!
+
+planes.compName = Name der Firma
+planes.nrOfPlaces = Anzahln der Plätze
+planes.type = Typ
+planes.addPlane = Add Plane  !!!
+planes.info = Plane Information !!!
+
+airport.name = Name
+airport.country = Land
+airport.city = Stadt
+airport.address = Adresse
+airport.info = Flughafen info
+airport.code = Schlüsselwort
+
+companies.companyDetails = Firmadaten
+companies.info = Firmeninfo
+
+manage.import = Importieren
+manage.export = Exportieren
+
+
+

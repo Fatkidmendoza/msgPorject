@@ -1,0 +1,26 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.repository.UserRepository;
+import edu.msg.flightmanager.backend.service.AuthenticationService;
+
+@Stateless(name = "AuthenticationService", mappedName = "ejb/AuthenticationService")
+public class AuthenticationServiceBean implements AuthenticationService {
+
+	@EJB
+	private UserRepository userRepository;
+
+	@Override
+	public boolean login(String userName, String password) {
+		User tempUser = userRepository.getByUserName(userName);
+		if (tempUser != null) {
+			if (tempUser.getPassword().equals(password)) {
+				return true;
+			}
+		}
+		return false;
+	}
+}

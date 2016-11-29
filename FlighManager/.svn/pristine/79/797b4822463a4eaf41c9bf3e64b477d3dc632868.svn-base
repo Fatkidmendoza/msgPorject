@@ -1,0 +1,36 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import edu.msg.flightmanager.backend.assembler.FlightTemplateAssembler;
+import edu.msg.flightmanager.backend.dto.FlightTemplateDto;
+import edu.msg.flightmanager.backend.model.FlightTemplate;
+import edu.msg.flightmanager.backend.repository.FlightTemplateRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.service.FlightTemplateService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+
+@Stateless(name = "FlightTemplateService", mappedName = "ejb/FlightTemplateService")
+public class FlightTemplateServiceBean implements FlightTemplateService {
+
+	@EJB
+	private FlightTemplateRepository flightTemplateRepository;
+
+	@Override
+	public List<FlightTemplateDto> getAll() throws ServiceException {
+		try {
+			List<FlightTemplateDto> templates = new ArrayList<FlightTemplateDto>();
+			for (FlightTemplate flightTemplate : flightTemplateRepository.getAll()) {
+				templates.add(FlightTemplateAssembler.modelToDto(flightTemplate));
+			}
+			return templates;
+		} catch (RepositoryException e) {
+			throw new ServiceException("The flight templates selection failed", e);
+		}
+	}
+
+}

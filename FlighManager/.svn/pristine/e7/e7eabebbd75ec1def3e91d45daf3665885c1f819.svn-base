@@ -1,0 +1,172 @@
+package edu.msg.flightmanager.beans;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpSession;
+import javax.xml.bind.ValidationException;
+
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.service.UserService;
+
+@ManagedBean
+@SessionScoped // DON'T CHANGE!! :)))
+public class UsersBean implements Serializable {
+
+	private static final long serialVersionUID = 4860933911207569401L;
+
+	private boolean editable;
+
+	private boolean editPassword = false;
+
+	@EJB
+	private UserService userService;
+	private UserDto userDto = userInSession();
+
+	private UserDto userToInsert = new UserDto();
+	private UserDto userToUpdate;
+
+	public UserDto getUserToUpdate() {
+		return userToUpdate;
+	}
+
+	public void setUserToUpdate(UserDto userToUpdate) {
+		this.userToUpdate = userToUpdate;
+	}
+
+	public void enableEdit() {
+		setEditable(true);
+
+	}
+
+	public void executeUpdate(String firstName, String lastName, String email, String phoneNumber, String userName,
+			String oldPassword, String newPassword, String confirmPassword) throws ValidationException {
+		userDto.setFirstName(firstName);
+		userDto.setLastName(lastName);
+		userDto.setEmail(email);
+		userDto.setPhoneNumber(phoneNumber);
+		userDto.setUserName(userName);
+		userDto.setPassword(null);
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+
+		if (editPassword) {
+			if (!oldPassword.equals(userDto.getPassword())) {
+				FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Wrong password",
+						"The data is not valid.");
+				FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			} else if (!newPassword.equals(confirmPassword)) {
+				FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "The passwords must match",
+						"The data is not valid.");
+				FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			} else {
+				userDto.setPassword(newPassword);
+			}
+		}
+
+		session.setAttribute("user", userDto);
+		try {
+			userService.update(userDto);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Successful.",
+					"The data was updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Failed.",
+					"The data is not valid.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+		setEditPassword(false);
+		setEditable(false);
+	}
+
+	public String addUser() {
+		try {
+			userService.insert(userToInsert);
+			userToInsert = new UserDto();
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Insert Successful.",
+					"The user was inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Insert Failed.",
+					"The user was not inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "addUser";
+		}
+		return "addUser";
+	}
+
+	public UserDto getUserToInsert() {
+		return userToInsert;
+	}
+
+	public void setUserToInsert(UserDto userToInsert) {
+		this.userToInsert = userToInsert;
+	}
+
+	public List<String> getAllTypes() {
+		return userService.getAllTypes();
+	}
+
+	public void updateUser() {
+		try {
+			userService.update(userToUpdate);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Successful.",
+					"The user was updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Failed.",
+					"The user was not updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+	}
+
+	public void disableEdit() {
+		setEditPassword(false);
+		setEditable(false);
+
+	}
+
+	public List<UserDto> getAllUsers() {
+		return userService.getAll();
+	}
+
+	public boolean getUserIsEditable() {
+		return isEditable();
+	}
+
+	public static UserDto userInSession() {
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+		return (UserDto) session.getAttribute("user");
+
+	}
+
+	public UserDto getUserInSession() {
+		return userInSession();
+	}
+
+	public boolean isEditable() {
+		return editable;
+	}
+
+	public void setEditable(boolean edit) {
+		this.editable = edit;
+	}
+
+	public boolean isEditPassword() {
+		return editPassword;
+	}
+
+	public void setEditPassword(boolean editPassword) {
+		this.editPassword = editPassword;
+	}
+
+	public void changeVisibilityOfPassword() {
+		editPassword = !editPassword;
+	}
+
+}

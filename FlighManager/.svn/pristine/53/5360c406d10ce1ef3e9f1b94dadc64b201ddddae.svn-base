@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<h:head>
+	<title>Add Itinerary</title>
+</h:head>
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="addItineraryForm">^
+		<p:growl showDetail="true" />
+			<div class="valign-wrapper" id="companies-page"
+				style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="ui-fluid">
+							<p:panelGrid columns="2" cellpadding="5">
+
+								<p:outputLabel for="duration" value="Duration" />
+								<p:panelGrid columns="4" id="duration">
+									<p:outputLabel for="hours" value="Hours" />
+									<p:spinner id="hours" min="0" onkeypress="return false" value="#{itinerariesBean.hours}" />
+									<p:outputLabel for="minutes" value="Minutes" />
+									<p:spinner id="minutes" min="0" onkeypress="return false" value="#{itinerariesBean.minutes}" />
+
+								</p:panelGrid>
+								<p:outputLabel for="periodicityMenu" value="Periodicity" />
+								<p:selectOneMenu id="periodicityMenu"
+									value="#{itinerariesBean.itineraryToInsert.periodicityName}">
+									<f:selectItems value="#{itinerariesBean.periodicityTypes}"
+										var="type" itemValue="#{type}" itemLabel="#{type}" />
+								</p:selectOneMenu>
+
+							</p:panelGrid>
+
+							<p:commandButton value="Save" icon="ui-icon-disk" id="save"
+								actionListener="#{itinerariesBean.addItinerary()}"
+								update="addItineraryForm" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+
+</html>

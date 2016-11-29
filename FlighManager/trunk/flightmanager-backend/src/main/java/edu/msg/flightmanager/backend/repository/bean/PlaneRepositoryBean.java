@@ -1,0 +1,74 @@
+package edu.msg.flightmanager.backend.repository.bean;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.ejb.Stateless;
+import javax.persistence.PersistenceException;
+import javax.persistence.TypedQuery;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.msg.flightmanager.backend.model.Plane;
+import edu.msg.flightmanager.backend.repository.PlaneRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+
+@Stateless(name = "PlaneRepository", mappedName = "ejb/PlaneRepository")
+public class PlaneRepositoryBean extends BaseRepositoryBean<Plane, Long> implements PlaneRepository {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(PlaneRepositoryBean.class);
+
+	public PlaneRepositoryBean() {
+		super(Plane.class);
+	}
+
+	@Override
+	public List<Plane> getByCompany(String companyName) throws RepositoryException {
+		try {
+			LOGGER.info("Try to select a plane by its company");
+			TypedQuery<Plane> planes = entityManager
+					.createQuery("SELECT p FROM Plane p WHERE p.company.name= :companyName", Plane.class);
+			planes.setParameter("companyName", companyName);
+			LOGGER.info("Planes selection by company successful.");
+			return planes.getResultList();
+		} catch (PersistenceException e) {
+			LOGGER.error("Planes selection by company failed.", e);
+			throw new RepositoryException("Planes selection by company failed.");
+		}
+	}
+
+	@Override
+	public Plane getPlaneThatHasACode(String code) throws RepositoryException {
+		try {
+			LOGGER.info("Try to select the plane that has the given code.");
+			TypedQuery<Plane> plane = entityManager.createQuery("SELECT p FROM Plane p WHERE p.code = :code",
+					Plane.class);
+			plane.setParameter("code", code);
+			Plane queryResult = plane.getSingleResult();
+			LOGGER.info("Plane that has a given code selection successful.");
+			return queryResult;
+		} catch (PersistenceException e) {
+			LOGGER.error("Plane that has a given code selection failed.", e);
+			throw new RepositoryException("Plane that has a given code selection failed.");
+		}
+	}
+
+	@Override
+	public List<Plane> getAvailablePlanes(Date date) throws RepositoryException {
+		try {
+			LOGGER.info("Try to get an available plane.");
+			TypedQuery<Plane> planesInTheDate = entityManager.createQuery("SELECT DISTINCT(f.plane) FROM Flight f WHERE f.date =:date",
+					Plane.class);
+			planesInTheDate.setParameter("date", date);
+			List<Plane> allPlanesInTheDate = planesInTheDate.getResultList();
+			List<Plane> planesNotInTheSameDate = getAll();
+			planesNotInTheSameDate.removeAll(allPlanesInTheDate);
+			LOGGER.info("Get an available flight successful.");
+			return planesNotInTheSameDate;
+		} catch (PersistenceException e) {
+			LOGGER.error("Plane available failed.", e);
+			throw new RepositoryException("Plane failed.");
+		}
+	}
+}

@@ -1,0 +1,58 @@
+login.username = Utilzator
+login.password = Parol\u0103
+login.loginButton = Logare
+login.forgotPassword = Parol\u0103 uitat\u0103
+
+home.flights = Zboruri
+home.flightTemplates = \u0218ablon Zboruri
+home.Itineraries = Itinerariile
+home.planes = Avioane
+home.airports = Aeropoarte
+home.companies = Companii
+home.personalData = Date Personale
+home.manageData = Datele gestionate
+
+
+pers.edit = Editare
+pers.back = Inapoi
+pars.save = Salvare
+pers.cancel = Anulare
+pers.firstName = Nume
+pers.lastName = Prenume
+pers.email = Email
+pers.phone = Telefon
+pers.role =	Rol
+pers.yourPass = Parol\u0103 dvs
+pers.newPass = Parol\u0103 noua
+pers.confirmPass = Confirmare Parol\u0103
+
+flights.date = Data
+flights.company = Companie
+flights.departure = Plecare
+flights.arrival = Sosire
+
+general.delete = \u0218tergere
+general.update = Actualizare
+general.logout = Log out
+general.operations = Opera\u021Bii
+
+flightTemplate.duration = Durata
+
+itineraries.periodicity = Periodicitate
+
+planes.compName = Numele Companiei
+planes.nrOfPlaces = Numar de Avioane
+planes.type = Tip
+
+airport.name = Nume
+airport.country = \u021Aara
+airport.city = Ora\u0219
+airport.address = Adres\u0103
+
+companies.companyDetails = Detalile Companiei
+
+manage.import = Importare
+manage.export = Exportare
+
+
+

@@ -1,0 +1,14 @@
+package edu.msg.flightmanager.backend.service;
+
+import java.util.List;
+
+import javax.ejb.Local;
+
+import edu.msg.flightmanager.backend.model.Company;
+
+@Local
+public interface CompanyService {
+
+	List<Company> getAll() throws ServiceException;
+
+}

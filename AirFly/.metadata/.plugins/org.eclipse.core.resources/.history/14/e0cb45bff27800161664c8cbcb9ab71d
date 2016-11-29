@@ -1,0 +1,203 @@
+package edu.msg.flightmanager.web.beans;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.Properties;
+
+import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang.RandomStringUtils;
+
+import edu.msg.flightmanager.backend.assembler.UserAssembler;
+import edu.msg.flightmanager.backend.dto.TokenDto;
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.service.AuthenticationService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.service.UserService;
+import edu.msg.flightmanager.web.util.Constants;
+
+@ManagedBean
+@SessionScoped
+public class LoginBean implements Serializable {
+
+	private static final long serialVersionUID = 6104922328402104850L;
+
+	private UserDto userDto = new UserDto();
+
+	@EJB
+	private UserService userService;
+
+	@EJB
+	private AuthenticationService authenticationService;
+
+	private UserDto userForChangePassword;
+
+	private String newPassword;
+
+	public String getNewPassword() {
+		return newPassword;
+	}
+
+	public void setNewPassword(String newPassword) {
+		this.newPassword = newPassword;
+	}
+
+	public String processLogin() {
+		try {
+			userDto = authenticationService.login(userDto.getUserName(), userDto.getPassword());
+
+			HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext()
+					.getSession(false);
+			session.setAttribute(Constants.USER, userDto);
+
+			return "loginSuccess";
+		} catch (ServiceException e) {
+			return "loginFailed";
+		}
+
+	}
+
+	public String back() {
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		try {
+			ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "home";
+	}
+
+	public String logout() {
+		HttpSession session = getSession();
+		session.invalidate();
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		try {
+			ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "login";
+	}
+
+	private HttpSession getSession() {
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+		return session;
+	}
+
+	public UserDto getUserDto() {
+		return userDto;
+	}
+
+	public void setUserDto(UserDto userDto) {
+		this.userDto = userDto;
+	}
+
+	public String forgotPasswordMethod() {
+
+		return "forgotPassword";
+	}
+
+	public String sendEmail(String userName, String email) {
+
+		Properties props = System.getProperties();
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.smtp.host", "smtp.gmail.com");
+		props.put("mail.smtp.port", "587");
+
+		Session session = Session.getInstance(props, new Authenticator() {
+
+			@Override
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication("flightmanager2016", "testflight");
+			}
+		});
+		try {
+			User tempUser = userService.getByUserName(userName); // change to
+			// userDto
+			TokenDto tokenDto = authenticationService.generateToken(userName, email);
+			// if (tempUser.getEmail().equals(email)) {
+			Message message = new MimeMessage(session);
+			message.setFrom(new InternetAddress("flightmanager2016@gmail.com"));
+			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(email));
+			message.setSubject("Password change request");
+			String randomPassword = getRandomPassword();
+			message.setText("Dear " + userName
+					+ ", \n\n Your link to change the password  is: http://localhost:8080/flightmanager-web/changePassword.xhtml?token="
+					+ tokenDto.getValue() + "\n\n Please change it at the first log in. \n\n ");
+			Transport transport = session.getTransport("smtp");
+			transport.connect("smtp.gmail.com", "flightmanager2016", "testflight");
+			transport.sendMessage(message, message.getAllRecipients());
+			transport.close();
+			tempUser.setPassword(randomPassword);
+			userService.update(UserAssembler.modelToDto(tempUser));
+			// } else {
+			// FacesMessage errorMessage = new
+			// FacesMessage(FacesMessage.SEVERITY_INFO,
+			// "Wrong username and email combination", "Email verified.");
+			// FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			// }
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO,
+					"Wrong username and email combination", "Username and email verified.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (AddressException e) {
+			e.printStackTrace();
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		try {
+			ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "login";
+	}
+
+	private String getRandomPassword() {
+		StringBuilder randomPassword = new StringBuilder("");
+		randomPassword.append(RandomStringUtils.randomAlphanumeric(20));
+		return randomPassword.toString();
+
+	}
+
+	public UserDto getUserForChangePassword() {
+		HttpServletRequest request = (HttpServletRequest) (FacesContext.getCurrentInstance().getExternalContext()
+				.getRequest());
+		return (UserDto) request.getAttribute("user");
+	}
+
+	public void setUserForChangePassword(UserDto userForChangePassword) {
+		this.userForChangePassword = userForChangePassword;
+	}
+
+	public String changePassword() {
+		try {
+			userForChangePassword.setPassword(newPassword);
+			userService.changePassword(userForChangePassword);
+			return "forgotPassword";
+		} catch (ServiceException e) {
+			throw e;
+
+		}
+	}
+
+}

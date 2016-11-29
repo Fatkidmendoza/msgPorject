@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<f:view locale="#{languageBean.currentLocale}"></f:view>
+
+<h:head>
+	<title>Add Itinerary</title>
+</h:head>
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="addItineraryForm">^
+		<p:growl showDetail="true" />
+			<div class="valign-wrapper" id="companies-page"
+				style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="ui-fluid">
+							<p:panel id="basic" header="Add Itinerary">
+								<p:panelGrid columns="2" cellpadding="5">
+								
+									<p:outputLabel for="code" value="Code" />
+									<p:inputText id="code" value="#{itinerariesBean.itineraryToInsert.code}">
+										<f:validateLength minimum="2" />
+									</p:inputText>
+
+									<p:outputLabel for="startTime" value="Start time" />
+									<p:calendar id="startTime"
+										value="#{itinerariesBean.itineraryToInsert.startTime}"
+										pattern="HH:mm" timeOnly="true" />
+									
+									<p:outputLabel for="endTime" value="End Time" />
+									<p:calendar id="endTime"
+										value="#{itinerariesBean.itineraryToInsert.endTime}" 
+										pattern="HH:mm" timeOnly="true" />
+									
+									<p:outputLabel for="nextDay" value="Next Day" />
+									<p:selectBooleanCheckbox id="nextDay"
+										value="#{itinerariesBean.itineraryToInsert.nextDay}" 
+										/>
+
+									<p:outputLabel for="periodicityMenu" value="Periodicity" />
+									<p:selectOneMenu id="periodicityMenu"
+										value="#{itinerariesBean.itineraryToInsert.periodicityName}">
+										<f:selectItems value="#{itinerariesBean.periodicityTypes}"
+											var="type" itemValue="#{type}" itemLabel="#{type}" />
+									</p:selectOneMenu>
+
+								</p:panelGrid>
+
+								<f:facet name="footer">
+									<p:commandButton value="Save" style="width:300px;align:center"
+										icon="ui-icon-disk" id="save"
+										actionListener="#{itinerariesBean.addItinerary()}"
+										update="addItineraryForm" />
+								</f:facet>
+							</p:panel>
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+
+</html>

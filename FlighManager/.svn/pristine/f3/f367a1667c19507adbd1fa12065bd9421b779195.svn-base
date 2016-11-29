@@ -1,0 +1,82 @@
+package edu.msg.flightmanager.web.beans;
+
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.ejb.EJB;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.RequestScoped;
+
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.service.FlightService;
+
+@ManagedBean
+@RequestScoped
+public class ReportsBean implements Serializable {
+
+	private static final long serialVersionUID = -1515484868531116418L;
+
+	@EJB
+	private FlightService flightService;
+
+	private Date startDate;
+	private Date endDate;
+	private List<Entry<UserDto, Long>> usersHours;
+
+	public Date getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getFormatedStartDate() {
+		if (startDate != null) {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			return dateFormat.format(startDate);
+		} else {
+			return "";
+		}
+	}
+
+	public String getFormatedEndDate() {
+		if (endDate != null) {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			return dateFormat.format(endDate);
+		} else {
+			return "";
+		}
+	}
+
+	public List<Entry<UserDto, Long>> getUsersHours() {
+		generateUsersHours();
+		return usersHours;
+	}
+
+	public void setUsersHours(List<Entry<UserDto, Long>> usersHours) {
+		this.usersHours = usersHours;
+	}
+
+	public void generateUsersHours() {
+		usersHours = new ArrayList<>();
+		Map<UserDto, Long> usersMinutes = flightService.reportWithAllFlightHoursOfAllCrewMembers(startDate, endDate);
+		for (Entry<UserDto, Long> entry : usersMinutes.entrySet()) {
+			usersHours.add(entry);
+		}
+	}
+
+}

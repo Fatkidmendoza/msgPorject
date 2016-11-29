@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html">
+<f:view locale="#{languageBean.currentLocale}"></f:view>
+<body>
+	<ui:composition>
+		<h:form>
+			<p:megaMenu orientation="vertical" style="margin-top:20px">
+
+				<p:submenu label="#{msg['home.flights']}" icon="ui-icon-document">
+
+					<p:column>
+						<p:submenu>
+							<p:menuitem value="#{msg['flights.data']}" outcome="/flightData" />
+							<p:menuitem value="#{msg['general.view']}" outcome="/flights"
+								rendered="#{userRights.flightManAdminRight}" />
+							<p:menuitem value="#{msg['home.manageData']}"
+								outcome="/addFlight"
+								rendered="#{userRights.flightManAdminRight}" />
+							<p:menuitem value="#{msg['home.history']}"
+								outcome="/flightHistory" rendered="#{userRights.flightHistory}" />
+						</p:submenu>
+
+					</p:column>
+
+				</p:submenu>
+
+				<p:submenu label="#{msg['home.flightTemplates']}"
+					icon="ui-icon-pencil" rendered="#{userRights.flightManAdminRight}">
+
+					<p:column>
+						<p:submenu>
+							<p:menuitem value="#{msg['general.view']}"
+								outcome="/flightTemplates" />
+							<p:menuitem value="#{msg['home.manageData']}"
+								outcome="/addFlightTemplate" />
+						</p:submenu>
+					</p:column>
+				</p:submenu>
+
+				<p:submenu label="#{msg['home.itineraries']}" icon="ui-icon-contact"
+					rendered="#{userRights.compManAdminRight}">
+					<p:column>
+						<p:submenu>
+							<p:menuitem value="#{msg['general.view']}" outcome="/itineraries" />
+							<p:menuitem value="#{msg['home.manageData']}"
+								outcome="/addItinerary" />
+						</p:submenu>
+
+					</p:column>
+				</p:submenu>
+
+				<p:submenu label="#{msg['home.planes']}" icon="ui-icon-contact"
+					rendered="#{userRights.compManAdminRight}">
+					<p:column>
+						<p:submenu>
+							<p:menuitem value="#{msg['general.view']}" outcome="/planes" />
+							<p:menuitem value="#{msg['home.manageData']}" outcome="/addPlane" />
+						</p:submenu>
+					</p:column>
+				</p:submenu>
+
+				<p:submenu label="#{msg['home.users']}" icon="ui-icon-contact"
+					rendered="#{userRights.compManAdminRight}">
+					<p:column>
+						<p:submenu>
+							<p:menuitem value="#{msg['general.view']}" outcome="/users" />
+							<p:menuitem value="#{msg['home.newEmployee']}" outcome="/addUser"
+								rendered="#{userRights.compManAdminRight}" />
+						</p:submenu>
+
+					</p:column>
+
+				</p:submenu>
+
+				<p:submenu label="#{msg['home.airports']}" icon="ui-icon-contact"
+					rendered="#{userRights.compManAdminRight}">
+					<p:column>
+						<p:submenu>
+							<p:menuitem value="#{msg['general.view']}" outcome="/airports" />
+							<p:menuitem value="#{msg['home.manageData']}" outcome="/addAirport" />
+						</p:submenu>
+
+					</p:column>
+
+				</p:submenu>
+
+				<p:submenu label="#{msg['home.companies']}" icon="ui-icon-contact"
+					rendered="#{userRights.adminRight}">
+					<p:column>
+						<p:submenu>
+							<p:menuitem value="#{msg['general.view']}" outcome="/companies" />
+							<p:menuitem value="#{msg['home.manageData']}"
+								outcome="/addCompany" />
+						</p:submenu>
+					</p:column>
+				</p:submenu>
+
+				<p:menuitem value="#{msg['home.reports']}" icon="ui-icon-document"
+					rendered="#{userRights.compManAdminRight}" outcome="/reports" />
+
+				<p:menuitem value="#{msg['manage.imEx']}"
+					icon="ui-icon-document" rendered="#{userRights.adminRight}"
+					outcome="/manageData" />
+
+				<p:menuitem value="#{msg['home.personalData']}"
+					icon="ui-icon-contact" outcome="/details" />
+
+				<p:menuitem id="logout" value="#{msg['general.logout']}"
+					action="#{loginBean.logout}" icon="ui-icon-close" />
+
+			</p:megaMenu>
+		</h:form>
+	</ui:composition>
+</body>
+</html>
+
+

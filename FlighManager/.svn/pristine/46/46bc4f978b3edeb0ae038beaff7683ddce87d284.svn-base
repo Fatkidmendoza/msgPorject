@@ -1,0 +1,43 @@
+package edu.msg.flightmanager.backend.repository.bean;
+
+import javax.ejb.Stateless;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
+import javax.persistence.TypedQuery;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.repository.UserRepository;
+
+@Stateless(name = "UserRepository", mappedName = "ejb/UserRepository")
+public class UserRepositoryBean extends BaseRepositoryBean<User, Long> implements UserRepository {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserRepositoryBean.class);
+
+	public UserRepositoryBean() {
+		super(User.class);
+	}
+
+	@Override
+	public User getByUserName(String userName) throws RepositoryException {
+		try {
+			LOGGER.info("Try to select an user by its user name.");
+			TypedQuery<User> users = entityManager.createQuery("SELECT u FROM User u WHERE u.userName= :userName",
+					User.class);
+			users.setParameter("userName", userName);
+			User user = users.getSingleResult();
+			LOGGER.info("User selection by user name successful.");
+			return user;
+		} catch (NoResultException e) {
+			LOGGER.error("User selection by user name failed.", e);
+			throw new RepositoryException("User selection by user name failed.");
+		} catch (PersistenceException ex) {
+			LOGGER.error("User selection by user name failed.", ex);
+			throw new RepositoryException("User selection by user name failed.");
+		}
+	}
+
+}

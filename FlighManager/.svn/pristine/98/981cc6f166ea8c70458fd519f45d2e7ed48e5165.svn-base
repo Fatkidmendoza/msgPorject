@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+	<title>Add Companies</title>
+</h:head>
+
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="addCompanyForm">
+			<p:growl showDetail="true" />
+			<div class="valign-wrapper" id="add-company-page"
+				style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="ui-fluid">
+							<p:panel id="basic" header="Add Company">
+								<p:panelGrid columns="2" cellpadding="5">
+
+									<p:outputLabel for="name" value="Name" />
+									<p:inputText id="name"
+										value="#{companiesBean.companyToInsert.name}" />
+										
+									<p:outputLabel for="city" value="City" />
+									<p:inputText id="city" />
+									
+									<p:outputLabel for="country" value="Country" />
+									<p:inputText id="country"/>
+
+								</p:panelGrid>
+
+								<p:dataTable id="checkboxDT" var="airport"
+									value="#{airportsBean.allAirports}"
+									selection="#{companiesBean.selectedAirports}"
+									rowKey="#{airport.id}" style="margin-bottom:0">
+									<f:facet name="header">
+							            Airports
+							        </f:facet>
+									<p:column selectionMode="multiple"
+										style="width:50px;text-align:center" />
+									<p:column headerText="Name">
+										<h:outputText value="#{airport.name}" />
+									</p:column>
+									<p:column headerText="Country">
+										<h:outputText value="#{airport.country}" />
+									</p:column>
+									<p:column headerText="City">
+										<h:outputText value="#{airport.city}" />
+									</p:column>
+								</p:dataTable>
+
+								<f:facet name="footer">
+									<p:commandButton value="Save" style="width:300px;align:center"
+										icon="ui-icon-disk" id="save"
+										actionListener="#{companiesBean.addCompany()}"
+										update="addCompanyForm" />
+								</f:facet>
+							</p:panel>
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+
+</html>

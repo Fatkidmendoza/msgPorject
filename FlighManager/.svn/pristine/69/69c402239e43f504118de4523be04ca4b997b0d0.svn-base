@@ -1,0 +1,78 @@
+package edu.msg.flightmanager.backend.model;
+
+import java.sql.Time;
+import java.util.Calendar;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "itinerary")
+public class Itinerary extends BaseEntity {
+
+	private static final long serialVersionUID = -2862301088891646334L;
+
+	@Column(name = "duration", nullable = false)
+	private Time duration;
+	@Column(name = "periodicity", nullable = false)
+	@Enumerated(EnumType.STRING)
+	private PeriodicityType periodicity;
+
+	public Itinerary() {
+		this(null, null);
+	}
+
+	public Itinerary(Time duration, PeriodicityType periodicity) {
+		super();
+		this.duration = duration;
+		this.periodicity = periodicity;
+	}
+
+	public Time getDuration() {
+		return duration;
+	}
+
+	public void setDuration(Time duration) {
+		this.duration = duration;
+	}
+
+	public PeriodicityType getPeriodicity() {
+		return periodicity;
+	}
+
+	public void setPeriodicity(PeriodicityType periodicity) {
+		this.periodicity = periodicity;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((duration == null) ? 0 : duration.hashCode());
+		result = prime * result + ((periodicity == null) ? 0 : periodicity.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+
+		Itinerary other = (Itinerary) obj;
+		Calendar calendar1 = Calendar.getInstance();
+		Calendar calendar2 = Calendar.getInstance();
+		calendar1.setTime(duration);
+		calendar2.setTime(other.duration);
+		if(calendar1.get(Calendar.MINUTE)==calendar2.get(Calendar.MINUTE) && calendar1.get(Calendar.HOUR_OF_DAY)==calendar2.get(Calendar.HOUR_OF_DAY) && duration == other.duration && periodicity.name().equals(other.periodicity.name())) {
+			return true;
+		}
+		return false;
+	}
+}

@@ -1,0 +1,88 @@
+login.username = Felhasználónév
+login.password = Jelszó
+login.loginButton = Bejelentkezés
+login.forgotPassword = Elfelejtette a jelszavát?
+login.sendPass = Jelszó küldése
+
+home.flights = Repülések
+home.flightTemplates = Repülési sablon
+home.itineraries = Útiterv
+home.planes = Repül\u0151k
+home.airports = Repül\u0151terek
+home.companies = Vállalatok
+home.personalData = Személyes adatok
+home.manageData = Adatok kezelése
+home.history = El\u0151zmények
+home.users = Felhasználók
+home.newEmployee = Új alkalmazott
+home.employees = Employees
+
+pers.edit = Szerkesztés
+pers.back = Vissza
+pers.save = Mentés
+pers.cancel = Mégse
+pers.firstName = Keresztnév
+pers.lastName = Családnév
+pers.email = Email
+pers.phone = Telefon
+pers.role = Szerepkör
+pers.yourPass = Jelszavad
+pers.newPass = Új jelszó
+pers.confirmPass = Jelszó meger\u0151sítése
+pers.info = Személyes adatok
+pers.activate = Engedélyezés
+
+users.addEmployee = Add Employee
+
+flights.date = Dátum
+flights.company = Vállalat
+flights.departure = Indulás
+flights.arrival = Érkezés
+
+general.delete = Törlés
+general.update = Frissítés
+general.logout = Kijelentkezés
+general.operations = M\u0171veletek
+general.view = Megtekint
+general.confirmDelete = Törlés meger\u0151sítése
+general.sureDeleteAi = Biztosan szeretné törölni ezt a repül\u0151teret?
+general.sureDeleteIt = Are you sure you want to delete this itinerary? 
+general.sureDeletePl = Are you sure you want to delete this plane? 
+general.yes = Igen 
+general.no = Nem
+general.deactivated = Kikapcsolva
+
+flightTemplate.duration = Id\u0151tartam
+flightTemplate.itinerary = Itinerary
+flightTemplate.info = Flight Template Information
+
+itineraries.periodicity = Periódus
+itineraries.startTime = Start Time
+itineraries.endTime = End TIme
+itineraries.startDate = Start Date
+itineraries.endDate = End Date
+itineraries.nextDay = Next Day
+itineraries.info = Itineraries information
+itineraries.add = Add itinerary
+
+planes.compName = Vállalat név
+planes.nrOfPlaces = Helyek
+planes.type = Típus
+planes.addPlane = Repül\u0151 hozzáadása
+planes.info = Repül\u0151 információ
+
+airport.name = Név
+airport.country = Ország
+airport.city = Város
+airport.address = Cím
+airport.info = Repül\u0151tér információ
+airport.code = Kulcs
+
+companies.companyDetails = Vállalat adatok
+companies.info = Vállalat információ
+
+manage.import = Import
+manage.export = Export
+
+
+

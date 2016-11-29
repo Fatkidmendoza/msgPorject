@@ -1,0 +1,58 @@
+login.username = Username
+login.password = Password
+login.loginButton = Log in
+login.forgotPassword = Forgot password
+
+home.flights = Flights
+home.flightTemplates = Flight Templates 
+home.Itineraries = Itineraries
+home.planes = Planes
+home.airports = Airports
+home.companies = Companies
+home.personalData = PersonalData
+home.manageData = Manage Data
+
+
+pers.edit = Edit
+pers.back = Back
+pars.save = Save
+pers.cancel = Cancel
+pers.firstName = First Name
+pers.lastNam = Last Name
+pers.email = Email
+pers.phone = Phone
+pers.role = Role
+pers.yourPass = Your Password
+pers.newPass = New Password
+pers.confirmPass = Confirm Password
+
+flights.date = Date
+flights.company = Company
+flights.departure = Departure
+flights.arrival = Arrival
+
+general.delete = Delete
+general.update = Update
+general.logout = Log out 
+general.operations = Operations
+
+flightTemplate.duration = Duration
+
+itineraries.periodicity = Periodicity
+
+planes.compName = Company Name
+planes.nrOfPlaces = Number of places
+planes.type = Type
+
+airport.name = Name
+airport.country = Country
+airport.city = City
+airport.address = Address
+
+companies.companyDetails = Company Details
+
+manage.import = Import Data
+manage.export = Export Data
+
+
+

@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+	<title>Airports</title>
+</h:head>
+
+<ui:composition template="/template/commonLayout.xhtml">
+
+
+	<ui:define name="dynamicContent">
+		<h:form id="airportsForm">
+			<p:growl id="growl" showDetail="true" />
+			<div class="valign-wrapper" id="Airports-page"
+				style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="row">
+							<div class="card">
+								<div class="card-content"
+									style="font-family: Helvetica; border: 1px solid black;">
+									<p:dataTable value="#{airportsBean.allAirports}" var="airport"
+										rows="10" paginator="true"
+										paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+										<f:facet name="header">Airports</f:facet>
+
+										<p:column headerText="Code">
+											<h:outputText value="#{airport.code}" />
+										</p:column>
+										
+										<p:column headerText="Name">
+											<h:outputText value="#{airport.name}" />
+										</p:column>
+
+										<p:column headerText="Country">
+											<h:outputText value="#{airport.country}" />
+										</p:column>
+
+										<p:column headerText="City">
+											<h:outputText value="#{airport.city}" />
+										</p:column>
+										
+										<p:column headerText="Address">
+											<h:outputText value="#{airport.address}" />
+										</p:column>
+
+										<p:column headerText="Delete?" style="width:130px">
+											<p:commandButton icon="ui-icon-trash" id="delete"
+												actionListener="#{airportsBean.deleteAirport(airport)}"
+												update="airportsForm" rendered="#{!airport.deleted}">
+												<p:confirm header="Confirm delete"
+													message="Are you sure you want to delete this airport?"
+													icon="ui-icon-alert" />
+											</p:commandButton>
+
+										</p:column>
+
+										<p:column headerText="Update?" style="width:130px">
+											<p:commandButton update=":airportsForm:airportDetail"
+												oncomplete="PF('airportDialog').show()"
+												icon="ui-icon-pencil" title="View">
+												<f:setPropertyActionListener value="#{airport}"
+													target="#{airportsBean.airportToUpdate}" />
+											</p:commandButton>
+
+										</p:column>
+									</p:dataTable>
+									
+									<p:button outcome="addAirport" value="Add Airport" icon="ui-icon-plus" />
+
+									<!-- confirm dialog for delete -->
+									<p:confirmDialog global="true" showEffect="fade"
+										hideEffect="fade">
+										<p:commandButton value="Yes" type="button"
+											styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+										<p:commandButton value="No" type="button"
+											styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+									</p:confirmDialog>
+
+									<p:dialog header="Airport Info" widgetVar="airportDialog"
+										modal="true" showEffect="fade" hideEffect="fade"
+										resizable="false">
+										<p:outputPanel id="airportDetail" style="text-align:center;">
+											<p:panelGrid columns="2"
+												rendered="#{not empty airportsBean.airportToUpdate}"
+												columnClasses="label,value">
+												
+												<p:outputLabel for="code" value="Code" />
+												<p:inputText id="code" value="#{airportsBean.airportToUpdate.code}" />
+												
+												<p:outputLabel for="name" value="Name" />
+												<p:inputText id="name"
+													value="#{airportsBean.airportToUpdate.name}" />
+
+												<p:outputLabel for="country" value="Country" />
+												<p:inputText id="country"
+													value="#{airportsBean.airportToUpdate.country}" />
+
+												<p:outputLabel for="city" value="City" />
+												<p:inputText id="city"
+													value="#{airportsBean.airportToUpdate.city}" />
+
+												<p:outputLabel for="address" value="Address" />
+												<p:inputText id="address"
+													value="#{airportsBean.airportToUpdate.address}" />
+
+												<p:outputLabel for="activateAirport" value="Deactivated"
+													rendered="#{airportsBean.airportToUpdate.deleted}" />
+												<p:selectBooleanCheckbox id="activateAirport"
+													value="#{airportsBean.airportToUpdate.deleted}"
+													rendered="#{airportsBean.airportToUpdate.deleted}" />
+											</p:panelGrid>
+
+											<p:commandButton value="Update" icon="ui-icon-pencil"
+												id="update" actionListener="#{airportsBean.updateAirport()}"
+												update="airportsForm" />
+										</p:outputPanel>
+									</p:dialog>
+
+								</div>
+								<br />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>
+
+</html>

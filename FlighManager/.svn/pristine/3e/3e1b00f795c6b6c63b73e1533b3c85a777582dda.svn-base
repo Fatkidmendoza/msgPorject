@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<f:view locale="#{languageBean.currentLocale}"></f:view>
+<h:head>
+	<title>Add Flight Templates</title>
+</h:head>
+
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="addFlightTemplateForm">
+			<p:growl showDetail="true" />
+			<div class="valign-wrapper" id="add-flightTemplate-page"
+				style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="ui-fluid">
+							<p:panel id="basic" header="Add Flight Template">
+								<p:panelGrid columns="2" cellpadding="5">
+
+									<p:outputLabel for="code" value="Code" />
+									<p:inputText id="code"
+										value="#{flightTemplatesBean.flightTemplateToInsert.code}">
+										<f:validateLength minimum="2" />
+									</p:inputText>
+
+									<p:dataTable id="checkboxDTDeparture" var="airport"
+										value="#{airportsBean.allAirports}"
+										selection="#{flightTemplatesBean.flightTemplateToInsert.departure}"
+										rowKey="#{airport.id}" style="margin-bottom:0">
+										<f:facet name="header">
+							            Departure
+							        </f:facet>
+										<p:column selectionMode="single"
+											style="width:50px;text-align:center" />
+										<p:column headerText="Code" filterBy="#{airport.code}"
+											filterMatchMode="contains">
+											<h:outputText value="#{airport.code}" />
+										</p:column>
+										<p:column headerText="Name">
+											<h:outputText value="#{airport.name}" />
+										</p:column>
+										<p:column headerText="Country">
+											<h:outputText value="#{airport.country}" />
+										</p:column>
+										<p:column headerText="City">
+											<h:outputText value="#{airport.city}" />
+										</p:column>
+									</p:dataTable>
+
+									<p:dataTable id="checkboxDTArrival" var="airport"
+										value="#{airportsBean.allAirports}"
+										selection="#{flightTemplatesBean.flightTemplateToInsert.arrival}"
+										rowKey="#{airport.id}" style="margin-bottom:0">
+										<f:facet name="header">
+							            Arrival
+							        </f:facet>
+										<p:column selectionMode="single"
+											style="width:50px;text-align:center" />
+										<p:column headerText="Code" filterBy="#{airport.code}"
+											filterMatchMode="contains">
+											<h:outputText value="#{airport.code}" />
+										</p:column>
+										<p:column headerText="Name">
+											<h:outputText value="#{airport.name}" />
+										</p:column>
+										<p:column headerText="Country">
+											<h:outputText value="#{airport.country}" />
+										</p:column>
+										<p:column headerText="City">
+											<h:outputText value="#{airport.city}" />
+										</p:column>
+									</p:dataTable>
+								</p:panelGrid>
+								<p:dataTable id="checkboxDTItinerary" var="itinerary"
+									value="#{itinerariesBean.allItineraries}"
+									selection="#{flightTemplatesBean.flightTemplateToInsert.itinerary}"
+									rowKey="#{itinerary.id}" style="margin-bottom:0">
+									<f:facet name="header">
+							            Itinerary
+							        </f:facet>
+									<p:column selectionMode="single"
+										style="width:50px;text-align:center" />
+									<p:column headerText="Code"
+										filterBy="#{itinerary.code}" filterMatchMode="contains">
+										<h:outputText value="#{itinerary.code}" />
+									</p:column>
+									<p:column headerText="Start Time">
+										<h:outputText value="#{itinerary.startTime}">
+											<f:converter converterId="timeConvertor" />
+										</h:outputText>
+									</p:column>
+
+									<p:column headerText="End Time">
+										<h:outputText value="#{itinerary.endTime}">
+											<f:converter converterId="timeConvertor" />
+										</h:outputText>
+									</p:column>
+
+									<p:column headerText="Periodicity">
+										<h:outputText value="#{itinerary.periodicityName}" />
+									</p:column>
+								</p:dataTable>
+								<f:facet name="footer">
+									<p:commandButton value="Save" style="width:300px;align:center"
+										icon="ui-icon-disk" id="save"
+										actionListener="#{flightTemplatesBean.addFlightTemplate()}"
+										update="addFlightTemplateForm" />
+								</f:facet>
+							</p:panel>
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+
+</html>

@@ -1,0 +1,163 @@
+package edu.msg.flightmanager.backend.repository.bean;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.ejb.Stateless;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
+import javax.persistence.TemporalType;
+import javax.persistence.TypedQuery;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.msg.flightmanager.backend.model.Flight;
+import edu.msg.flightmanager.backend.model.FlightTemplate;
+import edu.msg.flightmanager.backend.model.Plane;
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.repository.FlightRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+
+@Stateless(name = "FlightRepository", mappedName = "ejb/FlightRepository")
+public class FlightRepositoryBean extends BaseRepositoryBean<Flight, Long> implements FlightRepository {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(FlightRepositoryBean.class);
+
+	public FlightRepositoryBean() {
+		super(Flight.class);
+	}
+
+	@Override
+	public List<Flight> getTheFlightsOfAUser(User user) {
+		try {
+			LOGGER.info("Try to select flights that have a given user.");
+			TypedQuery<Flight> flights = entityManager
+					.createQuery("SELECT f FROM Flight f JOIN f.aircrewUsers aU WHERE aU.id = :id", Flight.class);
+			flights.setParameter("id", user.getId());
+			List<Flight> queryResult = flights.getResultList();
+			LOGGER.info("Flights that have a given user selection successful.");
+			return queryResult;
+		} catch (NoResultException e) {
+			LOGGER.error("Flights that have a given user selection failed.", e);
+			throw new RepositoryException("Flights that have a given user selection failed.");
+		} catch (PersistenceException ex) {
+			LOGGER.error("Flights that have a given user selection failed.", ex);
+			throw new RepositoryException("Flights that have a given user selection failed.");
+		}
+	}
+
+	@Override
+	public List<Flight> getFlightsThatHaveAFlightTemplate(FlightTemplate flightTemplate) {
+		try {
+			LOGGER.info("Try to select flights that have a given flight template.");
+			TypedQuery<Flight> flights = entityManager
+					.createQuery("SELECT f FROM Flight f Join f.template t WHERE t.id = :id", Flight.class);
+			flights.setParameter("id", flightTemplate.getId());
+			List<Flight> queryResult = flights.getResultList();
+			LOGGER.info("Flights that have a given flight template selection successful.");
+			return queryResult;
+		} catch (NoResultException e) {
+			LOGGER.error("Flights that have a given flight template selection failed.", e);
+			throw new RepositoryException("Flights that have a given flight template selection failed.");
+		} catch (PersistenceException ex) {
+			LOGGER.error("Flights that have a given flight template selection failed.", ex);
+			throw new RepositoryException("Flights that have a given flight template selection failed.");
+		}
+	}
+
+	@Override
+	public List<Flight> getFlightsThatHaveAPlane(Plane plane) {
+		try {
+			LOGGER.info("Try to select flights that have a given plane.");
+			TypedQuery<Flight> flights = entityManager
+					.createQuery("SELECT f FROM Flight f JOIN f.plane p WHERE p.id = :id", Flight.class);
+			flights.setParameter("id", plane.getId());
+			List<Flight> queryResult = flights.getResultList();
+			LOGGER.info("Flights that have a given plane selection successful.");
+			return queryResult;
+		} catch (NoResultException e) {
+			LOGGER.error("Flights that have a given plane selection failed.", e);
+			throw new RepositoryException("Flights that have a given plane selection failed.");
+		} catch (PersistenceException ex) {
+			LOGGER.error("Flights that have a given plane selection failed.", ex);
+			throw new RepositoryException("Flights that have a given plane selection failed.");
+		}
+	}
+
+	@Override
+	public void physicalDelete(Flight flight) throws RepositoryException {
+		try {
+			LOGGER.info("Try to delete physically a flight.");
+			flight = super.getById(flight.getId());
+			entityManager.remove(flight);
+			LOGGER.info("The physical delete of a flight successful.");
+		} catch (PersistenceException e) {
+			LOGGER.info("The physical delete of a flight failed.");
+			throw new RepositoryException(e);
+		} catch (RepositoryException e) {
+			LOGGER.info("The physical delete of a flight failed.");
+			throw new RepositoryException(e);
+		} catch (NullPointerException e) {
+			LOGGER.info("The physical delete of a flight failed because there is no flight with the given id.");
+			throw new RepositoryException("NULL");
+		}
+	}
+
+	@Override
+	public List<Flight> getFlightsBetweenTwoDates(Date startDate, Date endDate) {
+		try {
+			LOGGER.info("Try to select the flights that have the date between two given dates.");
+			TypedQuery<Flight> flights = entityManager.createQuery(
+					"SELECT f FROM Flight f WHERE f.date >= :startDate AND f.date <= :endDate", Flight.class);
+			flights.setParameter("startDate", startDate, TemporalType.DATE);
+			flights.setParameter("endDate", endDate, TemporalType.DATE);
+			List<Flight> queryResult = flights.getResultList();
+			LOGGER.info("Flights that have the date between two given dates selection successful.");
+			return queryResult;
+		} catch (NoResultException e) {
+			LOGGER.error("Flights that have the date between two given dates selection failed.", e);
+			throw new RepositoryException("Flights that have the date between two given dates selection failed.");
+		} catch (PersistenceException ex) {
+			LOGGER.error("Flights that have the date between two given dates selection failed.", ex);
+			throw new RepositoryException("Flights that have the date between two given dates selection failed.");
+		}
+	}
+
+	@Override
+	public List<Flight> getAvailableFlights() throws RepositoryException {
+		try {
+			LOGGER.info("Try to select flights that are available.");
+			TypedQuery<Flight> flights = entityManager
+					.createQuery("SELECT f FROM Flight f WHERE f.passed = false", Flight.class);
+			List<Flight> queryResult = flights.getResultList();
+			LOGGER.info("Available flights selection successful.");
+			return queryResult;
+		} catch (NoResultException e) {
+			LOGGER.error("Available selection failed.", e);
+			throw new RepositoryException("Flights  available selection failed.");
+		} catch (PersistenceException ex) {
+			LOGGER.error("Available selection failed.", ex);
+			throw new RepositoryException("Flights that are available selection failed.");
+		}
+	}
+
+	@Override
+	public List<Flight> getPassedFlights() throws RepositoryException {
+		try {
+			LOGGER.info("Try to select flights that are passed.");
+			TypedQuery<Flight> flights = entityManager
+					.createQuery("SELECT f FROM Flight f WHERE f.passed = true", Flight.class);
+			List<Flight> queryResult = flights.getResultList();
+			LOGGER.info("Passed flights selection successful.");
+			return queryResult;
+		} catch (NoResultException e) {
+			LOGGER.error("Available selection failed.", e);
+			throw new RepositoryException("Flights passed selection failed.");
+		} catch (PersistenceException ex) {
+			LOGGER.error("Available selection failed.", ex);
+			throw new RepositoryException("Flights that are passed selection failed.");
+		}
+	}
+
+}

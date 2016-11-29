@@ -1,0 +1,5 @@
+package edu.msg.flightmanager.web.util;
+
+public class PropertiesHelper {
+
+}

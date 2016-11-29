@@ -1,0 +1,47 @@
+/**
+ * 
+ */
+
+/**
+ * @author fodorm
+ *
+ */
+import java.io.Serializable;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.repository.UserRepository;
+
+@ManagedBean
+@SessionScoped
+public class HelloJsf implements Serializable {
+
+	private static final long serialVersionUID = -7828490240688231419L;
+
+	private String name;
+
+	@EJB
+	private UserRepository userRepository;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	// JSF Action, with navigation outcome
+	public String sayHello() {
+		// hardcoded navigation, it's a bad idea :)
+		name = name + "i almost made a huge mistake";
+		List<User> users = userRepository.getAll();
+		name += " --" + users.size();
+		return "welcome";
+		// return "welcomeWrongPage";
+	}
+}

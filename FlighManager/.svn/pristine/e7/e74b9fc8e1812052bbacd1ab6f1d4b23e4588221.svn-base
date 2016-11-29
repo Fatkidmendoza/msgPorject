@@ -1,0 +1,69 @@
+package edu.msg.flightmanager.beans;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+
+import edu.msg.flightmanager.backend.model.Airport;
+import edu.msg.flightmanager.backend.model.Company;
+import edu.msg.flightmanager.backend.model.Plane;
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.service.CompanyService;
+
+@ManagedBean
+@SessionScoped
+public class CompaniesBean implements Serializable {
+
+	private static final long serialVersionUID = -2644003918788450237L;
+
+	@EJB
+	private CompanyService companyService;
+
+	private List<Company> companies;
+	private Company selectedCompany;
+
+	public List<Company> getAllCompanies() {
+		return companyService.getAll();
+	}
+
+	public void deleteCompany(Company company) {
+
+	}
+
+	public void updateCompany(Company company) {
+
+	}
+
+	public List<Plane> getSelectedCompanyPlanes() {
+		if(selectedCompany != null) {
+			return selectedCompany.getPlanes();
+		} else {
+			return new ArrayList<>();
+		}
+	}
+
+	public List<Airport> getSelectedCompanyAirports() {
+		if(selectedCompany != null) {
+			return selectedCompany.getAirports();
+		} else {
+			return new ArrayList<>();
+		}
+	}
+
+	public List<User> getSelectedCompanyUsers() {
+		if(selectedCompany != null) {
+			return selectedCompany.getEmployees();
+		} else {
+			return new ArrayList<>();
+		}
+	}
+
+	public void selectAction(Company company) {
+		selectedCompany = company;
+	}
+
+}

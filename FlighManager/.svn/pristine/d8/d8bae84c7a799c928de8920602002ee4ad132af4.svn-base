@@ -1,0 +1,50 @@
+package edu.msg.flightmanager.backend.util;
+
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Random;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.msg.flightmanager.backend.repository.PasswordEncryptingException;
+
+public class PasswordEncrypter {
+
+	private static final Logger LOG = LoggerFactory.getLogger(PasswordEncrypter.class);
+	private static final String saltCharacters = "abcdefghijklmnopqrstuvwxyz";
+
+	public static String generateHashedPassword(final String password) throws PasswordEncryptingException {
+		String salt = PasswordEncrypter.generateSalt();
+		String hashedPassword = "";
+		byte[] initialBytes;
+		try {
+			initialBytes = (password + salt).getBytes("utf-8");
+			final MessageDigest algorithm = MessageDigest.getInstance("SHA-256");
+			algorithm.reset();
+			algorithm.update(initialBytes);
+			final byte[] hashedBytes = algorithm.digest();
+			hashedPassword = new String(hashedBytes);
+		} catch (final UnsupportedEncodingException e) {
+			PasswordEncrypter.LOG.error("Password encryption failed: unsupported encoding", e);
+			throw new PasswordEncryptingException("Password encryption failed: unsupported encoding");
+		} catch (final NoSuchAlgorithmException nsae) {
+			PasswordEncrypter.LOG.error("Password encryption failed: hashing algorithm not supported", nsae);
+			throw new PasswordEncryptingException("Password encryption failed: hashing algorithm not supported");
+		}
+		return hashedPassword;
+	}
+
+	public static String generateSalt() {
+		final char[] chars = saltCharacters.toCharArray();
+		final StringBuilder sb = new StringBuilder();
+		final Random random = new Random();
+		for (int i = 0; i < 10; i++) {
+			final char c = chars[random.nextInt(chars.length)];
+			sb.append(c);
+		}
+		final String generatedSalt = sb.toString();
+		return generatedSalt;
+	}
+}

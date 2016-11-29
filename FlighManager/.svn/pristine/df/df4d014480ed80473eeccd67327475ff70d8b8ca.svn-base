@@ -1,0 +1,30 @@
+package edu.msg.flightmanager.backend.dto;
+
+public class PlaneDto extends EntityDto {
+
+	private String companyName;
+
+	private Integer numberOfPlaces;
+	private String type;
+
+	public String getCompanyName() {
+		return companyName;
+	}
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+	public Integer getNumberOfPlaces() {
+		return numberOfPlaces;
+	}
+	public void setNumberOfPlaces(Integer numberOfPlaces) {
+		this.numberOfPlaces = numberOfPlaces;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+
+
+}

@@ -1,0 +1,128 @@
+login.username = Benutzername
+login.password = Passwort
+login.loginButton = Einloggen
+login.forgotPassword = Passwort vorgessen
+login.sendPass = Passwort senden
+
+changePassword.change = Passwort ändern
+changePassword.retypedPassword = Passwort erneut eingeben
+
+home.flights = Flüge
+home.flightTemplates = Flug-Vorlage
+home.itineraries = Routen
+home.planes = Flugzeuge
+home.airports = Flughafen
+home.companies = Firmen
+home.personalData = Perosonenbezogen Daten
+home.manageData = Verwalten von Daten
+home.history = Historie
+home.users = Benutzer
+home.newEmployee = Neue Mitarbeiter
+home.employees = Mitarbeiter
+home.reports = Berichte
+
+pers.edit = Bearbeiten 
+pers.back = Zurück
+pers.save = Speichern
+pers.cancel = Beenden
+pers.firstName = Vorname
+pers.lastName = Familienname
+pers.email = Email
+pers.phone = Telefon
+pers.role = Role
+pers.yourPass = Ihre Passwort
+pers.newPass = Neues Passwort
+pers.confirmPass = Bestätigen Passwort
+pers.info = Persönliche Informationen
+pers.activate = Aktivieren
+pers.pilot = Pilot
+pers.steward = Steward
+pers.employee = Mitarbeiter
+
+users.addEmployee = Mitarbeiter hinzufügen
+
+flights.date = Datum
+flights.company = Firma
+flights.departure = Abreise
+flights.arrival = Anreise
+flights.add = Flug hinzufügen
+flights.members = Mannschaftsmitglieder
+flights.pilots = Piloten 
+flights.stewards = Stewards
+flights.planeDetails = Flugzeug Details
+flights.info = Fluginfo
+flights.data = Flugdaten
+
+general.delete = Löschen
+general.update = Aktualisieren
+general.logout = Ausloggen
+general.operations = Operationen
+general.view = Aussicht
+general.confirmDelete = Löschen bestätigen
+general.sureDeleteAi = Sind  Sie sicher, dass Sie diesen Flughafen löschen wollen?
+general.sureDeleteIt = Sind  Sie sicher, dass Sie diesen Routen löschen wollen?
+general.sureDeletePl = Sind  Sie sicher, dass Sie diesen Flugzeug löschen wollen?
+general.sureDeleteUs = Sind  Sie sicher, dass Sie diesen Benutzer löschen wollen?
+general.sureDeleteFl = Sind  Sie sicher, dass Sie diesen Flug löschen wollen?
+general.yes = Ja
+general.no = Nein
+general.deactivates = Deaktiviert
+general.values = Wert
+general.time = Zeit
+general.map = Landkarte
+general.and = und
+general.nrHoursWorked = Gesamten Stunden gearbeitet bei Mitarbeiter
+
+flightTemplate.duration = Dauer
+flightTemplate.itinerary = Routen 
+flightTemplate.info = Flug-Vorlage Informationen
+flightTemplate.data = Flug-Vorlage Daten
+
+itineraries.periodicity = Periodizität
+itineraries.startTime = Startzeit
+itineraries.endTime = Endzeit
+itineraries.startDate = Anfangsdatum
+itineraries.endDate = Enddatum
+itineraries.nextDay = Nächster Tag
+itineraries.info = Routen Informationen
+itineraries.add = Routen hinzufügen
+itineraries.data = Routendaten
+
+planes.compName = Name der Firma
+planes.nrOfPlaces = Anzahln der Plätze
+planes.type = Typ
+planes.addPlane = hinzufügen Flugzeug
+planes.info = Flugzeug Informationen
+planes.make = Fabrikat
+planes.data = Flugzeugdaten
+
+airport.name = Name
+airport.country = Land
+airport.city = Stadt
+airport.address = Adresse
+airport.info = Flughafen info
+airport.code = Schlüsselwort
+airport.add = Flughafen hinzufügen
+
+companies.companyDetails = Firmadaten
+companies.info = Firmeninfo
+companies.add = Firma hinzufügen
+companies.name = Firmaname
+
+report.get = Holen Sie sich einen Bericht über die Anzahl der geleisteten Arbeitsstunden aller Mitarbeiter zwischen zwei Terminen
+report.start = Wählen Sie das Startdatum
+report.end = Wählen Sie das Enddatum
+report.generate = Generieren
+
+manage.imEx = Importieren/Exportieren
+manage.import = Importieren
+manage.export = Exportieren
+manage.importData = Daten importiearen 
+manage.exportData = Daten exportieren 
+manage.exportFlights = Flugdaten exportieren  
+manage.exportPlanes = Flugzeugdaten exportieren
+manage.exportFlightTemplates = Flug-Vorlagedaten exportieren
+manage.exportItineraries = Routendaten exportieren
+
+
+

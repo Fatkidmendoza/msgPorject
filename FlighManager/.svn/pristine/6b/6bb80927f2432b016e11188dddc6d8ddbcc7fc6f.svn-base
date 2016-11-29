@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+	<title>Itineraries</title>
+</h:head>
+<ui:composition template="/template/commonLayout.xhtml">
+	<ui:define name="dynamicContent">
+		<h:form id="itinerariesForm">
+			<p:growl id="growl" showDetail="true" />
+			<div class="valign-wrapper" id="itineraries-page"
+				style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="row">
+							<div class="card">
+								<div class="card-content"
+									style="font-family: Helvetica; border: 1px solid black;">
+									<p:dataTable value="#{itinerariesBean.allItineraries}"
+										var="itinerary" rows="10" paginator="true"
+										paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+										<f:facet name="header">Itineraries</f:facet>
+
+										<p:column headerText="Start Time">
+											<h:outputText>
+												<f:converter converterId="timeConvertor" />
+											</h:outputText>
+										</p:column>
+									
+										<p:column headerText="End Time">
+											<h:outputText>
+												<f:converter converterId="timeConvertor" />
+											</h:outputText>
+										</p:column>
+										
+										<p:column headerText="Next Day">
+												<p:selectBooleanCheckbox id="nextDay"
+													
+													/>
+										</p:column>
+									
+										<p:column headerText="Periodicity">
+											<h:outputText value="#{itinerary.periodicityName}" />
+										</p:column>
+
+										<p:column headerText="Delete?" style="width:130px">
+											<p:commandButton icon="ui-icon-trash" id="delete"
+												actionListener="#{itinerariesBean.deleteItinerary(itinerary)}"
+												update="itinerariesForm" rendered="#{!itinerary.deleted}">
+												<p:confirm header="Confirm delete"
+													message="Are you sure you want to delete this itinerary?"
+													icon="ui-icon-alert" />
+											</p:commandButton>
+										</p:column>
+
+										<p:column headerText="Update?" style="width:130px">
+											<p:commandButton update=":itinerariesForm:itineraryDetail"
+												oncomplete="PF('itineraryDialog').show()"
+												icon="ui-icon-pencil" title="View">
+												<f:setPropertyActionListener value="#{itinerary}"
+													target="#{itinerariesBean.itineraryToUpdate}" />
+											</p:commandButton>
+										</p:column>
+
+									</p:dataTable>
+
+									<!-- confirm dialog for delete -->
+									<p:confirmDialog global="true" showEffect="fade"
+										hideEffect="fade">
+										<p:commandButton value="Yes" type="button"
+											styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+										<p:commandButton value="No" type="button"
+											styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+									</p:confirmDialog>
+
+									<p:dialog header="Itinerary Info" widgetVar="itineraryDialog"
+										modal="true" showEffect="fade" hideEffect="fade"
+										resizable="false">
+										<p:outputPanel id="itineraryDetail" style="text-align:center;">
+											<p:panelGrid columns="2"
+												rendered="#{not empty itinerariesBean.itineraryToUpdate}"
+												columnClasses="label,value">
+												<p:outputLabel for="startTime" value="Start Time" />
+												<p:calendar id="startTime"
+													
+													pattern="HH:mm" timeOnly="true" />
+													
+												<p:outputLabel for="endTime" value="End Time" />
+												<p:calendar id="endTime"
+													
+													pattern="HH:mm" timeOnly="true" />
+													
+												<p:outputLabel for="nextDay" value="Next Day" />
+												<p:selectBooleanCheckbox id="nextDay"
+													
+													/>
+
+												<p:outputLabel for="periodicityMenu" value="Periodicity" />
+												<p:selectOneMenu id="periodicityMenu"
+													value="#{itinerariesBean.itineraryToUpdate.periodicityName}">
+													<f:selectItems value="#{itinerariesBean.periodicityTypes}"
+														var="type" itemValue="#{type}" itemLabel="#{type}" />
+												</p:selectOneMenu>
+
+												<p:outputLabel for="activateItinerary" value="Deactivated"
+													rendered="#{itinerariesBean.itineraryToUpdate.deleted}" />
+												<p:selectBooleanCheckbox id="activateItinerary"
+													value="#{itinerariesBean.itineraryToUpdate.deleted}"
+													rendered="#{itinerariesBean.itineraryToUpdate.deleted}" />
+											</p:panelGrid>
+
+											<p:commandButton value="Update" icon="ui-icon-pencil"
+												id="update"
+												actionListener="#{itinerariesBean.updateItinerary()}"
+												update="itinerariesForm" />
+
+										</p:outputPanel>
+									</p:dialog>
+
+								</div>
+								<br />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>

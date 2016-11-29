@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<f:view locale="#{languageBean.currentLocale}"></f:view>
+<h:head>
+	<title>Add Flight</title>
+</h:head>
+
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="addFlightForm">
+			<p:growl showDetail="true" />
+			<div class="valign-wrapper" id="add-flight-page"
+				style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="ui-fluid">
+							<p:panel id="basic" header="#{msg['flight.add']}">
+								<p:panelGrid columns="2" cellpadding="5">
+								
+									<p:outputLabel for="code" value="Code" />
+									<p:inputText id="code" value="#{flightsBean.flightToInsert.code}">
+										<f:validateLength minimum="2" />
+									</p:inputText>
+								
+									<p:dataTable id="checkboxDTPilots" var="pilot"
+										value="#{usersBean.pilots}"
+										selection="#{flightsBean.selectedPilots}" rowKey="#{pilot.id}"
+										style="margin-bottom:0">
+										<f:facet name="header">
+											<h:outputText value="#{msg['pers.pilot']}"></h:outputText>
+										</f:facet>
+
+										<p:column selectionMode="multiple"
+											style="width:50px;text-align:center" />
+										<p:column headerText="#{msg['pers.firstName']}">
+											<h:outputText value="#{pilot.firstName}" />
+										</p:column>
+										<p:column headerText="#{msg['pers.lastName']}">
+											<h:outputText value="#{pilot.lastName}" />
+										</p:column>
+										<p:column headerText="#{msg['flights.company']}">
+											<h:outputText value="#{pilot.companyName}" />
+										</p:column>
+									</p:dataTable>
+
+									<p:dataTable id="checkboxDTStewards" var="steward"
+										value="#{usersBean.stewards}"
+										selection="#{flightsBean.selectedStewards}"
+										rowKey="#{steward.id}" style="margin-bottom:0">
+										<f:facet name="header">
+											<h:outputText value="#{msg['pers.steward']}"></h:outputText>
+										</f:facet>
+										<p:column selectionMode="multiple"
+											style="width:50px;text-align:center" />
+										<p:column headerText="#{msg['pers.firstName']}">
+											<h:outputText value="#{steward.firstName}" />
+										</p:column>
+										<p:column headerText="#{msg['pers.lastName']}">
+											<h:outputText value="#{steward.lastName}" />
+										</p:column>
+										<p:column headerText="#{msg['flights.company']}">
+											<h:outputText value="#{steward.companyName}" />
+										</p:column>
+									</p:dataTable>
+								</p:panelGrid>
+								<p:dataTable id="checkboxDTFlightTemplate" var="flightTemplate"
+									value="#{flightTemplatesBean.allFlightTemplates}"
+									selection="#{flightsBean.selectedFlightTemplate}"
+									rowKey="#{flightTemplate.id}" style="margin-bottom:0">
+									<f:facet name="header">
+										<h:outputText value="#{msg['home.flightTemplates']}"></h:outputText>
+									</f:facet>
+									<p:column selectionMode="single"
+										style="width:50px;text-align:center" />
+									<p:column headerText="#{msg['flights.departure']}">
+										<h:outputText value="#{flightTemplate.departure.name}" />
+									</p:column>
+									<p:column headerText="#{msg['flights.arrival']}">
+										<h:outputText value="#{flightTemplate.arrival.name}" />
+									</p:column>
+									<p:column headerText="#{msg['itineraries.startTime']}">
+										<h:outputText value="#{flightTemplate.itinerary.startTime}">
+											<f:converter converterId="timeConvertor" />
+										</h:outputText>
+									</p:column>
+									<p:column headerText="#{msg['itineraries.endTime']}">
+										<h:outputText value="#{flightTemplate.itinerary.endTime}">
+											<f:converter converterId="timeConvertor" />
+										</h:outputText>
+									</p:column>
+									<p:column headerText="#{msg['itineraries.nextDay']}">
+										<p:selectBooleanCheckbox id="nextDay" disabled="true"
+											value="#{flightTemplate.itinerary.nextDay}" />
+									</p:column>
+									<p:column headerText="#{msg['itineraries.periodicity']}">
+										<h:outputText
+											value="#{flightTemplate.itinerary.periodicityName}" />
+									</p:column>
+								</p:dataTable>
+								<p:dataTable id="checkboxDTPlane" var="plane"
+									value="#{planesBean.planesByCompany}"
+									selection="#{flightsBean.selectedPlane}" rowKey="#{plane.id}"
+									style="margin-bottom:0">
+									<f:facet name="header">
+										<h:outputText value="#{msg['home.planes']}"></h:outputText>
+									</f:facet>
+									<p:column selectionMode="single"
+										style="width:50px;text-align:center" />
+									<p:column headerText="#{msg['flights.company']}">
+										<h:outputText value="#{plane.companyName}" />
+									</p:column>
+									<p:column headerText="#{msg['planes.type']}">
+										<h:outputText value="#{plane.type}" />
+									</p:column>
+									<p:column headerText="#{msg['planes.nrOfPlaces']}">
+										<h:outputText value="#{plane.numberOfPlaces}" />
+									</p:column>
+								</p:dataTable>
+								<h:form id="form">
+									<p:growl id="msgs" showDetail="true" />
+
+									<h:panelGrid columns="2" cellpadding="5">
+
+										<p:outputLabel for="mask" value="#{msg['flights.date']}" />
+										<p:calendar id="mask"
+											value="#{flightsBean.flightToInsert.date}"
+											pattern="dd-MM-yyyy" mask="true" />
+									</h:panelGrid>
+
+
+									<p:dialog modal="true" resizable="false"
+										header="#{msg['general.values']}" widgetVar="dlg"
+										showEffect="fold">
+										<p:panelGrid id="display" columns="2"
+											columnClasses="label,value">
+
+											<h:outputText value="#{msg['general.mask']}" />
+											<h:outputText value="#{flightsBean.flightToInsert.date}">
+												<f:convertDateTime pattern="MM/dd/yyyy" />
+											</h:outputText>
+										</p:panelGrid>
+									</p:dialog>
+								</h:form>
+
+								<f:facet name="footer">
+									<p:commandButton value="Save" style="width:300px;align:center"
+										icon="ui-icon-disk" id="save"
+										actionListener="#{flightsBean.addFlight}"
+										update="addFlightForm" />
+
+								</f:facet>
+							</p:panel>
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+
+</html>

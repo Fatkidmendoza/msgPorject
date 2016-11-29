@@ -1,0 +1,44 @@
+package edu.msg.flightmanager.backend.repository.bean;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
+import edu.msg.flightmanager.backend.model.AbstractModel;
+import edu.msg.flightmanager.backend.repository.BaseRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+
+public class BaseRepositoryBean<M extends AbstractModel, I> implements BaseRepository<M, I> {
+
+	@PersistenceContext(unitName = "flight_manager")
+	private EntityManager entityManager;
+
+	private Class<M> entityClass;
+
+	public BaseRepositoryBean(Class<M> entityClass) {
+		this.entityClass = entityClass;
+	}
+
+	@Override
+	public List<M> getAll() throws RepositoryException {
+		try {
+			System.out.println(entityManager == null);
+			CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+			CriteriaQuery<M> cq = cb.createQuery(entityClass);
+			Root<M> root = cq.from(entityClass);
+			CriteriaQuery<M> allEntities = cq.select(root);
+			TypedQuery<M> tq = entityManager.createQuery(allEntities);
+			return tq.getResultList();
+		} catch (PersistenceException ex) {
+			throw new RepositoryException(ex);
+		}
+
+	}
+
+}

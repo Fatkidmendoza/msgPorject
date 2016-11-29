@@ -1,0 +1,72 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<f:view locale="#{languageBean.currentLocale}"></f:view>
+<h:head>
+	<title>Companies</title>
+</h:head>
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="airportsCompany">
+			<p:growl showDetail="true" />
+
+			<div class="valign-wrapper" id="companies-page"
+				style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="row">
+							<div class="card">
+								<div class="card-content"
+									style="font-family: Helvetica; border: 1px solid black;">
+
+									<p:outputLabel for="cAirports"
+										value="Please select the airports for the company #{companiesBean.companyToUpdate.name}" />
+									<p:dataTable id="cAirports" var="airport"
+										value="#{airportsBean.allAirports}"
+										selection="#{companiesBean.companyToUpdate.airports}"
+										rowKey="#{airport.id}" style="margin-bottom:0">
+										<p:column selectionMode="multiple"
+											style="width:50px;text-align:center" />
+
+										<p:column headerText="#{msg['airport.code']}"
+											filterBy="#{airport.code}" filterMatchMode="contains">
+											<h:outputText value="#{airport.code}" />
+										</p:column>
+
+										<p:column headerText="#{msg['airport.name']}">
+											<h:outputText value="#{airport.name}" />
+										</p:column>
+										<p:column headerText="#{msg['airport.country']}">
+											<h:outputText value="#{airport.country}" />
+										</p:column>
+										<p:column headerText="#{msg['airport.city']}">
+											<h:outputText value="#{airport.city}" />
+										</p:column>
+									</p:dataTable>
+
+
+									<p:button id="airportsPage" outcome="airports"
+										value="Airports page" />
+
+									<p:commandButton value="#{msg['general.update']}"
+										icon="ui-icon-pencil" id="update"
+										actionListener="#{companiesBean.updateCompany}"
+										update="airportsCompany" />
+
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+		</h:form>
+	</ui:define>
+</ui:composition>
+</html>

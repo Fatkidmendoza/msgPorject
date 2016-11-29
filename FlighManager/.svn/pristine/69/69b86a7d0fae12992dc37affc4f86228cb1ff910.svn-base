@@ -1,0 +1,8 @@
+import javax.ejb.Stateful;
+
+@Stateful
+public class Test {
+	public static void main(String[] args) {
+		System.out.println("sth");
+	}
+}

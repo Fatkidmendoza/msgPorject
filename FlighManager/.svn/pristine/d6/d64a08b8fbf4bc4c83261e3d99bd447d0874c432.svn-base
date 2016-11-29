@@ -1,0 +1,38 @@
+package edu.msg.flightmanager.Util;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.validator.FacesValidator;
+import javax.faces.validator.Validator;
+import javax.faces.validator.ValidatorException;
+
+import edu.msg.flightmanager.backend.service.UserService;
+
+@FacesValidator("userPasswordValidator")
+public class PasswordValidator implements Validator {
+
+	@EJB
+	UserService userService;
+
+	@Override
+	public void validate(FacesContext facesContext, UIComponent uiComponent, Object value) throws ValidatorException {
+		String stringValue = value.toString();
+		Pattern pattern = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
+		Matcher matcherInput = pattern.matcher(stringValue);
+		boolean matchesNormalCharacter = matcherInput.find();
+
+		if (stringValue.length() < 4) {
+			FacesMessage message = new FacesMessage("Password too short!");
+			throw new ValidatorException(message);
+		} else if (matchesNormalCharacter) {
+			FacesMessage message = new FacesMessage("Password contains special characters");
+			throw new ValidatorException(message);
+		}
+
+	}
+}

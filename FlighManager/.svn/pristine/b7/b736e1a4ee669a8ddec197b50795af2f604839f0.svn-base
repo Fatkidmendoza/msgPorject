@@ -1,0 +1,101 @@
+login.username = Username
+login.password = Password
+login.loginButton = Log in
+login.forgotPassword = Forgot password
+login.sendPass = Send password
+
+changePassword.change = Change Password
+changePassword.password = Password
+changePassword.retypedPassword = Retype Password
+
+
+home.flights = Flights
+home.flightTemplates = Flight Templates 
+home.itineraries = Itineraries
+home.planes = Planes
+home.airports = Airports
+home.companies = Companies
+home.personalData = PersonalData
+home.manageData = Manage Data
+home.history = History
+home.users = Users
+home.newEmployee = New Employee
+home.employees = Employees
+
+pers.edit = Edit
+pers.back = Back
+pers.save = Save
+pers.cancel = Cancel
+pers.firstName = First Name
+pers.lastName = Last Name
+pers.email = Email
+pers.phone = Phone
+pers.role = Role
+pers.yourPass = Your Password
+pers.newPass = New Password
+pers.confirmPass = Confirm Password
+pers.info = Personal Information
+pers.activate = Activate
+pers.pilot = Pilot
+pers.steward = Steward
+
+
+users.addEmployee = Add Employee
+
+flights.date = Date
+flights.company = Company
+flights.departure = Departure
+flights.arrival = Arrival
+flights.add = Add Flight
+
+general.delete = Delete
+general.update = Update
+general.logout = Log out 
+general.operations = Operations
+general.view = View
+general.confirmDelete = Confirm Delete
+general.sureDeleteAi = Are you sure you want to delete this airport? 
+general.sureDeleteIt = Are you sure you want to delete this itinerary? 
+general.sureDeletePl = Are you sure you want to delete this plane? 
+general.yes = Yes
+general.no = No
+general.deactivated = Deactivated
+general.values = Values
+
+
+flightTemplate.duration = Duration
+flightTemplate.itinerary = Itinerary
+flightTemplate.info = Flight Template Information
+
+itineraries.periodicity = Periodicity
+itineraries.startTime = Start Time
+itineraries.endTime = End TIme
+itineraries.startDate = Start Date
+itineraries.endDate = End Date
+itineraries.nextDay = Next Day
+itineraries.info = Itineraries information
+itineraries.add = Add itinerary
+
+planes.compName = Company Name
+planes.nrOfPlaces = Number of places
+planes.type = Type
+planes.addPlane = Add Plane
+planes.info = Plane Information
+
+airport.name = Name
+airport.country = Country
+airport.city = City
+airport.address = Address
+airport.info = Airport info
+airport.code = Code
+airport.add = Add airport
+
+companies.companyDetails = Company Details
+companies.info = Company Info
+companies.add = Add company
+
+manage.import = Import Data
+manage.export = Export Data
+
+
+

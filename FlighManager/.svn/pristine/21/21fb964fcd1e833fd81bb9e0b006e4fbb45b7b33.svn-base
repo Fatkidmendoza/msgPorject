@@ -1,0 +1,24 @@
+package edu.msg.flightmanager.backend.service;
+
+import java.util.List;
+
+import javax.ejb.Local;
+
+import edu.msg.flightmanager.backend.dto.ItineraryDto;
+
+@Local
+public interface ItineraryService {
+
+	List<ItineraryDto> getAll() throws ServiceException;
+
+	ItineraryDto insert(ItineraryDto itineraryDto) throws ServiceException;
+
+	void delete(ItineraryDto itineraryDto) throws ServiceException;
+
+	void activate(ItineraryDto itineraryDto) throws ServiceException;
+
+	List<String> getPeriodicityTypes();
+
+	ItineraryDto update(ItineraryDto itineraryDto) throws ServiceException;
+
+}

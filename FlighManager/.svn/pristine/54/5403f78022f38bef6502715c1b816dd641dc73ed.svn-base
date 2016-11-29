@@ -1,0 +1,99 @@
+package edu.msg.flightmanager.backend.model;
+
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+@Entity
+@Table(name = "itinerary")
+public class Itinerary extends BaseEntity {
+
+	private static final long serialVersionUID = -2862301088891646334L;
+	@Temporal(TemporalType.TIME)
+	@Column(name = "startTime", nullable = false)
+	private  Date startTime;
+
+	@Temporal(TemporalType.TIME)
+	@Column(name = "endTime", nullable = false)
+	private  Date endTime;
+
+	@Column(name = "periodicity", nullable = false)
+	@Enumerated(EnumType.STRING)
+	private PeriodicityType periodicity;
+
+	@Column (name="nextDay",columnDefinition="tinyint(1) default 0")
+	private boolean nextDay;
+
+	public Itinerary() {
+		this(null, null,null,false);
+	}
+
+	public Itinerary(Date startTime, Date endTime, PeriodicityType periodicity,boolean nextDay) {
+		super();
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.periodicity = periodicity;
+		this.nextDay = nextDay;
+	}
+
+	public Date getStartTime() {
+		return startTime;
+	}
+
+
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
+	}
+
+	public Date getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
+	}
+
+
+	public PeriodicityType getPeriodicity() {
+		return periodicity;
+	}
+
+	public void setPeriodicity(PeriodicityType periodicity) {
+		this.periodicity = periodicity;
+	}
+
+	public boolean isNextDay() {
+		return nextDay;
+	}
+
+
+	public void setNextDay(boolean nextDay) {
+		this.nextDay = nextDay;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (getClass() != obj.getClass())
+			return false;
+		//
+		//		Itinerary other = (Itinerary) obj;
+		//		Calendar calendar1 = Calendar.getInstance();
+		//		Calendar calendar2 = Calendar.getInstance();
+		//		calendar1.setTime(duration);
+		//		calendar2.setTime(other.duration);
+		//		if(calendar1.get(Calendar.MINUTE)==calendar2.get(Calendar.MINUTE) && calendar1.get(Calendar.HOUR_OF_DAY)==calendar2.get(Calendar.HOUR_OF_DAY) && periodicity.name().equals(other.periodicity.name())) {
+		//			return true;
+		//		}
+		return false;
+	}
+
+}

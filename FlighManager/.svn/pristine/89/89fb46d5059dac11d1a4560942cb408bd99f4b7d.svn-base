@@ -1,0 +1,11 @@
+package edu.msg.flightmanager.backend.repository;
+
+import java.util.List;
+
+import edu.msg.flightmanager.backend.model.AbstractModel;
+
+public interface BaseRepository<M extends AbstractModel, I> {
+
+	List<M> getAll() throws RepositoryException;
+
+}

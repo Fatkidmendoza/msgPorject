@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:body>
+	<div id="headerLanguage">
+		<h:form>
+			<h:commandButton image="/resources/us.png"
+				action="#{languageBean.setLanguage('')}"></h:commandButton>
+			<h:commandButton image="/resources/de.png"
+				action="#{languageBean.setLanguage('de')}"></h:commandButton>
+			<h:commandButton image="/resources/ro.png"
+				action="#{languageBean.setLanguage('ro')}"></h:commandButton>
+			<h:commandButton image="/resources/hu.png"
+				action="#{languageBean.setLanguage('hu')}"></h:commandButton>
+		</h:form>
+	</div>
+	<div id="header">
+		<h:form>
+			<p:dataGrid value="#{usersBean.allUsers}" var="user" rendered="true">
+				<p:column>
+					<h:outputText value="#{user.type}" />
+				</p:column>
+			</p:dataGrid>
+			<p:outputLabel value="FlightManager"></p:outputLabel>
+		</h:form>
+	</div>
+</h:body>
+</html>
+
+

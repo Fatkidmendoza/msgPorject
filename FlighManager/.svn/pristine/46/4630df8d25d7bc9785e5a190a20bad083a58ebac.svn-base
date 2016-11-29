@@ -1,0 +1,28 @@
+package edu.msg.flightmanager.backend.dto;
+
+import java.util.Date;
+
+public class ItineraryDto extends EntityDto {
+
+
+	private Date duration;
+	private String periodicityName;
+
+	public Date getDuration() {
+		return duration;
+	}
+
+	public void setDuration(Date duration) {
+		this.duration = duration;
+	}
+
+	public String getPeriodicityName() {
+		return periodicityName;
+	}
+
+	public void setPeriodicityName(String periodicityName) {
+		this.periodicityName = periodicityName;
+	}
+
+
+}

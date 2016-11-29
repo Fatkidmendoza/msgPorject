@@ -1,0 +1,34 @@
+package edu.msg.flightmanager.beans;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.RequestScoped;
+
+import edu.msg.flightmanager.backend.dto.FlightDto;
+import edu.msg.flightmanager.backend.model.Flight;
+import edu.msg.flightmanager.backend.service.FlightService;
+
+@ManagedBean
+@RequestScoped
+public class FlightsBean implements Serializable {
+
+	private static final long serialVersionUID = 5005644721756962091L;
+
+	@EJB
+	private FlightService flightService;
+
+	public List<FlightDto> getAllFlights() {
+		return flightService.getAll();
+	}
+
+	public void deleteFlight(Flight flight) {
+
+	}
+
+	public void updateFlight(Flight flight) {
+
+	}
+}

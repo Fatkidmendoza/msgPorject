@@ -1,0 +1,36 @@
+package edu.msg.flightmanager.backend.repository.bean;
+
+import javax.ejb.Stateless;
+import javax.persistence.PersistenceException;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.repository.UserRepository;
+
+@Stateless(name = "UserRepository", mappedName = "ejb/UserRepository")
+public class UserRepositoryBean extends BaseRepositoryBean<User, Long> implements UserRepository {
+
+	public UserRepositoryBean() {
+		super(User.class);
+	}
+
+	@Override
+	public User getByUserName(String userName) throws RepositoryException {
+		try {
+			CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+			CriteriaQuery<User> criteria = cb.createQuery(User.class);
+			Root<User> root = criteria.from(User.class);
+			criteria.select(root);
+			criteria.where(cb.equal(root.get("userName"), userName));
+			User user = entityManager.createQuery( criteria ).getSingleResult();
+			return user;
+		} catch (PersistenceException ex) {
+			throw new RepositoryException(ex);
+		}
+
+	}
+
+}

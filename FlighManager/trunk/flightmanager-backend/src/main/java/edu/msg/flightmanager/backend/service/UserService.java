@@ -1,0 +1,33 @@
+package edu.msg.flightmanager.backend.service;
+
+import java.util.List;
+
+import javax.ejb.Local;
+
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.model.User;
+
+@Local
+public interface UserService {
+
+	List<UserDto> getAll() throws ServiceException;
+
+	List<UserDto> getByTypeAndCompany(String type, String companyName) throws ServiceException;
+
+	User getByUserName(String userName) throws ServiceException;
+
+	UserDto update(UserDto userDto) throws ServiceException;
+
+	UserDto insert(UserDto userDto) throws ServiceException;
+
+	void delete(UserDto userDto) throws ServiceException;
+
+	void activate(UserDto userDto) throws ServiceException;
+
+	List<String> getAllTypes();
+
+	void changePassword(UserDto userDto) throws ServiceException;
+
+	List<UserDto> getByCompany(String companyName) throws ServiceException;
+
+}

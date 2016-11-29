@@ -1,0 +1,96 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import edu.msg.flightmanager.backend.assembler.PlaneAssembler;
+import edu.msg.flightmanager.backend.dto.PlaneDto;
+import edu.msg.flightmanager.backend.model.Company;
+import edu.msg.flightmanager.backend.model.Plane;
+import edu.msg.flightmanager.backend.model.PlaneType;
+import edu.msg.flightmanager.backend.repository.CompanyRepository;
+import edu.msg.flightmanager.backend.repository.PlaneRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.service.PlaneService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.util.PlaneValidator;
+import edu.msg.flightmanager.backend.util.ValidationException;
+
+@Stateless(name = "PlaneService", mappedName = "ej/PlaneService")
+public class PlaneServiceBean implements PlaneService {
+
+	@EJB
+	private PlaneRepository planeRepository;
+
+	@EJB
+	private CompanyRepository companyRepository;
+
+	@Override
+	public List<PlaneDto> getAll() throws ServiceException {
+		try {
+			List<PlaneDto> planesDto = new ArrayList<PlaneDto>();
+			for (Plane plane : planeRepository.getAll()) {
+				planesDto.add(PlaneAssembler.modelToDto(plane));
+			}
+			return planesDto;
+		} catch (RepositoryException e) {
+			throw new ServiceException("The planes selection failed");
+		}
+	}
+
+	@Override
+	public PlaneDto insert(PlaneDto planeDto) throws ServiceException {
+		Plane plane = PlaneAssembler.dtoToModel(planeDto);
+		try {
+			Company company = companyRepository.getByName(planeDto.getCompanyName());
+			plane.setCompany(company);
+			PlaneValidator.validatePlane(plane);
+			plane = planeRepository.insert(plane);
+			PlaneDto insertedPlane = PlaneAssembler.modelToDto(plane);
+			return insertedPlane;
+		} catch (ValidationException e) {
+			throw new ServiceException(e.getMessage());
+		} catch(RepositoryException e) {
+			throw new ServiceException("Plane insertion failed.");
+		}
+	}
+
+	@Override
+	public void delete(PlaneDto planeDto) throws ServiceException {
+		Plane plane = PlaneAssembler.dtoToModel(planeDto);
+		try {
+			// get the company by name so that the reference to company is managed
+			Company company = companyRepository.getByName(planeDto.getCompanyName());
+			plane.setCompany(company);
+			planeRepository.delete(plane);
+		} catch (RepositoryException e) {
+			throw new ServiceException("Plane deletion failed.");
+		}
+	}
+
+	@Override
+	public void activate(PlaneDto planeDto) throws ServiceException {
+		Plane plane = PlaneAssembler.dtoToModel(planeDto);
+		try {
+			// get the company by name so that the reference to company is managed
+			Company company = companyRepository.getByName(planeDto.getCompanyName());
+			plane.setCompany(company);
+			planeRepository.activate(plane);
+		} catch(RepositoryException e) {
+			throw new ServiceException("Plane activation failed.");
+		}
+	}
+
+	@Override
+	public List<String> getAllTypes() {
+		List<String> types = new ArrayList<>();
+		for (int i = 0; i < PlaneType.values().length; i++) {
+			types.add(PlaneType.values()[i].toString());
+		}
+		return types;
+	}
+
+}

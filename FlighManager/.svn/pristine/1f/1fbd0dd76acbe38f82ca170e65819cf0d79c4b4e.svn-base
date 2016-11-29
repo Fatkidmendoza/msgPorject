@@ -1,0 +1,80 @@
+package edu.msg.flightmanager.beans;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.RequestScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpSession;
+
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.service.UserService;
+
+@ManagedBean
+@RequestScoped
+public class UsersBean implements Serializable {
+
+	private static final long serialVersionUID = 4860933911207569401L;
+
+	private boolean editable;
+
+	@EJB
+	private UserService userService;
+
+	public String enableEdit() {
+		setEditable(true);
+		return "details";
+
+	}
+
+	public String disableEdit() {
+		setEditable(false);
+		return "details";
+	}
+
+	public List<UserDto> getAllUsers() {
+		return userService.getAll();
+	}
+
+	public String executeUpdate(String firstName, String lastName, String email, String phoneNumber, String userName) {
+
+		UserDto userDto = getUserInSession();
+		userDto.setFirstName(firstName);
+		userDto.setLastName(lastName);
+		userDto.setEmail(email);
+		userDto.setPhoneNumber(phoneNumber);
+		userDto.setUserName(userName);
+
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+		session.setAttribute("user", userDto);
+		try {
+			userService.update(userDto);
+		} catch (ServiceException e) {
+
+		}
+		setEditable(false);
+		return "details";
+	}
+
+	public boolean getUserIsEditable() {
+		return isEditable();
+	}
+
+	public UserDto getUserInSession() {
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+		return (UserDto) session.getAttribute("user");
+
+	}
+
+	public boolean isEditable() {
+		return editable;
+	}
+
+	public void setEditable(boolean edit) {
+		this.editable = edit;
+	}
+
+}

@@ -1,0 +1,10 @@
+package edu.msg.flightmanager.backend.service;
+
+import javax.ejb.Local;
+
+import edu.msg.flightmanager.backend.dto.UserDto;
+
+@Local
+public interface AuthenticationService {
+	public UserDto login(String userName, String password);
+}

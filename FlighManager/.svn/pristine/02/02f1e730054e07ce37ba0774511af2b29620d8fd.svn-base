@@ -1,0 +1,132 @@
+package edu.msg.flightmanager.beans;
+
+import java.io.Serializable;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+
+import edu.msg.flightmanager.backend.dto.ItineraryDto;
+import edu.msg.flightmanager.backend.model.Itinerary;
+import edu.msg.flightmanager.backend.service.ItineraryService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+
+@ManagedBean
+@ViewScoped
+public class ItinerariesBean implements Serializable {
+
+	private static final long serialVersionUID = -2908422761939182720L;
+
+	@EJB
+	private ItineraryService itineraryService;
+	private Integer hours;
+	private Integer minutes;
+	private ItineraryDto itineraryToInsert;
+	private ItineraryDto itineraryToUpdate;
+
+	@PostConstruct
+	private void initValues() {
+		hours = 0;
+		minutes = 0;
+		itineraryToInsert = new ItineraryDto();
+
+	}
+
+	public List<ItineraryDto> getAllItineraries() {
+		return itineraryService.getAll();
+	}
+
+	public void deleteItinerary(Itinerary itinerary) {
+
+	}
+
+	public void updateItinerary(Itinerary itinerary) {
+
+	}
+
+	public String addItinerary() {
+		try {
+			Calendar calendar = Calendar.getInstance();
+			calendar.set(Calendar.HOUR_OF_DAY, hours);
+			calendar.set(Calendar.MINUTE, minutes);
+			SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm:ss");
+			Time time = Time.valueOf(localDateFormat.format(calendar.getTime()));
+			itineraryToInsert.setDuration(time);
+			itineraryService.insert(itineraryToInsert);
+			initValues();
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Insert Successful.",
+					"The itinerary was inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Insert Failed.",
+					"The itinerary was not inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "addItinerary";
+		}
+		return "addItinerary";
+	}
+
+	public List<String> getPeriodicityTypes() {
+		return itineraryService.getPeriodicityTypes();
+	}
+
+	public ItineraryDto getItineraryToInsert() {
+		return itineraryToInsert;
+	}
+
+	public void setItineraryToInsert(ItineraryDto itineraryToInsert) {
+		this.itineraryToInsert = itineraryToInsert;
+	}
+
+	public Integer getHours() {
+		return hours;
+	}
+
+	public void setHours(Integer hours) {
+		this.hours = hours;
+	}
+
+	public Integer getMinutes() {
+		return minutes;
+	}
+
+	public void setMinutes(Integer minutes) {
+		this.minutes = minutes;
+	}
+
+
+
+
+	public ItineraryDto getItineraryToUpdate() {
+		return itineraryToUpdate;
+	}
+
+	public void setItineraryToUpdate(ItineraryDto itineraryToUpdate) {
+		this.itineraryToUpdate = itineraryToUpdate;
+	}
+
+	public void updateItinerary() {
+		try {
+			itineraryToUpdate=itineraryService.update(itineraryToUpdate);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Successful.",
+					"The itinerary was updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch(ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Failed.",
+					"The itinerary was not updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+	}
+
+	public void deleteItinerary(ItineraryDto itineraryDto) {
+
+	}
+
+}

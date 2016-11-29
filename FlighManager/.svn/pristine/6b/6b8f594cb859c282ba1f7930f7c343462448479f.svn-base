@@ -1,0 +1,47 @@
+package edu.msg.flightmanager.beans;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.service.UserService;
+
+@ManagedBean
+@SessionScoped
+public class UsersBean implements Serializable {
+
+	private static final long serialVersionUID = 105571392445469175L;
+
+	@EJB
+	private UserService userService;
+
+	public List<User> getAllUsers() {
+		return userService.getAll();
+	}
+
+	public void deleteUser(User user) {
+
+	}
+
+	public void updateUser(User user) {
+
+	}
+
+	public List<String> getUserFields() {
+		List<String> fields = new ArrayList<>();
+		fields.add("First Name");
+		fields.add("Last Name");
+		fields.add("Username");
+		fields.add("Password");
+		fields.add("Adress");
+		fields.add("E-mail");
+		fields.add("Phone");
+		return fields;
+	}
+
+}

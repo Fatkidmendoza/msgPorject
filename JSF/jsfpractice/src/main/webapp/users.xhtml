@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+<h:head></h:head>
+<h:body>
+	<h:form>
+	
+		<p:messages />
+	
+		<p:dataTable value="#{usersBean.allUsers}" var="user" rendered="#{usersBean.shouldShow}">
+			<f:facet name="header">
+				Users Table!
+			</f:facet>
+			
+			<p:column headerText="Username">
+				<h:outputText value="#{user.userName}" rendered="#{!user.equals(usersBean.selectedUser)}" />
+				<h:inputText value="#{usersBean.selectedUser.userName}" rendered="#{user.equals(usersBean.selectedUser)}" />
+			</p:column>
+			<p:column headerText="Password">
+				#{user.password}
+			</p:column>
+			
+			<p:column headerText="Delete?">
+				<h:commandButton action="#{usersBean.deleteUser(user)}" value="Delete!" />
+			</p:column>
+			
+			<p:column headerText="Modify?">
+				<h:commandButton action="#{usersBean.enableModifyUser(user)}" value="Modify!" rendered="#{!user.equals(usersBean.selectedUser)}" />
+				<h:commandButton action="#{usersBean.modifyUser}" value="Save!" rendered="#{user.equals(usersBean.selectedUser)}" />
+			</p:column>
+		
+		</p:dataTable>
+		
+		<h:commandButton action="#{loginBean.logout}" value="goodbye!" />
+	</h:form>
+	
+	
+</h:body>
+</html>

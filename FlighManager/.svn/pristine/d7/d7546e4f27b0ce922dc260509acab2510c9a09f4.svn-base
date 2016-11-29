@@ -1,0 +1,20 @@
+package edu.msg.flightmanager.backend.util;
+
+import java.util.Calendar;
+
+import edu.msg.flightmanager.backend.model.Flight;
+
+public class FlightValidator {
+
+	private static final String DATE_IS_NOT_VALID = "The date is not valid.";
+
+	public static void validateFlight(Flight flight) throws ValidationException {
+		FlightTemplateValidator.validateFlightTemplate(flight.getTemplate());
+		PlaneValidator.validatePlane(flight.getPlane());
+
+		if (flight.getDate().before(Calendar.getInstance().getTime())) {
+			throw new ValidationException(DATE_IS_NOT_VALID);
+		}
+	}
+
+}

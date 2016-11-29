@@ -1,0 +1,28 @@
+package edu.msg.flightmanager.backend.service;
+
+import java.io.File;
+import java.util.Date;
+import java.util.List;
+
+import javax.ejb.Local;
+
+import edu.msg.flightmanager.backend.dto.FlightDto;
+
+@Local
+public interface FlightService {
+
+	List<FlightDto> getAll() throws ServiceException;
+
+	FlightDto update(FlightDto flightDto) throws ServiceException;
+
+	FlightDto insert(FlightDto flightDto) throws ServiceException;
+
+	void delete(FlightDto flightDto) throws ServiceException;
+
+	void activate(FlightDto flightDto) throws ServiceException;
+
+	List<FlightDto> getHistory() throws ServiceException;
+
+	File getCsvFileWithFlights(Date startDate, Date endDate) throws ServiceException;
+
+}

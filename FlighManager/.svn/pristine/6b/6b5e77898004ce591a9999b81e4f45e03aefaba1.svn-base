@@ -1,0 +1,105 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.persistence.NoResultException;
+
+import org.apache.commons.lang.RandomStringUtils;
+
+import edu.msg.flightmanager.backend.assembler.TokenAssembler;
+import edu.msg.flightmanager.backend.assembler.UserAssembler;
+import edu.msg.flightmanager.backend.dto.TokenDto;
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.exception.DeletedEntityException;
+import edu.msg.flightmanager.backend.exception.EntityNotFoundException;
+import edu.msg.flightmanager.backend.exception.ExpiredTokenException;
+import edu.msg.flightmanager.backend.exception.LogInException;
+import edu.msg.flightmanager.backend.exception.WrongEmailException;
+import edu.msg.flightmanager.backend.model.Token;
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.repository.TokenRepository;
+import edu.msg.flightmanager.backend.repository.UserRepository;
+import edu.msg.flightmanager.backend.service.AuthenticationService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.util.PasswordEncrypter;
+
+@Stateless(name = "AuthenticationService", mappedName = "ejb/AuthenticationService")
+public class AuthenticationServiceBean implements AuthenticationService {
+
+	private static final int TOKEN_LENGTH = 32;
+
+	private static final int NUMBER_OF_DAYS_UNTIL_TOKEN_EXPIRE = 3;
+
+	@EJB
+	private UserRepository userRepository;
+
+	@EJB
+	private TokenRepository tokenRepository;
+
+	@Override
+	public UserDto login(String userName, String password) {
+		String encryptedPassword = PasswordEncrypter.generateHashedPassword(password);
+		User tempUser;
+		try {
+			tempUser = userRepository.getByUserName(userName);
+		} catch (RepositoryException e) {
+			throw new LogInException("Wrong username or password");
+		}
+		if (tempUser.isDeleted()) {
+			throw new LogInException("You do not have permission to log in");
+		}
+		if (tempUser.getPassword().equals(encryptedPassword) || tempUser.getPassword().equals(password)) {
+			return UserAssembler.modelToDto(tempUser);
+		} else {
+			throw new LogInException("Wrong username or password");
+		}
+	}
+
+	@Override
+	public UserDto validateToken(String value) throws ServiceException {
+		try {
+			Token foundToken = tokenRepository.getByValue(value);
+			Date createdAt = foundToken.getCreatedAt();
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(createdAt);
+			calendar.add(Calendar.DATE, NUMBER_OF_DAYS_UNTIL_TOKEN_EXPIRE);
+			Date afterNumberOfDays = calendar.getTime();
+			if (afterNumberOfDays.before(new Date())) {
+				throw new ExpiredTokenException("Token expired");
+			}
+			return UserAssembler.modelToDto(foundToken.getUser());
+		} catch (NoResultException e) {
+			throw new EntityNotFoundException("Invalid token");
+		} catch (RepositoryException e) {
+			throw new ServiceException("Get token by value failed");
+		}
+	}
+
+	@Override
+	public TokenDto generateToken(String userName, String email) throws ServiceException, WrongEmailException {
+		try {
+
+			User tempUser = userRepository.getByUserName(userName);
+			if (tempUser.isDeleted()) {
+				throw new DeletedEntityException("You dont have permission to change password");
+			}
+			if (tempUser.getEmail().equals(email)) {
+				Token token = new Token();
+				token.setCreatedAt(new Date());
+				token.setUser(tempUser);
+				token.setValue(RandomStringUtils.randomAlphanumeric(TOKEN_LENGTH));
+				token = tokenRepository.insert(token);
+				return TokenAssembler.modelToDto(token);
+			} else {
+				throw new WrongEmailException("The email is not corect for existing user");
+			}
+		} catch (RepositoryException e) {
+			throw new ServiceException("Uer not found");
+		}
+	}
+
+}

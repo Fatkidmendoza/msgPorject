@@ -1,0 +1,22 @@
+package edu.msg.flightmanager.backend.repository;
+
+import java.util.List;
+
+import edu.msg.flightmanager.backend.exception.DifferentVersionException;
+import edu.msg.flightmanager.backend.model.AbstractModel;
+
+public interface BaseRepository<M extends AbstractModel, I> {
+
+	List<M> getAll() throws RepositoryException;
+
+	M insert(M model) throws RepositoryException;
+
+	M update(M model) throws DifferentVersionException,RepositoryException;
+
+	void delete(M model) throws RepositoryException;
+
+	M getById(I id) throws RepositoryException;
+
+	void activate(M model) throws RepositoryException;
+
+}

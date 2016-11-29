@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+	<title>Flights</title>
+</h:head>
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<div class="valign-wrapper" id="Flights-page" style="margin: 0 auto;">
+			<div class="container">
+				<div class="corner-align">
+					<div class="row">
+						<div class="card">
+							<div class="card-content"
+								style="font-family: Helvetica; font-size: 20pt; border: 1px solid black;">
+								<p:dataTable value="#{flightsBean.allFlights}" var="flight">
+									<f:facet name="header">Flights</f:facet>
+
+									<p:column headerText="Date">
+										<h:outputText value="#{flight.date}" />
+									</p:column>
+
+									<p:column headerText="Company">
+										<h:outputText value="#{flight.plane.companyName}" />
+									</p:column>
+
+									<p:column headerText="Departure">
+										<h:outputText value="#{flight.template.departure.name}" />
+									</p:column>
+
+									<p:column headerText="Arrival">
+										<h:outputText value="#{flight.template.arrival.name}" />
+									</p:column>
+
+									<p:column headerText="Delete?" style="width:130px">
+										<p:commandButton icon="ui-icon-trash" id="delete" actionListener="#{flightsBean.deleteFlight(flight)}" />
+									</p:column>
+
+									<p:column headerText="Update?" style="width:130px">
+										<p:commandButton icon="ui-icon-pencil" id="edit" actionListener="#{flightsBean.updateFlight(flight)}" />
+									</p:column>
+								</p:dataTable>
+
+							</div>
+							<br />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</ui:define>
+
+</ui:composition>
+
+</html>

@@ -1,0 +1,36 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import edu.msg.flightmanager.backend.assembler.PlaneAssembler;
+import edu.msg.flightmanager.backend.dto.PlaneDto;
+import edu.msg.flightmanager.backend.model.Plane;
+import edu.msg.flightmanager.backend.repository.PlaneRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.service.PlaneService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+
+@Stateless(name = "PlaneService", mappedName = "ej/PlaneService")
+public class PlaneServiceBean implements PlaneService {
+
+	@EJB
+	private PlaneRepository planeRepository;
+
+	@Override
+	public List<PlaneDto> getAll() throws ServiceException {
+		try {
+			List<PlaneDto> planesDto = new ArrayList<PlaneDto>();
+			for (Plane plane : planeRepository.getAll()) {
+				planesDto.add(PlaneAssembler.modelToDto(plane));
+			}
+			return planesDto;
+		} catch (RepositoryException e) {
+			throw new ServiceException("The planes selection failed", e);
+		}
+	}
+
+}

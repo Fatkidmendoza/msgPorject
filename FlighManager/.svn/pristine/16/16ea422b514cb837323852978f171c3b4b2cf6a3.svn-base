@@ -1,0 +1,8 @@
+package edu.msg.flightmanager.backend.service;
+
+import javax.ejb.Local;
+
+@Local
+public interface AuthenticationService {
+	public boolean login(String userName, String password);
+}

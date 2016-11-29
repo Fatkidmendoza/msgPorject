@@ -1,0 +1,48 @@
+package edu.msg.flightmanager.backend.model;
+
+import java.time.Duration;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "itinerary")
+public class Itinerary extends BaseEntity {
+
+	private static final long serialVersionUID = -2862301088891646334L;
+
+	@Column(name = "duration", nullable = false)
+	private Duration duration;
+	@Column(name = "periodicity", nullable = false)
+	@Enumerated(EnumType.STRING)
+	private PeriodicityType periodicity;
+
+	public Itinerary() {
+		this(null, null);
+	}
+
+	public Itinerary(Duration duration, PeriodicityType periodicity) {
+		super();
+		this.duration = duration;
+		this.periodicity = periodicity;
+	}
+
+	public Duration getDuration() {
+		return duration;
+	}
+
+	public void setDuration(Duration duration) {
+		this.duration = duration;
+	}
+
+	public PeriodicityType getPeriodicity() {
+		return periodicity;
+	}
+
+	public void setPeriodicity(PeriodicityType periodicity) {
+		this.periodicity = periodicity;
+	}
+}

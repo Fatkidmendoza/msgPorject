@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+	<title>FlightTemplate</title>
+</h:head>
+<ui:composition template="/template/commonLayout.xhtml">
+	<ui:define name="dynamicContent">
+		<div class="valign-wrapper" id="FlightTemplates-page"
+			style="margin: 0 auto;">
+			<div class="container">
+				<div class="corner-align">
+					<div class="row">
+						<div class="card">
+							<div class="card-content"
+								style="font-family: Helvetica; font-size: 20pt; border: 1px solid black;">
+								<p:dataTable value="#{flightTemplatesBean.allFlightTemplates}"
+									var="flightTemplate">
+									<f:facet name="header">Flight templates</f:facet>
+
+									<p:column headerText="Departure">
+										<h:outputText value="#{flightTemplate.departure.name}" />
+									</p:column>
+
+									<p:column headerText="Arrival">
+										<h:outputText value="#{flightTemplate.arrival.name}" />
+									</p:column>
+
+									<p:column headerText="Duration">
+										<h:outputText value="#{flightTemplate.itinerary.duration}" />
+									</p:column>
+
+									<p:column headerText="Delete?">
+										<h:commandButton
+											action="#{flightTemplatesBean.deleteFlightTemplate(flightTemplate)}"
+											value="Delete!" />
+									</p:column>
+
+									<p:column headerText="Update?">
+										<h:commandButton
+											action="#{flightTemplatesBean.updateFlightTemplate(flightTemplate)}"
+											value="Update!" />
+									</p:column>
+
+								</p:dataTable>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</ui:define>
+</ui:composition>
+</html>

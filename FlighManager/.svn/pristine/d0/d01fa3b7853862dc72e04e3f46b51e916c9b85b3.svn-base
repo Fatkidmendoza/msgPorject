@@ -1,0 +1,36 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import edu.msg.flightmanager.backend.assembler.FlightAssembler;
+import edu.msg.flightmanager.backend.dto.FlightDto;
+import edu.msg.flightmanager.backend.model.Flight;
+import edu.msg.flightmanager.backend.repository.FlightRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.service.FlightService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+
+@Stateless(name = "FlightService", mappedName = "ejb/FlightService")
+public class FlightServiceBean implements FlightService {
+
+	@EJB
+	private FlightRepository flightRepository;
+
+	@Override
+	public List<FlightDto> getAll() throws ServiceException {
+		try {
+			List<FlightDto> flights = new ArrayList<FlightDto>();
+			for (Flight flight : flightRepository.getAll()) {
+				flights.add(FlightAssembler.modelToDto(flight));
+			}
+			return flights;
+		} catch (RepositoryException e) {
+			throw new ServiceException("The flights selection failed", e);
+		}
+	}
+
+}

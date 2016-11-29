@@ -1,0 +1,36 @@
+package edu.msg.flightmanager.backend.dto;
+
+import java.util.List;
+
+public class CompanyDto extends EntityDto {
+	private List<AirportDto> airports;
+	private List<UserDto> employees;
+	private String name;
+	private List<PlaneDto> planes;
+	public List<AirportDto> getAirports() {
+		return airports;
+	}
+	public void setAirports(List<AirportDto> airports) {
+		this.airports = airports;
+	}
+	public List<UserDto> getEmployees() {
+		return employees;
+	}
+	public void setEmployees(List<UserDto> employees) {
+		this.employees = employees;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public List<PlaneDto> getPlanes() {
+		return planes;
+	}
+	public void setPlanes(List<PlaneDto> planes) {
+		this.planes = planes;
+	}
+
+
+}

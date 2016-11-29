@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>Home</title>
+	<!-- Compiled and minified CSS -->
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css" />
+	<!-- Compiled and minified JavaScript -->
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+</h:head>
+<h:body styleClass="blue light">
+<h:form >
+	<p:megaMenu orientation="vertical" style="margin-top:20px">
+
+		<p:submenu label="Flights" icon="ui-icon-document">
+
+			<p:column>
+				<p:submenu label="Operations">
+					<p:menuitem value="View" url="#{homeBean.flightPage}" />
+
+					<p:menuitem value="New" url="#" />
+				</p:submenu>
+
+			</p:column>
+
+		</p:submenu>
+
+		<p:submenu label="Flight Templates" icon="ui-icon-pencil">
+
+			<p:column>
+				<p:submenu label="Operations">
+					<p:menuitem value="View" url="#{homeBean.flightTemplatesPage}" />
+					<p:menuitem value="New" url="#" />
+				</p:submenu>
+			</p:column>
+		</p:submenu>
+
+		<p:submenu label="Itineraries" icon="ui-icon-contact">
+			<p:column>
+				<p:submenu label="Operations">
+					<p:menuitem value="View" url="#{homeBean.itineraryPage}" />
+					<p:menuitem value="New" url="#" />
+				</p:submenu>
+
+			</p:column>
+		</p:submenu>
+
+		<p:submenu label="Planes" icon="ui-icon-contact">
+			<p:column>
+				<p:submenu label="Operations">
+					<p:menuitem value="View" url="#{homeBean.planePage}" />
+					<p:menuitem value="New" url="#" />
+				</p:submenu>
+			</p:column>
+		</p:submenu>
+
+		<p:submenu label="Users" icon="ui-icon-contact">
+			<p:column>
+				<p:submenu label="Operations">
+					<p:menuitem value="View" url="#{homeBean.usersPage}" />
+					<p:menuitem value="Tech.1.2" url="#" />
+				</p:submenu>
+
+			</p:column>
+
+		</p:submenu>
+
+		<p:submenu label="Companies" icon="ui-icon-contact">
+			<p:column>
+				<p:submenu label="Operations">
+					<p:menuitem value="View" url="#{homeBean.compamyPage}" />
+					<p:menuitem value="Tech.1.2" url="#" />
+				</p:submenu>
+			</p:column>
+		</p:submenu>
+
+		<p:submenu label="Details" icon="ui-icon-contact">
+			<p:column>
+					<p:submenu label="Operations">
+					<p:menuitem value="Details" url="#{homeBean.userDetails}" />
+					
+				</p:submenu>
+			</p:column>
+		</p:submenu>
+
+		<p:menuitem value="Log out" url="login.xhtml" icon="ui-icon-close" />
+	</p:megaMenu>
+</h:form>
+</h:body>
+</html>

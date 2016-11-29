@@ -1,0 +1,43 @@
+package edu.msg.flightmanager.backend.repository.bean;
+
+import java.util.List;
+
+import javax.ejb.Stateless;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
+import javax.persistence.TypedQuery;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.msg.flightmanager.backend.model.Plane;
+import edu.msg.flightmanager.backend.repository.PlaneRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+
+@Stateless(name = "PlaneRepository", mappedName = "ejb/PlaneRepository")
+public class PlaneRepositoryBean extends BaseRepositoryBean<Plane, Long> implements PlaneRepository {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(PlaneRepositoryBean.class);
+
+	public PlaneRepositoryBean() {
+		super(Plane.class);
+	}
+
+	@Override
+	public List<Plane> getByCompany(String companyName) throws RepositoryException {
+		try {
+			LOGGER.info("Try to select a plane by its company");
+			TypedQuery<Plane> planes = entityManager
+					.createQuery("SELECT p FROM Plane p WHERE p.company.name= :companyName", Plane.class);
+			planes.setParameter("companyName", companyName);
+			LOGGER.info("Planes selection by company successful.");
+			return planes.getResultList();
+		} catch (NoResultException e) {
+			LOGGER.error("Planes selection by company failed.", e);
+			throw new RepositoryException("Planes selection by company failed.");
+		} catch (PersistenceException ex) {
+			LOGGER.error("Planes selection by company failed.", ex);
+			throw new RepositoryException("Planes selection company failed.");
+		}
+	}
+}

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+	<h:head>
+		<title>hide or show</title>
+	</h:head>
+	<h:form>
+		<h:commandButton value="Show" action ="#{userController.show}">
+			<f:ajax execute="@form" render="@form"></f:ajax>
+		</h:commandButton>
+		<h:commandButton value="Hide" action ="#{userController.hide}">
+			<f:ajax execute="@form" render="@form"></f:ajax>
+		</h:commandButton>
+		<br/>
+		<h:inputText rendered="#{userController.visible}"></h:inputText>
+		
+			<h:commandButton id="all" value="details" action ="#{usersBean.getDatails}">
+	
+		</h:commandButton>
+		
+		<h:commandButton id="adminFmanagerOp1" value="Flight_data_page" action ="#{usersBean.getFlightPage}">
+		</h:commandButton>
+		
+		<h:commandButton id="adminFmanagerOp2" value="Flight_templates" action ="#{usersBean.getFlightTemplatesPage}">
+		</h:commandButton>
+		
+		<h:commandButton id="adminFmanagerOp3" value="Airport" action ="#{usersBean.getAirportPage}">
+		</h:commandButton>
+		
+		<h:commandButton id="adminFmanagerOp4" value="Itinerary" action ="#{usersBean.getItineraryPage}">
+		</h:commandButton>
+		
+		<h:commandButton id="adminFmanagerOp5" value="Plane" action ="#{usersBean.getPlanePage}">
+		</h:commandButton>
+		
+		<h:commandButton id="adminFmanagerOp6" value="Compamy" action ="#{usersBean.getCompamyPage}">
+		</h:commandButton>
+		
+ 
+<p:megaMenu orientation="vertical" style="margin-top:20px">
+    <p:submenu label="Details" icon="ui-icon-check">
+        <p:column>
+            <p:submenu label="fgdh">
+                <p:menuitem value="TV.1.1" url="#" />
+                <p:menuitem value="TV.1.2" url="#" />
+            </p:submenu>
+         
+        </p:column>
+ 
+        <p:column>
+            <strong>Image</strong>
+            <p:graphicImage name="/demo/images/nature/nature1.jpg" width="200"/>
+        </p:column>
+    </p:submenu>
+ 
+    <p:submenu label="Flights" icon="ui-icon-document">
+ 
+        <p:column>
+            <p:submenu label="Operations">
+                <p:menuitem value="View"  url="flights.xhtml" />
+                <p:menuitem value="New" url="#" />
+            </p:submenu>
+         
+        </p:column>
+
+    </p:submenu>
+ 
+    <p:submenu label="Flight Templates" action="#{userController.hide}" icon="ui-icon-pencil">
+    
+        <p:column>
+            <p:submenu label="Operations">
+                <p:menuitem value="View" url="flightTemplates.xhtml" />
+                <p:menuitem value="New" url="#" />
+            </p:submenu> 
+            </p:column>
+    </p:submenu>
+ 
+    <p:submenu label="Itineraries" icon="ui-icon-contact">
+        <p:column>
+            <p:submenu label="Operations">
+               <p:menuitem value="View" url="itineraries.xhtml" />
+                <p:menuitem value="New" url="#" />
+            </p:submenu>
+
+        </p:column>
+    </p:submenu>
+    
+     <p:submenu label="Planes" icon="ui-icon-contact">
+        <p:column>
+            <p:submenu label="Operations">
+               <p:menuitem value="View" url="planes.xhtml" />
+                <p:menuitem value="New" url="#" />
+            </p:submenu>
+        </p:column>
+    </p:submenu>
+    
+    <p:submenu label="Users" icon="ui-icon-contact">
+        <p:column>
+            <p:submenu label="Tech.1">
+                <p:menuitem value="Tech.1.1" url="users.xhtml" />
+                <p:menuitem value="Tech.1.2" url="#" />
+            </p:submenu>
+
+        </p:column>
+ 
+    </p:submenu>
+ 
+    <p:menuitem value="Quit" url="https://www.youtube.com/watch?v=FCtbeXYkh7U" icon="ui-icon-close" />
+</p:megaMenu>
+
+<h3>Overlay</h3>
+    <p:commandButton id="dynaButton" value="Show" type="button" icon="ui-icon-extlink"/>
+    <p:menu overlay="true" trigger="dynaButton" my="left top" at="left bottom">
+        <p:submenu label="Ajax">
+            <p:panelGrid columns="2">
+    <f:facet name="header">
+        <p:graphicImage name="demo/images/misc/kobe.png" />
+    </f:facet>
+ 
+    <h:outputText value="Name:" />
+    <h:outputText value="Kobe Bryant" />
+ 
+    <h:outputText value="Team:" />
+    <h:outputText value="Los Angeles Lakers" />
+ 
+    <h:outputText value="Position:" />
+    <h:outputText value="Shooting Guard" />
+ 
+    <h:outputText value="Number:" />
+    <h:outputText value="24" />
+</p:panelGrid>
+        </p:submenu>
+    </p:menu>
+
+	</h:form>
+
+</html>

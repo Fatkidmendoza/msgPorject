@@ -1,0 +1,151 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<f:view locale="#{languageBean.currentLocale}"></f:view>
+
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="detailsForm">
+			<p:growl autoUpdate="true" />
+			<div class="valign-wrapper" id="login-page">
+				<div class="container">
+					<div class="corner-align">
+						<div class="row">
+							<div class="col s5 offset-s3">
+								<div class="card">
+									<div class="card-content">
+
+										<p:panelGrid columns="2" id="detailsPanel"
+											value="#{usersBean.userInSession}" var="user">
+											<f:facet name="header">
+												<h:outputText value="#{usersBean.userInSession.userName}" />
+											</f:facet>
+											<p:outputLabel for="fName" value="#{msg['pers.firstName']}" />
+											<p:outputLabel value="#{usersBean.userInSession.firstName}"
+												id="fName" rendered="#{!usersBean.userIsEditable}" />
+											<p:inputText value="#{usersBean.userInSession.firstName}"
+												binding="#{fNameInput}"
+												rendered="#{usersBean.userIsEditable}">
+												<f:validator validatorId="nameValidator" />
+											</p:inputText>
+
+											<p:outputLabel for="lName" value="#{msg['pers.lastName']}" />
+											<p:outputLabel value="#{usersBean.userInSession.lastName}"
+												id="lName" rendered="#{!usersBean.userIsEditable}" />
+											<p:inputText value="#{usersBean.userInSession.lastName}"
+												binding="#{lNameInput}"
+												rendered="#{usersBean.userIsEditable}">
+												<f:validator validatorId="nameValidator" />
+											</p:inputText>
+
+											<p:outputLabel for="uName" value="#{msg['login.username']}" />
+											<p:outputLabel value="#{usersBean.userInSession.userName}"
+												id="uName" rendered="#{!usersBean.userIsEditable}" />
+											<p:inputText id="userNameText"
+												value="#{usersBean.userInSession.userName}"
+												binding="#{uNameInput}"
+												rendered="#{usersBean.userIsEditable}">
+												<f:validator validatorId="userNameValidator" />
+											</p:inputText>
+
+											<p:outputLabel for="email" value="#{msg['pers.email']}" />
+											<p:outputLabel value="#{usersBean.userInSession.email}"
+												id="email" rendered="#{!usersBean.userIsEditable}" />
+											<p:inputText value="#{usersBean.userInSession.email}"
+												id="emailTxt" requiredMessage="NOT GOOD"
+												binding="#{emailInput}"
+												rendered="#{usersBean.userIsEditable}">
+												<f:validator validatorId="emailValidator" />
+											</p:inputText>
+
+
+											<p:outputLabel for="phone" value="#{msg['pers.phone']}" />
+											<p:outputLabel value="#{usersBean.userInSession.phoneNumber}"
+												id="phone" rendered="#{!usersBean.userIsEditable}" />
+											<p:inputText value="#{usersBean.userInSession.phoneNumber}"
+												binding="#{phoneInput}"
+												rendered="#{usersBean.userIsEditable}">
+												<f:validator validatorId="phoneValidator" />
+											</p:inputText>
+
+											<p:outputLabel for="type" value="#{msg['pers.role']}" />
+											<p:outputLabel value="#{usersBean.userInSession.type}"
+												id="type" />
+
+<<<<<<< .mine
+											<h:outputLabel for="pass" rendered="#{usersBean.userIsEditable}" value="#{msg['login.password']}"/>
+											<p:selectBooleanCheckbox id="pass" rendered="#{usersBean.userIsEditable}" > 
+												<f:ajax listener="#{usersBean.changeVisibilityOfPassword}" render=" @form" />
+=======
+											<p:outputLabel for="pass"
+												rendered="#{usersBean.userIsEditable}"
+												value="#{msg['login.password']}" />
+											<p:selectBooleanCheckbox id="pass"
+												rendered="#{usersBean.userIsEditable}">
+												<f:ajax listener="#{usersBean.changeVisibilityOfPassword}"
+													render=" @form" />
+>>>>>>> .r204
+											</p:selectBooleanCheckbox>
+
+
+											<p:outputLabel for="oldPassword"
+												rendered="#{usersBean.editPassword}"
+												value="#{msg['pers.yourPass']}" />
+											<h:inputSecret id="oldPassword" binding="#{oldPass}"
+												rendered="#{usersBean.editPassword}">
+												<f:validator validatorId="detailsPasswordValidator" />
+												<f:attribute name="newPassword" value="#{newPass}" />
+												<f:attribute name="chckPassword" value="#{confirmPass}" />
+											</h:inputSecret>
+
+											<p:outputLabel for="newPassword"
+												rendered="#{usersBean.editPassword}"
+												value="#{msg['pers.newPass']}" />
+											<p:password id="newPassword" binding="#{newPass}"
+												rendered="#{usersBean.editPassword}" feedback="true" />
+
+											<p:outputLabel for="chckPassword"
+												rendered="#{usersBean.editPassword}"
+												value="#{msg['pers.confirmPass']}" />
+											<p:password id="chckPassword" binding="#{confirmPass}"
+												rendered="#{usersBean.editPassword}" feedback="true" />
+
+
+											<p:commandButton value="#{msg['pers.edit']}"
+												update="detailsForm" styleClass="btn btn-large"
+												action="#{usersBean.enableEdit}"
+												rendered="#{!usersBean.userIsEditable}" />
+											
+											<p:commandButton value="#{msg['pers.save']}"
+												update="detailsForm" styleClass="btn btn-large"
+												actionListener="#{usersBean.executeUpdate(fNameInput.value,lNameInput.value,emailInput.value,phoneInput.value,uNameInput.value,oldPass.value,newPass.value,confirmPass.value)}"
+												rendered="#{usersBean.userIsEditable}" />
+											<p:commandButton value="#{msg['pers.cancel']}"
+												update="detailsForm" styleClass="btn btn-large"
+												action="#{usersBean.disableEdit}"
+												rendered="#{usersBean.userIsEditable}" immediate="true" />
+
+										</p:panelGrid>
+
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+</html>
+
+
+
+
+
+

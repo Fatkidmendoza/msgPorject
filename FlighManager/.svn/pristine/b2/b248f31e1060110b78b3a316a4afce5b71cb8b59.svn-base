@@ -1,0 +1,30 @@
+package edu.msg.flightmanager.backend.repository.bean;
+
+import javax.ejb.Stateless;
+import javax.persistence.PersistenceException;
+import javax.persistence.TypedQuery;
+
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.repository.UserRepository;
+
+@Stateless(name = "UserRepository", mappedName = "ejb/UserRepository")
+public class UserRepositoryBean extends BaseRepositoryBean<User, Long> implements UserRepository {
+
+	public UserRepositoryBean() {
+		super(User.class);
+	}
+
+	@Override
+	public User getByUserName(String userName) throws RepositoryException {
+		try {
+			TypedQuery<User> users = entityManager.createQuery("SELECT u FROM User u WHERE u.userName= :userName",User.class);
+			users.setParameter("userName", userName);
+			return users.getSingleResult();
+		} catch (PersistenceException ex) {
+			throw new RepositoryException(ex);
+		}
+
+	}
+
+}

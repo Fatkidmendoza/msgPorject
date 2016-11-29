@@ -1,0 +1,110 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+	<title>Users</title>
+</h:head>
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="usersForm">
+			<p:growl id="growl" showDetail="true" />
+			<div class="valign-wrapper" id="Users-page" style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="row">
+							<div class="card">
+								<div class="card-content"
+									style="font-family: Helvetica; font-size: 20pt; border: 1px solid black;">
+									<p:dataTable value="#{usersBean.allUsers}" var="user">
+										<f:facet name="header">Users</f:facet>
+	
+										<p:column headerText="First name">
+											<h:outputText value="#{user.firstName}" />
+										</p:column>
+	
+										<p:column headerText="Last name">
+											<h:outputText value="#{user.lastName}" />
+										</p:column>
+	
+										<p:column headerText="Username">
+											<h:outputText value="#{user.userName}" />
+										</p:column>
+	
+										<p:column headerText="Email">
+											<h:outputText value="#{user.email}" />
+										</p:column>
+	
+										<p:column headerText="Phone number">
+											<h:outputText value="#{user.phoneNumber}" />
+										</p:column>
+	
+										<p:column headerText="Type">
+											<h:outputText value="#{user.type}" />
+										</p:column>
+	
+										<p:column headerText="Delete?" style="width:130px">
+											<p:commandButton icon="ui-icon-trash" id="delete" actionListener="#{usersBean.deleteUser(user)}" />
+										</p:column>
+	
+										<p:column headerText="Update?" style="width:130px">
+												
+												<p:commandButton update=":usersForm:userDetail" oncomplete="PF('userDialog').show()" icon="ui-icon-pencil" title="View">
+									                <f:setPropertyActionListener value="#{user}" target="#{usersBean.userToUpdate}" />
+									            </p:commandButton>
+
+										</p:column>
+	
+									</p:dataTable>
+									
+									<p:dialog header="User Info" widgetVar="userDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+								        <p:outputPanel id="userDetail" style="text-align:center;">
+								            <p:panelGrid  columns="2" rendered="#{not empty usersBean.userToUpdate}" columnClasses="label,value">
+								                <p:outputLabel for="firstName" value="First name" />
+												<p:inputText id="firstName" value="#{usersBean.userToUpdate.firstName}"/>
+								 
+								                <p:outputLabel for="lastName" value="Last name" />
+												<p:inputText id="lastName" value="#{usersBean.userToUpdate.lastName}"/>
+				
+												<p:outputLabel for="email" value="Email" />
+												<p:inputText id="email" value="#{usersBean.userToUpdate.email}"/>
+												
+												<p:outputLabel for="phoneNumber" value="Phone number" />
+												<p:inputText id="phoneNumber" value="#{usersBean.userToUpdate.phoneNumber}"/>
+												
+												<p:outputLabel for="userName" value="User name" />
+												<p:inputText id="userName" value="#{usersBean.userToUpdate.userName}"/>
+				
+												<p:outputLabel for="password" value="Password" />
+												<p:password id="password" feedback="true" value="#{usersBean.userToUpdate.password}"/>
+												
+												<p:outputLabel for="typeMenu" value="Type" />
+												<p:selectOneMenu id="typeMenu" value="#{usersBean.userToUpdate.type}">
+													<f:selectItems value="#{usersBean.allTypes}" var="type" itemValue="#{type}" itemLabel="#{type}" />
+												</p:selectOneMenu>
+				
+												<p:outputLabel for="companyMenu" value="Company" />
+												<p:selectOneMenu id="companyMenu" value="#{usersBean.userToUpdate.companyName}">
+													<f:selectItems value="#{companiesBean.allCompanies}" var="company" itemValue="#{company.name}" itemLabel="#{company.name}" />
+												</p:selectOneMenu>
+								            </p:panelGrid>
+								            
+								            <p:commandButton value="Update" icon="ui-icon-pencil" id="update" actionListener="#{usersBean.updateUser()}" update="usersForm" />
+								        </p:outputPanel>
+								    </p:dialog>
+	
+								</div>
+								<br />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+</html>

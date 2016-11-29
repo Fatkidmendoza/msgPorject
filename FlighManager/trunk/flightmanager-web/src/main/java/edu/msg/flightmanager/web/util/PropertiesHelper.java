@@ -1,0 +1,23 @@
+package edu.msg.flightmanager.web.util;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+public class PropertiesHelper {
+
+	public static Properties propertie() {
+		Properties properties = new Properties();
+
+		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		InputStream input = loader.getResourceAsStream("/config.properties");
+
+		try {
+			properties.load(input);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		return properties;
+	}
+}

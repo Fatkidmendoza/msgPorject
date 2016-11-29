@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>Companies</title>
+	<!-- Compiled and minified CSS -->
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css" />
+	<!-- Compiled and minified JavaScript -->
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+</h:head>
+<h:body styleClass="blue light">
+<h:form>
+	<div class="valign-wrapper" id="companies-page" style="margin: 0 auto;">
+		<div class="container">
+			<div class="corner-align">
+				<div class="row">
+					<div class="card">
+						<div class="card-content" style="font-family: Helvetica; font-size: 20pt; border: 1px solid black;">
+							<p:dataTable value="#{companiesBean.allCompanies}" var="company">
+								<f:facet name="header">Companies</f:facet>
+								
+								<p:column headerText="Name">
+									<p:commandLink id="ajax" actionListener="#{companiesBean.selectAction(company)}" ajax="false">
+										<h:outputText value="#{company.name}" />
+									</p:commandLink>
+									
+								</p:column>
+
+								<p:column headerText="Delete?">
+									<h:commandButton
+										action="#{companiesBean.deleteCompany(company)}"
+										value="Delete!" />
+								</p:column>
+
+								<p:column headerText="Update?">
+									<h:commandButton
+										action="#{companiesBean.updateCompany(company)}"
+										value="Update!" />
+								</p:column>
+							</p:dataTable>
+
+						</div>
+						<br />
+					</div>
+				</div>
+				
+				<h:form>
+					<p:fieldset legend="Company details" style="margin-bottom:20px">
+					
+				        <p:panelGrid columns="3" cellpadding="5">
+				            <p:dataTable value="#{companiesBean.selectedCompanyPlanes}" var="plane">
+								<f:facet name="header">Planes</f:facet>
+
+								<p:column headerText="Number of places">
+									<h:outputText value="#{plane.numberOfPlaces}" />
+								</p:column>
+								
+								<p:column headerText="Type">
+									<h:outputText value="#{plane.type}" />
+								</p:column>
+
+							</p:dataTable>
+							
+				        	<p:dataTable value="#{companiesBean.selectedCompanyUsers}" var="user">
+								<f:facet name="header">Users</f:facet>
+
+								<p:column headerText="First name">
+									<h:outputText value="#{user.firstName}" />
+								</p:column>
+								
+								<p:column headerText="Last name">
+									<h:outputText value="#{user.lastName}" />
+								</p:column>
+
+							</p:dataTable>
+							
+				        	<p:dataTable value="#{companiesBean.selectedCompanyAirports}" var="airport">
+								<f:facet name="header">Airports</f:facet>
+
+								<p:column headerText="Name">
+									<h:outputText value="#{airport.name}" />
+								</p:column>
+								
+								<p:column headerText="Country">
+									<h:outputText value="#{airport.country}" />
+								</p:column>
+
+							</p:dataTable>
+				        </p:panelGrid>
+    				</p:fieldset>
+				</h:form>
+			</div>
+		</div>
+	</div>
+</h:form>
+</h:body>
+</html>

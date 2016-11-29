@@ -1,0 +1,105 @@
+package edu.msg.flightmanager.web.filters;
+
+import java.io.IOException;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.validator.ValidatorException;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.web.util.Constants;
+
+@WebFilter(filterName = "RoleFilter", urlPatterns = { "*.xhtml" })
+public class RoleFilter implements Filter {
+
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+
+	}
+
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
+		try {
+
+			HttpServletRequest httpRequest = (HttpServletRequest) request;
+			HttpServletResponse httpResponse = (HttpServletResponse) response;
+			HttpSession httpSession = httpRequest.getSession(false);
+
+			String requestUrl = httpRequest.getRequestURI();
+
+			boolean isPlanesPage = requestUrl.indexOf("/planes.xhtml") >= 0;
+			boolean isItinerariesPage = requestUrl.indexOf("/itineraries.xhtml") >= 0;
+			boolean isFlightTemplatesPage = requestUrl.indexOf("/flightTemplates.xhtml") >= 0;
+			boolean isAirportsPage = requestUrl.indexOf("/airports.xhtml") >= 0;
+			boolean isUsersPage = requestUrl.indexOf("/users.xhtml") >= 0;
+			boolean isAddPlanePage = requestUrl.indexOf("/addPlane.xhtml") >= 0;
+			boolean isAddUserPage = requestUrl.indexOf("/addUser.xhtml") >= 0;
+			boolean isAddCompanyPage = requestUrl.indexOf("/addCompany.xhtml") >= 0;
+			boolean isAddFlightPage = requestUrl.indexOf("/addFlight.xhtml") >= 0;
+			boolean isAddFlightTemplatePage = requestUrl.indexOf("/addFlightTemplate.xhtml") >= 0;
+			boolean isAddItineraryPage = requestUrl.indexOf("/addItinerary.xhtml") >= 0;
+			boolean isCompaniesPage = requestUrl.indexOf("/companies.xhtml") >= 0;
+			boolean isUserLoggedIn = httpSession != null && httpSession.getAttribute(Constants.USER) != null;
+			boolean isManageData = requestUrl.indexOf("/manageData.xhtml") >= 0;
+			boolean isErrorHome = requestUrl.indexOf("/errorHome.xhtml") >= 0;
+
+			boolean isReportsPage = requestUrl.indexOf("/reports.xhtml") >= 0;
+
+			if (isUserLoggedIn) {
+				UserDto userInSession = (UserDto) httpSession.getAttribute(Constants.USER);
+				String role = userInSession.getType();
+				if (role.equals(Constants.PILOT) || role.equals(Constants.STEWARD)) {
+					if (isItinerariesPage || isAddPlanePage || isAddUserPage || isPlanesPage || isFlightTemplatesPage
+							|| isUsersPage || isAirportsPage || isCompaniesPage || isManageData || isManageData
+							|| isAddCompanyPage || isAddFlightPage || isAddFlightTemplatePage || isAddItineraryPage
+							|| isReportsPage) {
+						httpResponse.sendRedirect(httpRequest.getContextPath() + "/home.xhtml");
+						FacesMessage message = new FacesMessage("You do");
+						throw new ValidatorException(message);
+					} else {
+						chain.doFilter(request, response);
+					}
+				} else if (role.equals(Constants.FLIGHT_MANAGER)) {
+					if (isItinerariesPage || isAddPlanePage || isAddUserPage || isPlanesPage || isUsersPage
+							|| isAirportsPage || isCompaniesPage || isManageData || isManageData || isAddCompanyPage
+							|| isAddFlightPage || isAddFlightTemplatePage || isAddItineraryPage || isReportsPage) {
+						httpResponse.sendRedirect(httpRequest.getContextPath() + "/home.xhtml");
+					} else {
+						chain.doFilter(request, response);
+					}
+				} else if (role.equals(Constants.COMPANY_MANAGER)) {
+					if (isCompaniesPage || isFlightTemplatesPage || isManageData || isManageData) {
+						httpResponse.sendRedirect(httpRequest.getContextPath() + "/home.xhtml");
+					} else {
+						chain.doFilter(request, response);
+					}
+				}
+
+				else {
+					chain.doFilter(request, response);
+				}
+
+			} else {
+				chain.doFilter(request, response);
+			}
+		} catch (Throwable t) {
+			t.printStackTrace();
+		}
+	}
+
+	@Override
+	public void destroy() {
+
+	}
+
+}

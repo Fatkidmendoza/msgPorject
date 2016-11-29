@@ -1,0 +1,156 @@
+package edu.msg.flightmanager.web.beans;
+
+import java.io.IOException;
+import java.io.Serializable;
+
+import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import edu.msg.flightmanager.backend.assembler.UserAssembler;
+import edu.msg.flightmanager.backend.dto.TokenDto;
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.exception.LogInException;
+import edu.msg.flightmanager.backend.exception.WrongEmailException;
+import edu.msg.flightmanager.backend.service.AuthenticationService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.service.UserService;
+import edu.msg.flightmanager.web.util.Constants;
+import edu.msg.flightmanager.web.util.EmailHelper;
+
+@ManagedBean
+@SessionScoped
+public class LoginBean implements Serializable {
+
+	private static final long serialVersionUID = 6104922328402104850L;
+
+	private UserDto userDto = new UserDto();
+
+	@EJB
+	private UserService userService;
+
+	@EJB
+	private AuthenticationService authenticationService;
+
+	private UserDto userForChangePassword;
+
+	private String newPassword;
+
+	public String getNewPassword() {
+		return newPassword;
+	}
+
+	public void setNewPassword(String newPassword) {
+		this.newPassword = newPassword;
+	}
+
+	public String processLogin() {
+		try {
+			userDto = authenticationService.login(userDto.getUserName(), userDto.getPassword());
+		} catch (LogInException | ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), "Login");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "loginFailed";
+		}
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+		if (session.getAttribute(Constants.USER) == null) {
+
+			session.setAttribute(Constants.USER, userDto);
+			return "loginSuccess";
+		} else {
+
+			return "loginFailed";
+		}
+
+	}
+
+	public String back() {
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		try {
+			ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "home";
+	}
+
+	public String logout() {
+		HttpSession session = getSession();
+		session.invalidate();
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		try {
+			ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "login";
+	}
+
+	private HttpSession getSession() {
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+		return session;
+	}
+
+	public UserDto getUserDto() {
+		return userDto;
+	}
+
+	public void setUserDto(UserDto userDto) {
+		this.userDto = userDto;
+	}
+
+	public String forgotPasswordMethod() {
+
+		return "forgotPassword";
+	}
+
+	public String sendEmail(String userName, String email) {
+		try{
+			TokenDto tokenDto = authenticationService.generateToken(userName, email);
+
+			String message = "Dear " + userName
+					+ ", \n\n Your link to change the password  is: http://localhost:8080/flightmanager-web/changePassword.xhtml?token="
+					+ tokenDto.getValue() + "\n";
+			String subject = "Password change request";
+			UserDto tempUser = UserAssembler.modelToDto(userService.getByUserName(userName));
+			userService.update(tempUser);
+			EmailHelper.sendEmail(email, subject, message);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Email sent.",
+					"The email was sent.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "login.xhtml";
+		}catch(WrongEmailException | ServiceException e){
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Send Email failed.",
+					"Username or password wrong.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "forgotPassword.xhtml";
+		}
+	}
+
+	public UserDto getUserForChangePassword() {
+		HttpServletRequest request = (HttpServletRequest) (FacesContext.getCurrentInstance().getExternalContext()
+				.getRequest());
+		return (UserDto) request.getAttribute("user");
+	}
+
+	public void setUserForChangePassword(UserDto userForChangePassword) {
+		this.userForChangePassword = userForChangePassword;
+	}
+
+	public String changePassword() {
+		try {
+			userForChangePassword.setPassword(newPassword);
+			userService.changePassword(userForChangePassword);
+			return "forgotPassword";
+		} catch (ServiceException e) {
+			throw e;
+
+		}
+	}
+
+}

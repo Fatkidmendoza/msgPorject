@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<f:view locale="#{languageBean.currentLocale}"></f:view>
+<h:head>
+	<title>Add Companies</title>
+</h:head>
+
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="addCompanyForm">
+			<p:growl showDetail="true" />
+			<div class="valign-wrapper" id="add-company-page"
+				style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="ui-fluid">
+							<p:panel id="basic" header="#{msg['companies.add']}">
+								<p:panelGrid columns="2" cellpadding="5">
+
+									<p:outputLabel for="name" value="#{msg['airport.name']}" />
+									<p:inputText id="name"
+										value="#{companiesBean.companyToInsert.name}" />
+										
+									<p:outputLabel for="city" value="#{msg['airport.city']}" />
+									<p:inputText id="city" value="#{companiesBean.companyToInsert.headquarterCity}" />
+									
+									<p:outputLabel for="country" value="#{msg['airport.country']}" />
+									<p:inputText id="country" value="#{companiesBean.companyToInsert.headquarterCountry}" />
+
+								</p:panelGrid>
+
+								<p:dataTable id="checkboxDT" var="airport"
+									value="#{airportsBean.allAirports}"
+									selection="#{companiesBean.selectedAirports}"
+									rowKey="#{airport.id}" style="margin-bottom:0">
+									<f:facet name="header">
+							          	<h:outputText value="#{msg[home.airports]}"></h:outputText>
+							        </f:facet>
+									<p:column selectionMode="multiple"
+										style="width:50px;text-align:center" />
+									<p:column headerText="#{msg['airport.name']}">
+										<h:outputText value="#{airport.name}" />
+									</p:column>
+									<p:column headerText="#{msg['airport.country']}">
+										<h:outputText value="#{airport.country}" />
+									</p:column>
+									<p:column headerText="#{msg['airport.city']}">
+										<h:outputText value="#{airport.city}" />
+									</p:column>
+								</p:dataTable>
+
+								<f:facet name="footer">
+									<p:commandButton value="#{msg['pers.save']}" style="width:300px;align:center"
+										icon="ui-icon-disk" id="save"
+										actionListener="#{companiesBean.addCompany()}"
+										update="addCompanyForm" />
+								</f:facet>
+							</p:panel>
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+
+</html>

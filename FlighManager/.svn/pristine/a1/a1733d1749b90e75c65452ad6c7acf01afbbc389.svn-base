@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+	<title>Itineraries</title>
+</h:head>
+	<ui:composition template="/template/commonLayout.xhtml">
+		<ui:define name="dynamicContent">
+			<div class="valign-wrapper" id="itineraries-page"
+				style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="row">
+							<div class="card">
+								<div class="card-content"
+									style="font-family: Helvetica; font-size: 20pt; border: 1px solid black;">
+									<p:dataTable value="#{itinerariesBean.allItineraries}"
+										var="itinerary">
+										<f:facet name="header">Itineraries</f:facet>
+
+										<p:column headerText="Duration">
+											<h:outputText value="#{itinerary.duration}" />
+										</p:column>
+
+										<p:column headerText="Periodicity">
+											<h:outputText value="#{itinerary.periodicity}" />
+										</p:column>
+
+										<p:column headerText="Delete?">
+											<h:commandButton
+												action="#{itinerariesBean.deleteItinerary(itinerary)}"
+												value="Delete!" />
+										</p:column>
+
+										<p:column headerText="Update?">
+											<h:commandButton
+												action="#{itinerariesBean.updateItinerary(itinerary)}"
+												value="Update!" />
+										</p:column>
+									</p:dataTable>
+
+								</div>
+								<br />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</ui:define>
+	</ui:composition>
+</html>

@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<f:view locale="#{languageBean.currentLocale}"></f:view>
+<h:head>
+	<title>Export data</title>
+</h:head>
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="myId">
+			<p:growl showDetail="true" />
+			<p:tabView>
+				<p:tab title="Flight data">
+					<p:panelGrid columns="2">
+						<h:panelGrid columns="2" cellpadding="10">
+							<p:outputLabel for="startDate" value="Start Date:" />
+							<p:calendar id="startDate" value="#{manageDataBean.startDate}"
+								mode="inline" />
+						</h:panelGrid>
+						<h:panelGrid columns="2" cellpadding="10">
+							<p:outputLabel for="endDate" value="End Date:" />
+							<p:calendar id="endDate" value="#{manageDataBean.endDate}"
+								mode="inline" />
+						</h:panelGrid>
+					</p:panelGrid>
+					<p:commandButton value="Download" ajax="false"
+						onclick="PrimeFaces.monitorDownload(start, stop);"
+						icon="ui-icon-arrowthick-1-s">
+						<p:fileDownload value="#{manageDataBean.file}" />
+					</p:commandButton>
+				</p:tab>
+				<p:tab title="Export Sth">
+
+				</p:tab>
+			</p:tabView>
+			<script type="text/javascript">
+				function start() {
+					PF('statusDialog').show();
+				}
+
+				function stop() {
+					PF('statusDialog').hide();
+				}
+			</script>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+</html>

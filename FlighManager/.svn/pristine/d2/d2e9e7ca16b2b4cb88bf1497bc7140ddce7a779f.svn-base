@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+	<title>Planes</title>
+</h:head>
+
+<ui:composition template="/template/commonLayout.xhtml">
+	<ui:define name="dynamicContent">
+		<h:form id="planesForm">
+			<p:growl id="growl" showDetail="true" />
+			<div class="valign-wrapper" id="planes-page" style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="row">
+
+							<div class="card">
+								<div class="card-content"
+									style="font-family: Helvetica; border: 1px solid black;">
+									<p:dataTable value="#{planesBean.allPlanes}" var="plane"
+										rows="10" paginator="true"
+										paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+										<f:facet name="header">Planes</f:facet>
+
+										<p:column headerText="Company name">
+											<h:outputText value="#{plane.companyName}" />
+										</p:column>
+
+										<p:column headerText="Number of places ">
+											<h:outputText value="#{plane.numberOfPlaces}" />
+										</p:column>
+
+										<p:column headerText="Type">
+											<h:outputText value="#{plane.type}" />
+										</p:column>
+
+
+										<p:column headerText="Delete?" style="width:130px">
+											<p:commandButton icon="ui-icon-trash" id="delete"
+												actionListener="#{planesBean.deletePlane(plane)}"
+												update="planesForm" rendered="#{!plane.deleted}">
+												<p:confirm header="Confirm delete"
+													message="Are you sure you want to delete this plane?"
+													icon="ui-icon-alert" />
+											</p:commandButton>
+										</p:column>
+
+										<p:column headerText="Update?" style="width:130px">
+											<p:commandButton update=":planesForm:planeDetail"
+												oncomplete="PF('planeDialog').show()" icon="ui-icon-pencil"
+												title="View">
+												<f:setPropertyActionListener value="#{plane}"
+													target="#{planesBean.planeToUpdate}" />
+											</p:commandButton>
+										</p:column>
+
+									</p:dataTable>
+									
+									<p:button outcome="addPlane" value="Add Plane" icon="ui-icon-plus" />
+
+									<!-- confirm dialog for delete -->
+									<p:confirmDialog global="true" showEffect="fade"
+										hideEffect="fade">
+										<p:commandButton value="Yes" type="button"
+											styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+										<p:commandButton value="No" type="button"
+											styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+									</p:confirmDialog>
+
+									<p:dialog header="Plane Info" widgetVar="planeDialog"
+										modal="true" showEffect="fade" hideEffect="fade"
+										resizable="false">
+										<p:outputPanel id="planeDetail" style="text-align:center;">
+											<p:panelGrid columns="2"
+												rendered="#{not empty planesBean.planeToUpdate}"
+												columnClasses="label,value">
+												<p:outputLabel for="companyMenu" value="Company" />
+												<p:selectOneMenu id="companyMenu"
+													value="#{planesBean.planeToUpdate.companyName}">
+													<f:selectItems value="#{companiesBean.allCompanies}"
+														var="company" itemValue="#{company.name}"
+														itemLabel="#{company.name}" />
+												</p:selectOneMenu>
+
+												<p:outputLabel for="numberOfPlaces" value="Number of places" />
+												<p:spinner id="numberOfPlaces" min="10" max="1000"
+													onkeypress="return false"
+													value="#{planesBean.planeToUpdate.numberOfPlaces}" />
+
+												<p:outputLabel for="typeMenu" value="Type" />
+												<p:selectOneMenu id="typeMenu"
+													value="#{planesBean.planeToUpdate.type}">
+													<f:selectItems value="#{planesBean.allTypes}" var="type"
+														itemValue="#{type}" itemLabel="#{type}" />
+												</p:selectOneMenu>
+
+												<p:outputLabel for="activatePlane" value="Deactivated"
+													rendered="#{planesBean.planeToUpdate.deleted}" />
+												<p:selectBooleanCheckbox id="activatePlane"
+													value="#{planesBean.planeToUpdate.deleted}"
+													rendered="#{planesBean.planeToUpdate.deleted}" />
+											</p:panelGrid>
+
+											<p:commandButton value="Update" icon="ui-icon-pencil"
+												id="update" actionListener="#{planesBean.updatePlane()}"
+												update="planesForm" />
+										</p:outputPanel>
+									</p:dialog>
+
+								</div>
+								<br />
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+</html>

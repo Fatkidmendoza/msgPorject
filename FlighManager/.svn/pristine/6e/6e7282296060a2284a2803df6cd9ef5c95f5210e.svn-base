@@ -1,0 +1,159 @@
+package edu.msg.flightmanager.web.beans;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+
+import edu.msg.flightmanager.backend.dto.PlaneDto;
+import edu.msg.flightmanager.backend.service.PlaneService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.web.util.Constants;
+
+@ManagedBean
+@SessionScoped
+public class PlanesBean implements Serializable {
+
+	private static final long serialVersionUID = -9192738665629990655L;
+
+	@EJB
+	private PlaneService planeService;
+
+	private PlaneDto planeToInsert = new PlaneDto();
+	private List<PlaneDto> planesByCompany = new ArrayList<PlaneDto>();
+
+	private PlaneDto planeToUpdate;
+
+	private List<PlaneDto> filteredPlanes;
+
+	private boolean deleted;
+
+	public List<PlaneDto> getAllPlanes() {
+		String role = UsersBean.userInSession().getType();
+		try {
+			if (role.equals(Constants.ADMIN)) {
+				return planeService.getAll();
+			} else {
+				return planeService.getByCompany(UsersBean.userInSession().getCompanyName());
+			}
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error.",
+					"The planes list could not be retrieved.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return new ArrayList<>();
+		}
+	}
+
+	public List<PlaneDto> getFilteredPlanes() {
+		return filteredPlanes;
+	}
+
+	public void setFilteredPlanes(List<PlaneDto> filteredPlanes) {
+		this.filteredPlanes = filteredPlanes;
+	}
+
+	public void deletePlane(PlaneDto planeDto) {
+		try {
+			planeService.delete(planeDto);
+			setDeleted(true);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Delete Successful.",
+					"The plane was deleted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Delete Failed.",
+					"The plane was not deleted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+	}
+
+	public String addPlane() {
+		if (planeToInsert.getCompanyName() == null || planeToInsert.getCompanyName().equals("")) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "No company was selected.",
+					"Please select a company.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "addPlane";
+		}
+		if (planeToInsert.getMake() == null || planeToInsert.getMake().equals("")) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "No make was selected.",
+					"Please select a make.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "addPlane";
+		}
+		if (planeToInsert.getType() == null || planeToInsert.getType().equals("")) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "No type was selected.",
+					"Please select a type.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "addPlane";
+		}
+
+		try {
+			planeService.insert(planeToInsert);
+			planeToInsert = new PlaneDto();
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Insert Successful.",
+					"The plane was inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Insert Failed.",
+					"The plane was not inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "addPlane";
+		}
+		return "addPlane";
+	}
+
+	public List<PlaneDto> getPlanesByCompany() {
+		planesByCompany = planeService.getByCompany(UsersBean.userInSession().getCompanyName());
+		return planesByCompany;
+	}
+
+	public List<String> getAllTypes() {
+		return planeService.getAllTypes();
+	}
+
+	public List<String> getAllMakes() {
+		return planeService.getAllMakes();
+	}
+
+	public PlaneDto getPlaneToInsert() {
+		return planeToInsert;
+	}
+
+	public void setPlaneToInsert(PlaneDto planeToInsert) {
+		this.planeToInsert = planeToInsert;
+	}
+
+	public void updatePlane() {
+		try {
+			planeService.update(planeToUpdate);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Successful.",
+					"The plane was updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Failed.",
+					"The plane was not updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+	}
+
+	public PlaneDto getPlaneToUpdate() {
+		return planeToUpdate;
+	}
+
+	public void setPlaneToUpdate(PlaneDto planeToUpdate) {
+		this.planeToUpdate = planeToUpdate;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
+
+}

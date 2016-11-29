@@ -1,0 +1,33 @@
+package edu.msg.flightmanager.backend.repository;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.ejb.Local;
+
+import edu.msg.flightmanager.backend.model.Company;
+import edu.msg.flightmanager.backend.model.Flight;
+import edu.msg.flightmanager.backend.model.FlightTemplate;
+import edu.msg.flightmanager.backend.model.Plane;
+import edu.msg.flightmanager.backend.model.User;
+
+@Local
+public interface FlightRepository extends BaseRepository<Flight, Long> {
+
+	List<Flight> getTheFlightsOfAUser(User user) throws RepositoryException;
+
+	List<Flight> getFlightsThatHaveAFlightTemplate(FlightTemplate flightTemplate);
+
+	List<Flight> getFlightsThatHaveAPlane(Plane plane);
+
+	void physicalDelete(Flight flight) throws RepositoryException;
+
+	List<Flight> getFlightsBetweenTwoDates(Date startDate, Date endDate) throws RepositoryException;
+
+	List<Flight> getAvailableFlights() throws RepositoryException;
+
+	List<Flight> getPassedFlights() throws RepositoryException;
+
+	List<Flight> getFlightsOfACompany(Company company) throws RepositoryException;
+
+}

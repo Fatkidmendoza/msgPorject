@@ -1,0 +1,12 @@
+package edu.msg.flightmanager.backend.repository;
+
+import java.util.List;
+
+import javax.ejb.Local;
+
+import edu.msg.flightmanager.backend.model.Plane;
+
+@Local
+public interface PlaneRepository extends BaseRepository<Plane, Long> {
+	List<Plane> getByCompany(String companyName) throws RepositoryException;
+}

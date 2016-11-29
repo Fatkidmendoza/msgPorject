@@ -1,0 +1,49 @@
+package edu.msg.flightmanager.backend.dto;
+
+import java.util.Date;
+
+public class ItineraryDto extends EntityDto {
+
+
+	private Date startTime;
+	private Date endTime;
+	private String periodicityName;
+	private boolean nextDay;
+
+
+
+	public String getPeriodicityName() {
+		return periodicityName;
+	}
+
+	public void setPeriodicityName(String periodicityName) {
+		this.periodicityName = periodicityName;
+	}
+
+	public Date getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
+	}
+
+	public Date getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
+	}
+
+	public boolean isNextDay() {
+		return nextDay;
+	}
+
+	public void setNextDay(boolean nextDay) {
+		this.nextDay = nextDay;
+	}
+
+
+
+}

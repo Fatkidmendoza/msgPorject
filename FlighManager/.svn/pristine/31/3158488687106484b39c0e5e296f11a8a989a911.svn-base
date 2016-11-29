@@ -1,0 +1,89 @@
+package edu.msg.flightmanager.web.beans;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+
+import edu.msg.flightmanager.backend.dto.FlightTemplateDto;
+import edu.msg.flightmanager.backend.service.FlightTemplateService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+
+@ManagedBean
+@ViewScoped
+public class FlightTemplatesBean implements Serializable {
+
+	private static final long serialVersionUID = 9048236267728877625L;
+
+	@EJB
+	private FlightTemplateService flightTemplateService;
+
+	private FlightTemplateDto flightTemplateToInsert = new FlightTemplateDto();
+	private FlightTemplateDto flightTemplateToUpdate = new FlightTemplateDto();
+
+	public List<FlightTemplateDto> getAllFlightTemplates() {
+		return flightTemplateService.getAll();
+	}
+
+	public void deleteFlightTemplate(FlightTemplateDto flightTemplateDto) {
+		try {
+			flightTemplateService.delete(flightTemplateDto);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Delete Successful.",
+					"The flight template was deleted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Delete Failed.",
+					"The flight template was not deleted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+	}
+
+	public void updateFlightTemplate() {
+		try {
+			flightTemplateService.update(flightTemplateToUpdate);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Successful.",
+					"The flight template was updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Failed.",
+					"The flight template was not updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+	}
+
+	public String addFlightTemplate() {
+		try {
+			flightTemplateService.insert(flightTemplateToInsert);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Insert Successful.",
+					"The flight template was inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Insert Failed.",
+					"The flight template was not inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "addFlightTemplate";
+		}
+		return "addFlightTemplate";
+	}
+
+	public FlightTemplateDto getFlightTemplateToInsert() {
+		return flightTemplateToInsert;
+	}
+
+	public void setFlightTemplateToInsert(FlightTemplateDto flightTemplateToInsert) {
+		this.flightTemplateToInsert = flightTemplateToInsert;
+	}
+
+	public FlightTemplateDto getFlightTemplateToUpdate() {
+		return flightTemplateToUpdate;
+	}
+
+	public void setFlightTemplateToUpdate(FlightTemplateDto flightTemplateToUpdate) {
+		this.flightTemplateToUpdate = flightTemplateToUpdate;
+	}
+
+}

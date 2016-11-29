@@ -1,0 +1,65 @@
+package edu.msg.flightmanager.backend.repository.bean;
+
+import javax.ejb.Stateless;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
+import javax.persistence.TypedQuery;
+
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.repository.UserRepository;
+
+@Stateless(name = "UserRepository", mappedName = "ejb/UserRepository")
+public class UserRepositoryBean extends BaseRepositoryBean<User, Long> implements UserRepository {
+
+	public UserRepositoryBean() {
+		super(User.class);
+	}
+
+	@Override
+	public User getByUserName(String userName) throws RepositoryException {
+		try {
+			TypedQuery<User> users = entityManager.createQuery("SELECT u FROM User u WHERE u.userName= :userName",User.class);
+			users.setParameter("userName", userName);
+			return users.getSingleResult();
+		} catch (NoResultException e) {
+			throw new RepositoryException("NOT WORKING");
+		} catch (PersistenceException ex) {
+			throw new RepositoryException(ex);
+		}
+
+	}
+
+	@Override
+	public User update(User user) throws RepositoryException {
+		try {
+			User userByUserName = getByUserName(user.getUserName());
+			if (user.getId() == userByUserName.getId()) {
+				return updateHelper(user);
+			} else {
+				throw new RepositoryException("The user name already exists");
+			}
+		} catch (RepositoryException ex) {
+			return updateHelper(user);
+		}
+	}
+
+	private User updateHelper(User user) {
+		if(user.getPassword() == null ){
+			try{
+				User userById = getById(user.getId());
+				user.setPassword(userById.getPassword());
+			} catch (RepositoryException re) {
+				throw new RepositoryException(re.getMessage());
+			}
+		}
+		try {
+			User userById = getById(user.getId());
+			user.setUuid(userById.getUuid());
+			return super.update(user);
+		} catch (RepositoryException e) {
+			throw new RepositoryException(e.getMessage());
+		}
+	}
+
+}

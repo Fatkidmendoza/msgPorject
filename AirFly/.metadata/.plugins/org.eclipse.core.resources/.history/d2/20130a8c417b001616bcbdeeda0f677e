@@ -1,0 +1,10 @@
+mail.smptA = mail.smtp.auth
+mail.smptStEn = mail.smtp.starttls.enable
+mail.smptH = mail.smtp.host
+mail.smptHValue = smtp.gmail.com
+mail.smptP = mail.smtp.port
+mail.smptPValue = 587
+mai.address = flightmanager2016@gmail.com
+flightManager = flightmanager2016
+flightManagerPassword = testflight
+flightManagerAddress = flightmanager2016@gmail.com

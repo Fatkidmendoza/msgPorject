@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+	<title>Flight History</title>
+</h:head>
+
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="historyForm">
+			<p:growl id="growl" showDetail="true" />
+			<div class="valign-wrapper" id="Flights-page" style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="row">
+							<div class="card">
+								<div class="card-content"
+									style="font-family: Helvetica; border: 1px solid black;">
+
+									<p:dataTable value="#{timerBean.flightsHistory}" var="flight">
+										<f:facet name="header">Flight history</f:facet>
+
+										<p:column headerText="Date">
+											<h:outputText value="#{flight.date}" />
+										</p:column>
+
+										<p:column headerText="Company">
+											<h:outputText value="#{flight.plane.companyName}" />
+										</p:column>
+
+										<p:column headerText="Details" style="width:130px">
+											<p:commandButton update=":historyForm:historyDetail"
+												oncomplete="PF('historyDialog').show()" title="View">
+												<f:setPropertyActionListener value="#{plane}"
+													target="#{timerBean.flightToView}" />
+											</p:commandButton>
+										</p:column>
+
+									</p:dataTable>
+
+									<p:dialog header="Flight Info" widgetVar="historyDialog"
+										modal="true" showEffect="fade" hideEffect="fade"
+										resizable="false">
+										<p:outputPanel id="historyDetail" style="text-align:center;">
+											<p:panelGrid columns="2"
+												rendered="#{not empty timerBean.flightToView}"
+												columnClasses="label,value">
+												<p:outputLabel for="date" value="Date" />
+												<p:inputText id="date"
+													value="#{timerBean.flightToView.date}" />
+												
+												<p:outputLabel for="companyMenu" value="Company" />
+												<p:selectOneMenu id="companyMenu"
+													value="#{timerBean.flightToView.plane.companyName}">
+													<f:selectItems value="#{companiesBean.allCompanies}"
+														var="company" itemValue="#{company.name}"
+														itemLabel="#{company.name}" />
+												</p:selectOneMenu>
+												
+												<p:outputLabel for="departureMenu" value="Departure" />
+												<p:selectOneMenu id="departureMenu"
+													value="#{timerBean.flighToView.template.departure}">
+													<f:selectItems value="#{airportsBean.allAirports}"
+														var="airport" itemValue="#{airport.name}"
+														itemLabel="#{airport.name}" />
+												</p:selectOneMenu>
+												
+												<p:outputLabel for="arrivalMenu" value="Arrival" />
+												<p:selectOneMenu id="arrivalMenu"
+													value="#{timerBean.flighToView.template.arrival}">
+													<f:selectItems value="#{airportsBean.allAirports}"
+														var="airport" itemValue="#{airport.name}"
+														itemLabel="#{airport.name}" />
+												</p:selectOneMenu>
+											</p:panelGrid>
+										</p:outputPanel>
+									</p:dialog>
+
+								</div>
+								<br />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+</html>

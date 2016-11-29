@@ -1,0 +1,80 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import edu.msg.flightmanager.backend.assembler.FlightAssembler;
+import edu.msg.flightmanager.backend.dto.FlightDto;
+import edu.msg.flightmanager.backend.model.Flight;
+import edu.msg.flightmanager.backend.repository.FlightRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.service.FlightService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.util.FlightValidator;
+import edu.msg.flightmanager.backend.util.ValidationException;
+
+@Stateless(name = "FlightService", mappedName = "ejb/FlightService")
+public class FlightServiceBean implements FlightService {
+
+	@EJB
+	private FlightRepository flightRepository;
+
+	@Override
+	public List<FlightDto> getAll() throws ServiceException {
+		try {
+			List<FlightDto> flights = new ArrayList<FlightDto>();
+			for (Flight flight : flightRepository.getAll()) {
+				flights.add(FlightAssembler.modelToDto(flight));
+			}
+			return flights;
+		} catch (RepositoryException e) {
+			throw new ServiceException("The flights selection failed");
+		}
+	}
+
+	@Override
+	public FlightDto update(FlightDto flightDto) throws ServiceException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public FlightDto insert(FlightDto flightDto) throws ServiceException {
+		Flight flight = FlightAssembler.dtoToModel(flightDto);
+		try {
+			FlightValidator.validateFlight(flight);
+			flight = flightRepository.insert(flight);
+			FlightDto insertedflight = FlightAssembler.modelToDto(flight);
+			return insertedflight;
+		} catch (ValidationException e) {
+			throw new ServiceException(e.getMessage());
+		} catch (RepositoryException e) {
+			throw new ServiceException("Flight insertion failed.");
+		}
+	}
+
+	@Override
+	public void delete(FlightDto flightDto) throws ServiceException {
+		Flight flight = FlightAssembler.dtoToModel(flightDto);
+		try {
+			flight.setAircrewUsers(new ArrayList<>());
+			flightRepository.delete(flight);
+		} catch (RepositoryException e) {
+			throw new ServiceException("Flight deletion failed.");
+		}
+	}
+
+	@Override
+	public void activate(FlightDto flightDto) throws ServiceException {
+		Flight flight = FlightAssembler.dtoToModel(flightDto);
+		try {
+			flightRepository.activate(flight);
+		} catch (RepositoryException e) {
+			throw new ServiceException("Flight activate failed.");
+		}
+	}
+
+}

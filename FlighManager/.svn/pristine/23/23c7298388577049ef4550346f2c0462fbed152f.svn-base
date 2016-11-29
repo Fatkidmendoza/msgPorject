@@ -1,0 +1,98 @@
+login.username = Utilzator
+login.password = Parol\u0103
+login.loginButton = Logare
+login.forgotPassword = Parol\u0103 uitat\u0103
+login.sendPass = Trimite parol\u0103
+
+home.flights = Zboruri
+home.flightTemplates = \u0218ablon Zboruri
+home.itineraries = Itinerariile
+home.planes = Avioane
+home.airports = Aeropoarte
+home.companies = Companii
+home.personalData = Date Personale
+home.manageData = Datele gestionate
+home.history = Istorie
+home.users = Utilizatori
+home.newEmployee = Angajat nou
+home.employees = Employees
+
+pers.edit = Editare
+pers.back = Inapoi
+pers.save = Salvare
+pers.cancel = Anulare
+pers.firstName = Nume
+pers.lastName = Prenume
+pers.email = Email
+pers.phone = Telefon
+pers.role =	Rol
+pers.yourPass = Parol\u0103 dvs
+pers.newPass = Parol\u0103 noua
+pers.confirmPass = Confirmare Parol\u0103
+pers.info = Date personale
+pers.activate = Activare.
+pers.pilot = Pilot
+pers.steward = Steward
+
+users.addEmployee = Add Employee
+
+flights.date = Data
+flights.company = Companie
+flights.departure = Plecare
+flights.arrival = Sosire
+flights.add = Add Flight
+
+general.delete = \u0218tergere
+general.update = Actualizare
+general.logout = Log out
+general.operations = Opera\u021Bii
+general.view = Vizualizare
+general.confirmDelete = Confirmare \u0218tergere
+general.sureDeleteAi = Sunte\u021Bi sigur c\u0103 dori\u021Bi s\u0103 \u0219terge\u021Bi acest aeroport?
+general.sureDeleteIt = Sunte\u021Bi sigur c\u0103 dori\u021Bi s\u0103 \u0219terge\u021Bi acest itinerarie?
+general.sureDeletePl = Sunte\u021Bi sigur c\u0103 dori\u021Bi s\u0103 \u0219terge\u021Bi acest avion?
+general.sureDeleteUs = Sunte\u021Bi sigur c\u0103 dori\u021Bi s\u0103 \u0219terge\u021Bi acest utilizator?
+general.yes = Da
+general.no = Nu
+general.deactivated = Dezactivat
+general.values = Values
+general.time = Time
+general.mask = Mask
+
+
+flightTemplate.duration = Durata
+flightTemplate.itinerary = Itinerarie
+flightTemplate.info = Informa\u021Bii despre \u0219ablon
+
+itineraries.periodicity = Periodicitate
+itineraries.startTime = Ora de început
+itineraries.endTime = Ora de terminare
+itineraries.startDate = Data de început
+itineraries.endDate = Data de încheiere
+itineraries.nextDay = Urm\u0103toarea zi
+itineraries.info = Informa\u021Bii despre itinarii
+itineraries.add = Ad\u0103ugare itinerari
+
+planes.compName = Numele Companiei
+planes.nrOfPlaces = Numar de Avioane
+planes.type = Tip
+planes.addPlane = Ad\u0103ugare avion
+planes.info = Informa\u021Bii despre avion
+
+airport.name = Nume
+airport.country = \u021Aara
+airport.city = Ora\u0219
+airport.address = Adres\u0103
+airport.info = Informa\u021Bii despre aeroport
+airport.code = Cod
+airport.add = Ad\u0103ugare aeroport
+
+companies.companyDetails = Detalile Companiei
+companies.info = Informa\u021Bii despre Companie
+companies.add = Add company
+
+manage.import = Importare
+manage.export = Exportare
+
+
+

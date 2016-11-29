@@ -1,0 +1,78 @@
+package edu.msg.flightmanager.backend.assembler;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.msg.flightmanager.backend.dto.AirportDto;
+import edu.msg.flightmanager.backend.dto.CompanyDto;
+import edu.msg.flightmanager.backend.dto.PlaneDto;
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.model.Airport;
+import edu.msg.flightmanager.backend.model.Company;
+import edu.msg.flightmanager.backend.model.Plane;
+import edu.msg.flightmanager.backend.model.User;
+
+/**
+ * The class converts from company model object to dto object, and reverse
+ */
+public class CompanyAssembler {
+
+	public static CompanyDto modelToDto(Company company){
+		CompanyDto companyDto = new CompanyDto();
+		companyDto.setName(company.getName());
+		companyDto.setId(company.getId());
+		companyDto.setUuid(company.getUuid());
+		List<AirportDto> airports = new ArrayList<AirportDto>();
+		for (Airport airport  : company.getAirports()) {
+			airports.add(AirportAssembler.modelToDto(airport));
+		}
+		companyDto.setAirports(airports);
+
+
+		List<UserDto> users = new ArrayList<UserDto>();
+		for (User user  : company.getEmployees()) {
+			users.add(UserAssembler.modelToDto(user));
+		}
+		companyDto.setEmployees(users);
+
+		List<PlaneDto> planes = new ArrayList<PlaneDto>();
+		for (Plane plane  : company.getPlanes()) {
+			planes.add(PlaneAssembler.modelToDto(plane));
+		}
+		companyDto.setPlanes(planes);
+		companyDto.setDeleted(company.isDeleted());
+		companyDto.setHeadquarterCountry(company.getHeadquarterCountry());
+		companyDto.setHeadquarterCity(company.getHeadquarterCity());
+		return companyDto;
+
+	}
+	public static Company dtoToModel(CompanyDto companyDto){
+		Company company = new Company();
+		company.setName(companyDto.getName());
+		company.setUuid(companyDto.getUuid());
+		company.setId(companyDto.getId());
+		List<Airport> airports = new ArrayList<Airport>();
+		for (AirportDto airport  : companyDto.getAirports()) {
+			airports.add(AirportAssembler.dtoToModel(airport));
+		}
+		company.setAirports(airports);
+
+
+		List<User> users = new ArrayList<User>();
+		for (UserDto userDto  : companyDto.getEmployees()) {
+			users.add(UserAssembler.dtoToModel(userDto));
+		}
+		company.setEmployees(users);
+
+		List<Plane> planes = new ArrayList<Plane>();
+		for (PlaneDto plane  : companyDto.getPlanes()) {
+			planes.add(PlaneAssembler.dtoToModel(plane));
+		}
+		company.setPlanes(planes);
+		company.setDeleted(companyDto.isDeleted());
+		company.setHeadquarterCountry(companyDto.getHeadquarterCountry());
+		company.setHeadquarterCity(companyDto.getHeadquarterCity());
+		return company;
+
+	}
+}

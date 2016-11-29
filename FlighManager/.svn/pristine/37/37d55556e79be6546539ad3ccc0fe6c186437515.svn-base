@@ -1,0 +1,283 @@
+package edu.msg.flightmanager.web.beans;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
+import javax.servlet.http.HttpSession;
+import javax.xml.bind.ValidationException;
+
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.service.UserService;
+import edu.msg.flightmanager.web.util.Constants;
+import edu.msg.flightmanager.web.util.EmailHelper;
+import edu.msg.flightmanager.web.util.RandomPassword;
+
+@ManagedBean
+@SessionScoped // DON'T CHANGE!! :)))
+public class UsersBean implements Serializable {
+
+	private static final long serialVersionUID = 4860933911207569401L;
+	private static final String PILOT = "PILOT";
+	private static final String STEWARD = "STEWARD";
+	private boolean editable;
+
+	private boolean editPassword = false;
+
+	private boolean activated;
+
+	@EJB
+	private UserService userService;
+
+	private UserDto userDto = userInSession();
+
+	private UserDto userToInsert = new UserDto();
+	private UserDto userToUpdate;
+	private List<UserDto> pilots = new ArrayList<>();
+	private List<UserDto> stewards = new ArrayList<>();
+
+	private List<UserDto> filteredUsers;
+
+	public UserDto getUserToUpdate() {
+		return userToUpdate;
+	}
+
+	public void setUserToUpdate(UserDto userToUpdate) {
+		this.userToUpdate = userToUpdate;
+	}
+
+	public void enableEdit() {
+		setEditable(true);
+	}
+
+	public void executeUpdate(String firstName, String lastName, String email, String phoneNumber, String userName,
+			String oldPassword, String newPassword, String confirmPassword) throws ValidationException {
+		userDto.setFirstName(firstName);
+		userDto.setLastName(lastName);
+		userDto.setEmail(email);
+		userDto.setPhoneNumber(phoneNumber);
+		userDto.setUserName(userName);
+
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+		if(editPassword) {
+			userDto.setPassword(newPassword);
+		} else {
+			userDto.setPassword(null);
+		}
+		session.setAttribute(Constants.USER, userDto);
+		try {
+			userService.update(userDto);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Successful.",
+					"The data was updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Failed.",
+					"The data is not valid.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+		setEditPassword(false);
+		setEditable(false);
+	}
+
+	public String addUser() {
+		if(userToInsert.getType() == null || userToInsert.getType().equals("")) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "No type was selected.",
+					"Please select a type.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "addUser";
+		}
+		if(userToInsert.getCompanyName() == null || userToInsert.getCompanyName().equals("")) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "No company was selected.",
+					"Please select a company.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "addUser";
+		}
+		try {
+			String randomPassword = RandomPassword.getRandomPassword();
+			String subject = "FlightManager registration";
+			String message = "Welcome " + userToInsert.getFirstName() + " " + userToInsert.getLastName()
+			+ "\n Your can login in our system on http://localhost:8080/flightmanager-web/login.xhtml \n\n Username: "
+			+ userToInsert.getUserName() + "\n Password: " + randomPassword
+			+ "\n You can change it after the first login. \n\n FlightManager staff.";
+			userToInsert.setPassword(randomPassword);
+			userService.insert(userToInsert);
+			EmailHelper.sendEmail(userToInsert.getEmail(), subject, message);
+			userToInsert = new UserDto();
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Insert Successful.",
+					"The user was inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Insert Failed.",
+					"The user was not inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "addUser";
+		}
+		return "addUser";
+	}
+
+	public UserDto getUserToInsert() {
+		return userToInsert;
+	}
+
+	public void setUserToInsert(UserDto userToInsert) {
+		this.userToInsert = userToInsert;
+	}
+
+	public List<String> getAllTypes() {
+		return userService.getAllTypes();
+	}
+
+	public void updateUser() {
+		try {
+			if (!editPassword) {
+				userToUpdate.setPassword(null);
+			}
+			userService.update(userToUpdate);
+			editPassword = false;
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Successful.",
+					"The user was updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Failed.",
+					"The user was not updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+
+	}
+
+	public void deleteUser(UserDto userDto) {
+		try {
+			userService.delete(userDto);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Delete Successful.",
+					"The user was deleted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Delete Failed.",
+					"The user was not deleted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+	}
+
+	public void disableEdit() {
+		setEditPassword(false);
+		setEditable(false);
+
+	}
+
+	public List<UserDto> getAllUsers() {
+		try {
+			List<UserDto> userList;
+			String role = userInSession().getType();
+			if(role.equals(Constants.ADMIN)) {
+				userList = userService.getAll();
+			} else {
+				userList = userService.getByCompany(userInSession().getCompanyName());
+			}
+			List<UserDto> companyManagerList = new ArrayList<>();
+			if (role.equals(Constants.COMPANY_MANAGER)) {
+				for (UserDto userDto : userList) {
+					String type = userDto.getType();
+					if (type.equals(Constants.PILOT) || type.equals(Constants.STEWARD)
+							|| type.equals(Constants.FLIGHT_MANAGER))
+						companyManagerList.add(userDto);
+				}
+				return companyManagerList;
+			}
+			return userList;
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+					"The employees list could not be retrieved.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return new ArrayList<>();
+		}
+	}
+
+	public List<UserDto> getFilteredUsers() {
+		return filteredUsers;
+	}
+
+	public void setFilteredUsers(List<UserDto> filteredUsers) {
+		this.filteredUsers = filteredUsers;
+	}
+
+	public boolean getUserIsEditable() {
+		return isEditable();
+	}
+
+	public static UserDto userInSession() {
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+		return (UserDto) session.getAttribute(Constants.USER);
+	}
+
+	public UserDto getUserInSession() {
+		return userInSession();
+	}
+
+	public boolean isEditable() {
+		return editable;
+	}
+
+	public void setEditable(boolean edit) {
+		this.editable = edit;
+	}
+
+	public boolean isEditPassword() {
+		return editPassword;
+	}
+
+	public void setEditPassword(boolean editPassword) {
+		this.editPassword = editPassword;
+	}
+
+	public void changeVisibilityOfPassword() {
+		editPassword = !editPassword;
+	}
+
+	public boolean isActivated() {
+		return activated;
+	}
+
+	public void setActivated(boolean deleted) {
+		this.activated = deleted;
+	}
+
+	public void activateUser(UserDto user) {
+		userService.activate(user);
+	}
+
+	public void valueChange(ValueChangeEvent e) {
+		setActivated((boolean) e.getNewValue());
+	}
+
+	public List<UserDto> getPilots() {
+		try{
+			pilots = userService.getByTypeAndCompany(PILOT, UsersBean.userInSession().getCompanyName());
+			return pilots;
+		} catch (ServiceException e){
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+					"The pilots list could not be retrieved.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return new ArrayList<>();
+		}
+	}
+
+	public List<UserDto> getStewards() {
+		try {
+			stewards = userService.getByTypeAndCompany(STEWARD, UsersBean.userInSession().getCompanyName());
+			return stewards;
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+					"The stewards list could not be retrieved.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return new ArrayList<>();
+		}
+	}
+
+}

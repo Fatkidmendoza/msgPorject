@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pageflow:Pageflow xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pageflow="http://www.sybase.com/suade/pageflow" id="pf14728259824620" configfile="/flightmanager-web/src/main/webapp/WEB-INF/faces-config.xml">
+  <nodes xsi:type="pageflow:PFPage" name="login.xhtml" x="122" y="1138" id="pf14730584544670" referenceLink="//@navigationRule.11/@fromViewId|" outlinks="pf14730584544671 pf14730584544672 pf14735213528950 pf147367397579916" inlinks="pf14730584544672" path="login.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="home.xhtml" x="338" y="1522" id="pf14730584544673" referenceLink="//@navigationRule.9/@fromViewId|" outlinks="pf14730584544674 pf14735213528951 pf14735213528952 pf14735213528953 pf14735213528954 pf14735213528955 pf14735213528956 pf14735213528957" inlinks="pf14730584544671" path="home.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="details.xhtml" x="554" y="178" id="pf14730584544685" referenceLink="//@navigationRule.9/@navigationCase.0/@toViewId|" inlinks="pf14730584544674" path="details.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="details.xhtml" x="122" y="2194" id="pf14731694997136" referenceLink="//@navigationRule.10/@navigationCase.0/@toViewId|" outlinks="pf14731694997137" inlinks="pf14731694997137" path="/details.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="planes.xhtml" x="554" y="562" id="pf14735213528958" referenceLink="//@navigationRule.1/@navigationCase.0/@toViewId|" inlinks="pf14735213528951" path="planes.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="users.xhtml" x="554" y="946" id="pf14735213528959" referenceLink="//@navigationRule.3/@navigationCase.0/@toViewId|" inlinks="pf14735213528952" path="users.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="companies.xhtml" x="554" y="1330" id="pf147352135289510" referenceLink="//@navigationRule.4/@navigationCase.0/@toViewId|" inlinks="pf14735213528953" path="companies.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="itineraries.xhtml" x="554" y="1714" id="pf147352135289511" referenceLink="//@navigationRule.5/@navigationCase.0/@toViewId|" inlinks="pf14735213528954" path="itineraries.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="airports.xhtml" x="554" y="2098" id="pf147352135289512" referenceLink="//@navigationRule.6/@navigationCase.0/@toViewId|" inlinks="pf14735213528955" path="airports.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="flightTemplates.xhtml" x="554" y="2482" id="pf147352135289513" referenceLink="//@navigationRule.7/@navigationCase.0/@toViewId|" inlinks="pf14735213528956" path="flightTemplates.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="flights.xhtml" x="554" y="2866" id="pf147352135289514" referenceLink="//@navigationRule.8/@navigationCase.0/@toViewId|" inlinks="pf14735213528957" path="flights.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="forgotPassword.xhtml" x="338" y="754" id="pf147352135289515" referenceLink="//@navigationRule.11/@navigationCase.0/@toViewId|" inlinks="pf14735213528950" path="/forgotPassword.xhtml"/>
+  <nodes xsi:type="pageflow:PFPage" name="forgotPassword.xhtml" x="338" y="1138" id="pf147367397579917" referenceLink="//@navigationRule.2/@navigationCase.0/@toViewId|" inlinks="pf147367397579916" path="forgotPassword.xhtml"/>
+  <links id="pf14730584544671" target="pf14730584544673" source="pf14730584544670" outcome="loginSuccess" redirect="true" fromaction="#{loginBean.processLogin}"/>
+  <links id="pf14730584544674" target="pf14730584544685" source="pf14730584544673" outcome="details" fromaction="#{homeBean.userDetails}"/>
+  <links id="pf14735213528951" target="pf14735213528958" source="pf14730584544673" outcome="planes" fromaction="#{homeBean.planePage}"/>
+  <links id="pf14735213528952" target="pf14735213528959" source="pf14730584544673" outcome="users" fromaction="#{homeBean.usersPage}"/>
+  <links id="pf14735213528953" target="pf147352135289510" source="pf14730584544673" outcome="companies" fromaction="#{homeBean.companyPage}"/>
+  <links id="pf14735213528954" target="pf147352135289511" source="pf14730584544673" outcome="itineraries" fromaction="#{homeBean.itineraryPage}"/>
+  <links id="pf14735213528955" target="pf147352135289512" source="pf14730584544673" outcome="airports" fromaction="#{homeBean.airportPage}"/>
+  <links id="pf14735213528956" target="pf147352135289513" source="pf14730584544673" outcome="flightTemplates" fromaction="#{homeBean.flightTemplatesPage}"/>
+  <links id="pf14735213528957" target="pf147352135289514" source="pf14730584544673" outcome="flights" fromaction="#{homeBean.flightPage}"/>
+  <links id="pf14735213528950" target="pf147352135289515" source="pf14730584544670" outcome="forgotPassword" fromaction="#{loginBean.forgotPasswordMethod}"/>
+  <links id="pf147367397579916" target="pf147367397579917" source="pf14730584544670" outcome="forgotPassword" redirect="true" fromaction="#{loginBean.forgotPasswordMethod}"/>
+  <links id="pf14730584544672" target="pf14730584544670" source="pf14730584544670" outcome="loginFailed" redirect="true" fromaction="#{loginBean.processLogin}">
+    <bendPoints d1Height="-36" d2Height="-36"/>
+    <bendPoints d1Width="-64" d1Height="-36" d2Width="-64" d2Height="-36"/>
+    <bendPoints d1Width="-64" d2Width="-64"/>
+  </links>
+  <links id="pf14731694997137" target="pf14731694997136" source="pf14731694997136" outcome="details" fromaction="#{usersBean.executeUpdate}">
+    <bendPoints d1Height="-36" d2Height="-36"/>
+    <bendPoints d1Width="-64" d1Height="-36" d2Width="-64" d2Height="-36"/>
+    <bendPoints d1Width="-64" d2Width="-64"/>
+  </links>
+</pageflow:Pageflow>

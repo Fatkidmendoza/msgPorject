@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workingSetManager>
+<workingSet editPageId="org.eclipse.ui.resourceWorkingSetPage" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1472557769583_0" label="flightmanager" name="flightmanager">
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/flightmanager-backend" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/flightmanager-web" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/flightmanager-server" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/flightmanager" type="4"/>
+</workingSet>
+<workingSet aggregate="true" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1472642515182_1" label="Window Working Set" name="Aggregate for window 1472642515182"/>
+</workingSetManager>

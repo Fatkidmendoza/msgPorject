@@ -1,0 +1,15 @@
+package edu.msg.flightmanager.backend.repository.bean;
+
+import javax.ejb.Stateless;
+
+import edu.msg.flightmanager.backend.model.Itinerary;
+import edu.msg.flightmanager.backend.repository.ItineraryRepository;
+
+@Stateless(name = "ItineraryRepository", mappedName = "ejb/ItineraryRepository")
+public class ItineraryRepositoryBean extends BaseRepositoryBean<Itinerary, Long> implements ItineraryRepository {
+
+	public ItineraryRepositoryBean() {
+		super(Itinerary.class);
+	}
+
+}

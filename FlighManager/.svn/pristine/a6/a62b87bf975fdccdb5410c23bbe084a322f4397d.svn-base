@@ -1,0 +1,36 @@
+package edu.msg.flightmanager.backend.util;
+
+import java.util.Calendar;
+
+import edu.msg.flightmanager.backend.model.Flight;
+import edu.msg.flightmanager.backend.model.User;
+
+public class FlightValidator {
+
+	private static final String DATE_IS_NOT_VALID = "The date is not valid.";
+	private static final String NUMBER_OF_CREW_MEMBERS_NOT_VALID = "Number of crew members is not valid.";
+	private static final String PILOT = "PILOT";
+	private static final String STEWARD = "STEWARD";
+
+	public static void validateFlight(Flight flight) throws ValidationException {
+		FlightTemplateValidator.validateFlightTemplate(flight.getTemplate());
+		PlaneValidator.validatePlane(flight.getPlane());
+
+		if (flight.getDate().before(Calendar.getInstance().getTime())) {
+			throw new ValidationException(DATE_IS_NOT_VALID);
+		}
+
+		int nrPilots = 0, nrStewards = 0;
+		for (User user : flight.getAircrewUsers()) {
+			if (user.getType().equals(PILOT)) {
+				nrPilots++;
+			} else if (user.getType().equals(STEWARD)) {
+				nrStewards++;
+			}
+		}
+		if (nrPilots != 2 || nrStewards != 4) {
+			throw new ValidationException(NUMBER_OF_CREW_MEMBERS_NOT_VALID);
+		}
+	}
+
+}

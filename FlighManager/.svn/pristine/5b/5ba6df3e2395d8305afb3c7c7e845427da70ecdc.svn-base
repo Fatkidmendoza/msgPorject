@@ -1,0 +1,156 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<f:view locale="#{languageBean.currentLocale}"></f:view>
+<h:head>
+	<title>Users</title>
+</h:head>
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="usersForm">
+			<p:growl id="growl" showDetail="true" />
+			<div class="valign-wrapper" id="Users-page" style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="row">
+							<div class="card">
+								<div class="card-content"
+									style="font-family: Helvetica; border: 1px solid black;">
+									<p:dataTable value="#{usersBean.allUsers}" var="user">
+										<f:facet name="header">
+											<h:outputText value="#{msg['home.users']}"></h:outputText>
+										</f:facet>
+	
+										<p:column headerText="#{msg['login.username']}" filterBy="#{user.userName}" filterMatchMode="contains">
+											<h:outputText value="#{user.userName}" />
+										</p:column>
+	
+										<p:column headerText="#{msg['pers.firstName']}">
+											<h:outputText value="#{user.firstName}" />
+										</p:column>
+	
+										<p:column headerText="#{msg['pers.lastName']}">
+											<h:outputText value="#{user.lastName}" />
+										</p:column>
+
+										<p:column headerText="#{msg['pers.email']}">
+											<h:outputText value="#{user.email}" />
+										</p:column>
+	
+										<p:column headerText="#{msg['pers.phone']}">
+											<h:outputText value="#{user.phoneNumber}" />
+										</p:column>
+	
+										<p:column headerText="#{msg['pers.role']}">
+											<h:outputText value="#{user.type}" />
+										</p:column>
+										
+										<p:column headerText="#{msg['general.delete']}" style="width:130px">
+											<p:commandButton icon="ui-icon-trash" id="delete"
+												actionListener="#{usersBean.deleteUser(user)}"
+												update="usersForm" rendered="#{!user.deleted}">
+												<p:confirm header="#{msg['general.confirmDelete']}"
+													message="#{msg['general.sureDeleteUs']}"
+													icon="ui-icon-alert" />
+											</p:commandButton>
+										</p:column>
+
+										<p:column headerText="#{msg['pers.edit']}" style="width:130px">
+											<p:commandButton update=":usersForm:userDetail"
+												oncomplete="PF('userDialog').show()" icon="ui-icon-pencil"
+												title="View">
+												<f:setPropertyActionListener value="#{user}"
+													target="#{usersBean.userToUpdate}" />
+											</p:commandButton>
+										</p:column>
+										
+										
+										
+									</p:dataTable>
+
+									<!-- confirm dialog for delete -->
+									<p:confirmDialog global="true" showEffect="fade"
+										hideEffect="fade">
+										<p:commandButton value="#{msg['general.yes']}" type="button"
+											styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+										<p:commandButton value="#{msg['general.no']}" type="button"
+											styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+									</p:confirmDialog>
+
+
+									<p:button outcome="addUser" value="#{msg['users.addEmployee']}" icon="ui-icon-plus" />
+
+									<p:dialog header="#{msg['pers.info']}" id="dialog" widgetVar="userDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+								        <p:outputPanel id="userDetail" style="text-align:center;">
+								            <p:panelGrid  columns="2" id="updatePanel" rendered="#{not empty usersBean.userToUpdate}" columnClasses="label,value">
+								                 <p:outputLabel for="userName" value="#{msg['login.username']}" />
+												<p:inputText id="userName" value="#{usersBean.userToUpdate.userName}">
+													<f:validator validatorId="userNameValidator"/>
+												</p:inputText>
+								                
+								                <p:outputLabel for="firstName" value="#{msg['pers.firstName']}" />
+												<p:inputText id="firstName" value="#{usersBean.userToUpdate.firstName}">
+													<f:validator validatorId="nameValidator"/>
+												</p:inputText>
+												
+												
+								 
+								                <p:outputLabel for="lastName" value="#{msg['pers.lastName']}" />
+												<p:inputText id="lastName" value="#{usersBean.userToUpdate.lastName}">
+													<f:validator validatorId="nameValidator"/>
+												</p:inputText>
+				
+												<p:outputLabel for="email" value="#{msg['pers.email']}" />
+												<p:inputText id="email" value="#{usersBean.userToUpdate.email}">
+													<f:validator validatorId="emailValidator"/>
+												</p:inputText>
+												
+												<p:outputLabel for="phoneNumber" value="#{msg['pers.phone']}" />
+												<p:inputText id="phoneNumber" value="#{usersBean.userToUpdate.phoneNumber}">
+													<f:validator validatorId="phoneValidator" />	
+												</p:inputText>
+												
+												<p:outputLabel for="pass"  value="#{msg['login.password']}"></p:outputLabel>
+												<p:selectBooleanCheckbox id="pass" binding="#{booleanChckBox}" value="#{usersBean.editPassword}"> 
+													<f:ajax   render="updatePanel" />
+												</p:selectBooleanCheckbox>
+				
+												<p:outputLabel for="password" rendered="#{usersBean.editPassword}" value="#{msg['login.password']}" />
+												<p:password id="password" rendered="#{usersBean.editPassword}" feedback="true" value="#{usersBean.userToUpdate.password}"/>
+												
+												<p:outputLabel for="typeMenu" value="#{msg['pers.role']}" />
+												<p:selectOneMenu id="typeMenu" value="#{usersBean.userToUpdate.type}">
+													<f:selectItems value="#{usersBean.allTypes}" var="type" itemValue="#{type}" itemLabel="#{type}" />
+												</p:selectOneMenu>
+				
+												<p:outputLabel for="companyMenu" value="#{msg['flights.company']}" />
+												<p:selectOneMenu id="companyMenu" value="#{usersBean.userToUpdate.companyName}">
+													<f:selectItems value="#{companiesBean.allCompanies}" var="company" itemValue="#{company.name}" itemLabel="#{company.name}" />
+												</p:selectOneMenu>
+												
+												<p:outputLabel value="#{msg['pers.activate']}" rendered="#{usersBean.userToUpdate.deleted}" />
+												<p:selectBooleanCheckbox value="#{usersBean.activated}" valueChangeListener="#{usersBean.valueChange}" rendered="#{usersBean.userToUpdate.deleted}"/>
+													
+												
+								            </p:panelGrid>
+								            
+								            <p:commandButton value="#{msg['general.update']}"  icon="ui-icon-pencil" id="update" actionListener="#{usersBean.updateUser}" update="usersForm" />
+								        </p:outputPanel>
+								    </p:dialog>
+	
+								</div>
+								<br />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+</html>

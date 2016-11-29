@@ -1,0 +1,39 @@
+package edu.msg.flightmanager.backend.repository.bean;
+
+import javax.ejb.Stateless;
+import javax.persistence.PersistenceException;
+import javax.persistence.TypedQuery;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.msg.flightmanager.backend.model.Company;
+import edu.msg.flightmanager.backend.repository.CompanyRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+
+@Stateless(name = "CompanyRepository", mappedName = "ejb/CompanyRepository")
+public class CompanyRepositoryBean extends BaseRepositoryBean<Company, Long> implements CompanyRepository {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(CompanyRepositoryBean.class);
+
+	public CompanyRepositoryBean() {
+		super(Company.class);
+	}
+
+	@Override
+	public Company getByName(String name) throws RepositoryException {
+		try {
+			LOGGER.info("Try to select a company by its name.");
+			TypedQuery<Company> companies = entityManager.createQuery("SELECT c FROM Company c WHERE c.name= :name",
+					Company.class);
+			companies.setParameter("name", name);
+			Company company = companies.getSingleResult();
+			LOGGER.info("Company selection by name successful.");
+			return company;
+		} catch (PersistenceException e) {
+			LOGGER.error("Company selection by name failed.", e);
+			throw new RepositoryException("Company selection by name failed.");
+		}
+	}
+
+}

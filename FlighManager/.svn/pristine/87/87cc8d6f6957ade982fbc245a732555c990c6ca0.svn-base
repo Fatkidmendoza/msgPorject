@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<h:head>
+	<title>Add Airport</title>
+</h:head>
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+		<h:form id="addAirportForm">^
+		<p:growl showDetail="true" />
+			<div class="valign-wrapper" id="companies-page"
+				style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="ui-fluid">
+							<p:panelGrid columns="2" cellpadding="5">
+
+								<p:outputLabel for="name" value="Name" />
+								<p:inputText id="name"
+									value="#{airportsBean.airportToInsert.name}" >
+									<f:validator validatorId="nameValidator" />
+									</p:inputText>
+
+								<p:outputLabel for="country" value="Country" />
+								<p:inputText id="country"
+									value="#{airportsBean.airportToInsert.country}" >
+									<f:validator validatorId="nameValidator" />
+									</p:inputText>
+
+								<p:outputLabel for="city" value="City" />
+								<p:inputText id="city"
+									value="#{airportsBean.airportToInsert.city}" >
+									<f:validator validatorId="nameValidator" />
+									</p:inputText>
+
+								<p:outputLabel for="address" value="Address" />
+								<p:inputText id="address"
+									value="#{airportsBean.airportToInsert.address}" >
+									<f:validator validatorId="nameValidator" />
+									</p:inputText>
+
+							</p:panelGrid>
+
+							<p:commandButton value="Save" icon="ui-icon-disk" id="save"
+								actionListener="#{airportsBean.addAirport()}"
+								update="addAirportForm" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+
+</html>

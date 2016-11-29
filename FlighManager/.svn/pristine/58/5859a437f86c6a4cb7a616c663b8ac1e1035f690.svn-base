@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config
+    xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd"
+    version="2.2">
+
+	<navigation-rule>
+		<from-view-id>login.xhtml</from-view-id>
+		<navigation-case>
+			<from-action>#{loginBean.processLogin}</from-action>
+			<from-outcome>loginSuccess</from-outcome>
+			<to-view-id>home.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-action>#{loginBean.processLogin}</from-action>
+			<from-outcome>loginFailed</from-outcome>
+			<to-view-id>login.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+	</navigation-rule>
+	<navigation-rule>
+		<from-view-id>home.xhtml</from-view-id>
+		<navigation-case>
+			<from-action>#{homeBean.planePage}</from-action>
+			<from-outcome>planes</from-outcome>
+			<to-view-id>planes.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+	<navigation-rule>
+		<from-view-id>home.xhtml</from-view-id>
+		<navigation-case>
+			<from-action>#{homeBean.usersPage}</from-action>
+			<from-outcome>users</from-outcome>
+			<to-view-id>users.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+	<navigation-rule>
+		<from-view-id>home.xhtml</from-view-id>
+		<navigation-case>
+			<from-action>#{homeBean.companyPage}</from-action>
+			<from-outcome>companies</from-outcome>
+			<to-view-id>companies.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+	<navigation-rule>
+		<from-view-id>home.xhtml</from-view-id>
+		<navigation-case>
+			<from-action>#{homeBean.itineraryPage}</from-action>
+			<from-outcome>itineraries</from-outcome>
+			<to-view-id>itineraries.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+	<navigation-rule>
+		<from-view-id>home.xhtml</from-view-id>
+		<navigation-case>
+			<from-action>#{homeBean.airportPage}</from-action>
+			<from-outcome>airports</from-outcome>
+			<to-view-id>airports.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+	<navigation-rule>
+		<from-view-id>home.xhtml</from-view-id>
+		<navigation-case>
+			<from-action>#{homeBean.flightTemplatesPage}</from-action>
+			<from-outcome>flightTemplates</from-outcome>
+			<to-view-id>flightTemplates.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+	<navigation-rule>
+		<from-view-id>home.xhtml</from-view-id>
+		<navigation-case>
+			<from-action>#{homeBean.flightPage}</from-action>
+			<from-outcome>flights</from-outcome>
+			<to-view-id>flights.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+	<navigation-rule>
+		<from-view-id>home.xhtml</from-view-id>
+		<navigation-case>
+			<from-action>#{homeBean.userDetails}</from-action>
+			<from-outcome>details</from-outcome>
+			<to-view-id>details.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+
+	<navigation-rule>
+		<from-view-id>/details.xhtml</from-view-id>
+		<navigation-case>
+			<from-action>#{usersBean.executeUpdate}</from-action>
+			<from-outcome>details</from-outcome>
+			<to-view-id>/details.xhtml</to-view-id>
+		</navigation-case>
+	</navigation-rule>
+
+
+</faces-config>

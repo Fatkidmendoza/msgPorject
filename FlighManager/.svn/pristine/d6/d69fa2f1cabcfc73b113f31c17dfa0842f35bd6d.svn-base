@@ -1,0 +1,116 @@
+package edu.msg.flightmanager.beans;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpSession;
+
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.service.UserService;
+
+@ManagedBean
+@SessionScoped // DON'T CHANGE!! :)))
+public class UsersBean implements Serializable {
+
+	private static final long serialVersionUID = 4860933911207569401L;
+
+	private boolean editable;
+
+	@EJB
+	private UserService userService;
+
+	public String enableEdit() {
+		setEditable(true);
+		return "details";
+
+	}
+
+	public String executeUpdate(String firstName, String lastName, String email, String phoneNumber, String userName) {
+		System.out.println("sdfsa");
+		UserDto userDto = getUserInSession();
+		userDto.setFirstName(firstName);
+		userDto.setLastName(lastName);
+		userDto.setEmail(email);
+		userDto.setPhoneNumber(phoneNumber);
+		userDto.setUserName(userName);
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+		session.setAttribute("user", userDto);
+		try {
+			userService.update(userDto);
+		} catch (ServiceException e) {
+		}
+		setEditable(false);
+		return "details";
+	}
+
+	public String disableEdit() {
+		setEditable(false);
+		return "details";
+	}
+
+	public List<UserDto> getAllUsers() {
+		return userService.getAll();
+	}
+
+	public boolean getUserIsEditable() {
+		return isEditable();
+	}
+
+	public UserDto getUserInSession() {
+		HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+		return (UserDto) session.getAttribute("user");
+
+	}
+
+	public boolean isEditable() {
+		return editable;
+	}
+
+	public void setEditable(boolean edit) {
+		this.editable = edit;
+	}
+
+	public String getDatails() {
+		return "details";
+	}
+
+	public String getFlightPage() {
+		return "flights";
+	}
+
+	public String getFlightTemplatesPage() {
+		return "flightTemplates";
+	}
+
+	public String getAirportPage() {
+		return "airports";
+	}
+
+	public String getItineraryPage() {
+		return "itineraries";
+	}
+
+	public String getCompamyPage() {
+		return "companies";
+	}
+
+	public String getPlanePage() {
+		return "planes";
+	}
+
+	private String orientation = "vertical";
+
+	public String getOrientation() {
+		return orientation;
+	}
+
+	public void setOrientation(String orientation) {
+		this.orientation = orientation;
+	}
+
+}

@@ -1,0 +1,43 @@
+package edu.msg.flightmanager.backend.repository.bean;
+
+import javax.ejb.Stateless;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
+import javax.persistence.TypedQuery;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.msg.flightmanager.backend.model.Airport;
+import edu.msg.flightmanager.backend.repository.AirportRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+
+@Stateless(name = "AirportRepository", mappedName = "ejb/AirportRepository")
+public class AirportRepositoryBean extends BaseRepositoryBean<Airport, Long> implements AirportRepository {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(AirportRepositoryBean.class);
+
+	public AirportRepositoryBean() {
+		super(Airport.class);
+	}
+
+	@Override
+	public Airport getByCode(String code) throws RepositoryException {
+		try {
+			LOGGER.info("Try to select an airport by its code.");
+			TypedQuery<Airport> airports = entityManager.createQuery("SELECT a FROM Airport a WHERE a.code= :code",
+					Airport.class);
+			airports.setParameter("code", code);
+			Airport airport = airports.getSingleResult();
+			LOGGER.info("Airport selection by code successful");
+			return airport;
+		} catch (NoResultException e) {
+			LOGGER.error("Airport selection by code failed.", e);
+			throw new RepositoryException("Airport selction by code failed.");
+		} catch (PersistenceException e) {
+			LOGGER.error("Airport selection by code failed", e);
+			throw new RepositoryException("Airport selection by code failed.");
+		}
+	}
+
+}

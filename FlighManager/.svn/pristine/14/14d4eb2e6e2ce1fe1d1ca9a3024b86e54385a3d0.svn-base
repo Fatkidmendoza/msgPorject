@@ -1,0 +1,10 @@
+package edu.msg.flightmanager.backend.repository;
+
+import javax.ejb.Local;
+
+import edu.msg.flightmanager.backend.model.Flight;
+
+@Local
+public interface FlightRepository extends BaseRepository<Flight, Long> {
+
+}

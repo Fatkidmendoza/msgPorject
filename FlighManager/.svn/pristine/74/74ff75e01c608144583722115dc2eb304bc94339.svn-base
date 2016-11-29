@@ -1,0 +1,29 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import edu.msg.flightmanager.backend.model.Company;
+import edu.msg.flightmanager.backend.repository.CompanyRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.service.CompanyService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+
+@Stateless(name = "CompanyService", mappedName = "ejb/CompanyService")
+public class CompanyServiceBean implements CompanyService {
+
+	@EJB
+	private CompanyRepository companyRepository;
+
+	@Override
+	public List<Company> getAll() throws ServiceException {
+		try {
+			return companyRepository.getAll();
+		} catch (RepositoryException e) {
+			throw new ServiceException("The companies selection failed", e);
+		}
+	}
+
+}

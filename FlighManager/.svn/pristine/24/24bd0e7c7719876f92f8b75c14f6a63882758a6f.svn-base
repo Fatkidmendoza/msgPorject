@@ -1,0 +1,494 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+
+import javax.ejb.EJB;
+import javax.ejb.Schedule;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+
+import org.apache.commons.lang.RandomStringUtils;
+
+import edu.msg.flightmanager.backend.assembler.FlightAssembler;
+import edu.msg.flightmanager.backend.assembler.UserAssembler;
+import edu.msg.flightmanager.backend.dto.FlightDto;
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.exception.CsvException;
+import edu.msg.flightmanager.backend.model.Company;
+import edu.msg.flightmanager.backend.model.Flight;
+import edu.msg.flightmanager.backend.model.FlightTemplate;
+import edu.msg.flightmanager.backend.model.Itinerary;
+import edu.msg.flightmanager.backend.model.PeriodicityType;
+import edu.msg.flightmanager.backend.model.Plane;
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.repository.CompanyRepository;
+import edu.msg.flightmanager.backend.repository.FlightRepository;
+import edu.msg.flightmanager.backend.repository.FlightTemplateRepository;
+import edu.msg.flightmanager.backend.repository.PlaneRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.repository.UserRepository;
+import edu.msg.flightmanager.backend.service.FlightService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.util.CsvFileReader;
+import edu.msg.flightmanager.backend.util.CsvFileWriter;
+import edu.msg.flightmanager.backend.util.FlightValidator;
+import edu.msg.flightmanager.backend.util.ValidationException;
+
+@Stateless(name = "FlightService", mappedName = "ejb/FlightService")
+public class FlightServiceBean implements FlightService {
+
+	@EJB
+	private FlightRepository flightRepository;
+
+	private static List<FlightDto> flightsHistory;
+
+	@EJB
+	private FlightTemplateRepository flightTemplateRepository;
+
+	@EJB
+	private PlaneRepository planeRepository;
+
+	@EJB
+	private UserRepository userRepository;
+
+	@EJB
+	private CompanyRepository companyRepository;
+
+	private static final int NUMBER_OF_DAYS_FOR_NEXT_FLIGHT_DAILY = 365;
+	private static final int NUMBER_OF_WEEKS_FOR_NEXT_FLIGHT_WEEKLY = 52;
+	private static final int NUMBER_OF_MONTH_FOR_NEXT_FLIGHT_MONTHLY = 12;
+
+	@Override
+	public List<FlightDto> getAll() throws ServiceException {
+		try {
+			List<FlightDto> flights = new ArrayList<FlightDto>();
+			for (Flight flight : flightRepository.getAll()) {
+				flights.add(FlightAssembler.modelToDto(flight));
+			}
+			return flights;
+		} catch (RepositoryException e) {
+			throw new ServiceException("The flights selection failed");
+		}
+	}
+
+	@Override
+	public FlightDto update(FlightDto flightDto) throws ServiceException {
+		Flight flight = FlightAssembler.dtoToModel(flightDto);
+		if (flight.getCode().equals("")) {
+			throw new ServiceException("Code can not be empty");
+		}
+		try {
+			FlightValidator.validateFlight(flight);
+			flight = flightRepository.update(flight);
+			FlightDto updatedFlight = FlightAssembler.modelToDto(flight);
+			return updatedFlight;
+		} catch (ValidationException e) {
+			throw new ServiceException(e.getMessage());
+		} catch (RepositoryException e) {
+			throw new ServiceException(e.getMessage());
+		}
+	}
+
+	@Override
+	public FlightDto insert(FlightDto flightDto) throws ServiceException {
+		Flight flight = FlightAssembler.dtoToModel(flightDto);
+		if (flight.getCode().equals("")) {
+			throw new ServiceException("Code can not be empty");
+		}
+		try {
+			FlightValidator.validateFlight(flight);
+			flight = flightRepository.insert(flight);
+			FlightDto insertedflight = FlightAssembler.modelToDto(flight);
+			insertNextFlights(flight.getTemplate(), insertedflight.getDate(),flight.getPlane());
+			return insertedflight;
+		} catch (ValidationException e) {
+			throw new ServiceException(e.getMessage());
+		} catch (RepositoryException e) {
+			throw new ServiceException("Flight insertion failed.");
+		}
+	}
+
+	private void insertNextFlights(FlightTemplate template, Date date,Plane plane) {
+		PeriodicityType periodicityType =template.getItinerary().getPeriodicity();
+		if (periodicityType.equals(PeriodicityType.ONCE)){
+			return;
+		}
+		Calendar flightNextCalendar = Calendar.getInstance();
+		flightNextCalendar.setTime(date);
+
+		if (periodicityType.equals(PeriodicityType.DAILY)){
+			for (int i=1;i<NUMBER_OF_DAYS_FOR_NEXT_FLIGHT_DAILY;i++){
+				flightNextCalendar.add(Calendar.DAY_OF_YEAR, 1);
+				insertFlightAccordingToTemplateAndDate(template, flightNextCalendar.getTime(),plane);
+			}
+			return;
+		}
+		if (periodicityType.equals(PeriodicityType.MONTHLY)){
+			for (int i=1;i<NUMBER_OF_MONTH_FOR_NEXT_FLIGHT_MONTHLY;i++){
+				flightNextCalendar.setTime(date);
+				if (isNextMonth(flightNextCalendar.getTime(),i)) {
+					flightNextCalendar.add(Calendar.MONTH, i);
+					insertFlightAccordingToTemplateAndDate(template, flightNextCalendar.getTime(),plane);
+				}
+			}
+			return;
+		}
+		if (periodicityType.equals(PeriodicityType.WEEKLY)){
+			for (int i=1;i<NUMBER_OF_WEEKS_FOR_NEXT_FLIGHT_WEEKLY;i++){
+				flightNextCalendar.add(Calendar.DAY_OF_YEAR, 7);
+				insertFlightAccordingToTemplateAndDate(template, flightNextCalendar.getTime(),plane);
+
+			}
+			return;
+		}
+
+
+
+	}
+
+	private void insertFlightAccordingToTemplateAndDate(FlightTemplate template, Date time, Plane plane) {
+		Flight generatedFlight = new Flight();
+		StringBuilder builder = new StringBuilder();
+		builder.append(template.getCode());
+		builder.append('-');
+		builder.append(RandomStringUtils.randomNumeric(5));
+		generatedFlight.setCode(builder.toString());
+		generatedFlight.setDate(time);
+		generatedFlight.setPlane(plane);
+		generatedFlight.setTemplate(template);
+		flightRepository.insert(generatedFlight);
+
+	}
+
+	@Override
+	public void delete(FlightDto flightDto) throws ServiceException {
+		Flight flight = FlightAssembler.dtoToModel(flightDto);
+		try {
+			flight.setAircrewUsers(new ArrayList<>());
+			flightRepository.delete(flight);
+		} catch (RepositoryException e) {
+			throw new ServiceException("Flight deletion failed.");
+		}
+	}
+
+	@Override
+	public void activate(FlightDto flightDto) throws ServiceException {
+		Flight flight = FlightAssembler.dtoToModel(flightDto);
+		try {
+			flightRepository.activate(flight);
+		} catch (RepositoryException e) {
+			throw new ServiceException("Flight activate failed.");
+		}
+	}
+
+	@Override
+	public List<FlightDto> getHistory() throws ServiceException {
+		return flightsHistory;
+
+	}
+
+	@Schedule(second = "*/1", minute = "*", hour = "*", persistent = false)
+	public void generateHistory() {
+		try {
+			List<Flight> allFlights = flightRepository.getAvailableFlights();
+			for (Flight flight : allFlights) {
+				Itinerary itinerary = flight.getTemplate().getItinerary();
+				Date flightDate = flight.getDate();
+				Calendar flightCalendar = Calendar.getInstance();
+				Calendar itineraryCalendar = Calendar.getInstance();
+				flightCalendar.setTime(flightDate);
+				itineraryCalendar.setTime(itinerary.getEndTime());
+				if (flight.getTemplate().getItinerary().isNextDay()) {
+					flightCalendar.add(Calendar.DATE, 1);
+				}
+				flightCalendar.set(Calendar.HOUR_OF_DAY, itineraryCalendar.get(Calendar.HOUR_OF_DAY));
+				flightCalendar.set(Calendar.MINUTE, itineraryCalendar.get(Calendar.MINUTE));
+				flightCalendar.setTimeZone(TimeZone.getTimeZone(flight.getTemplate().getArrival().getTimezone()));
+				flightDate = flightCalendar.getTime();
+				Date dateNow = new Date();
+				if (flightDate.before(dateNow)) {
+					if (!itinerary.getPeriodicity().equals(PeriodicityType.ONCE)) {
+						generateNextFlights(flight);
+					}
+					flight.setPassed(true);
+					flightRepository.update(flight);
+				}
+			}
+			refreshFlightHistory();
+		} catch (RepositoryException e) {
+			throw new ServiceException("Flight history failed.");
+		}
+	}
+
+	private void generateNextFlights(Flight flight) {
+		PeriodicityType type = flight.getTemplate().getItinerary().getPeriodicity();
+		Calendar flightNext = Calendar.getInstance();
+		flightNext.setTime(flight.getDate());
+		if (type.equals(PeriodicityType.DAILY)) {
+			flightNext.add(Calendar.DAY_OF_YEAR, NUMBER_OF_DAYS_FOR_NEXT_FLIGHT_DAILY);
+		}
+
+		if (type.equals(PeriodicityType.WEEKLY)) {
+
+			flightNext.add(Calendar.DAY_OF_YEAR, 7 * NUMBER_OF_WEEKS_FOR_NEXT_FLIGHT_WEEKLY);
+
+		}
+		if (type.equals(PeriodicityType.MONTHLY)) {
+			if (isNextMonth(flight.getDate(),NUMBER_OF_MONTH_FOR_NEXT_FLIGHT_MONTHLY)) {
+				flightNext.add(Calendar.MONTH, NUMBER_OF_MONTH_FOR_NEXT_FLIGHT_MONTHLY);
+			} else {
+				return;
+			}
+		}
+		Flight generatedFlight = new Flight();
+		StringBuilder builder = new StringBuilder();
+		builder.append(flight.getTemplate().getCode());
+		builder.append('-');
+		builder.append(RandomStringUtils.randomNumeric(3));
+		generatedFlight.setCode(builder.toString());
+		generatedFlight.setDate(flightNext.getTime());
+		generatedFlight.setPlane(flight.getPlane());
+		generatedFlight.setTemplate(flight.getTemplate());
+		flightRepository.insert(generatedFlight);
+
+	}
+
+	private boolean isNextMonth(Date date,int number_of_months) {
+		Calendar nextDateCalendar = Calendar.getInstance();
+		nextDateCalendar.setTime(date);
+		nextDateCalendar.add(Calendar.MONTH, number_of_months);
+		Calendar lastDateCalenadr = Calendar.getInstance();
+		lastDateCalenadr.setTime(date);
+		if (lastDateCalenadr.get(Calendar.DAY_OF_MONTH) == nextDateCalendar.get(Calendar.DAY_OF_MONTH))
+			return true;
+		return false;
+	}
+
+	private void refreshFlightHistory() {
+		try {
+			flightsHistory = new ArrayList<FlightDto>();
+			for (Flight flight : flightRepository.getPassedFlights()) {
+				flightsHistory.add(FlightAssembler.modelToDto(flight));
+			}
+		} catch (RepositoryException e) {
+			throw new ServiceException("Flight history  refresh failed.");
+		}
+	}
+
+	@Override
+	public File getCsvFileWithFlights(Date startDate, Date endDate) throws ServiceException {
+		List<Flight> flights = new ArrayList<>();
+		try {
+			flights = flightRepository.getFlightsBetweenTwoDates(startDate, endDate);
+		} catch (RepositoryException e) {
+			throw new ServiceException(e.getMessage());
+		}
+		List<List<String>> flightsAsListsOfStrings = new ArrayList<>();
+		for (Flight flight : flights) {
+			List<String> flightAsString = new ArrayList<>();
+			flightAsString.add(flight.getCode());
+			flightAsString.add(new SimpleDateFormat("yyyy-MM-dd").format(flight.getDate()));
+			flightAsString.add(String.valueOf(flight.isDeleted()));
+			flightAsString.add(String.valueOf(flight.isPassed()));
+			flightAsString.add(flight.getPlane().getCode().toString());
+			flightAsString.add(flight.getTemplate().getCode().toString());
+
+			flightsAsListsOfStrings.add(flightAsString);
+		}
+		String fileHeader = "Code,Date,Deleted,Passed,PlaneCode,TemplateCode";
+
+		File csvFile = new File("fligts.csv");
+		try {
+			FileWriter fileWriter = new FileWriter(csvFile);
+			CsvFileWriter.writeCsvFile(fileWriter, fileHeader, flightsAsListsOfStrings);
+			return csvFile;
+		} catch (IOException e) {
+			throw new ServiceException("Could not create a writer for the csv file.");
+		} catch (CsvException e) {
+			throw new ServiceException("Could not write to the csv file.");
+		}
+
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.NEVER)
+	public Map<String, Integer> readFromCsvFile(InputStream inputStream) {
+		List<List<String>> entities = new ArrayList<>();
+		try {
+			entities = CsvFileReader.readCsvFile(inputStream);
+		} catch (CsvException e) {
+			Map<String, Integer> numberOfInserts = new HashMap<>();
+			numberOfInserts.put("successful", 0);
+			numberOfInserts.put("unsuccessful", 0);
+			return numberOfInserts;
+		}
+		// first read the header
+		List<String> header = entities.get(0);
+		// get the position of each field from the header
+		Map<String, Integer> positionOfFields = new HashMap<>();
+		for (int i = 0; i < header.size(); i++) {
+			positionOfFields.put(header.get(i), i);
+		}
+
+		// read the entities, which start from position 1
+		Integer numberOfSuccessfulInserts = 0;
+		Integer numberOfUnsuccessfulInserts = 0;
+		for (int i = 1; i < entities.size(); i++) {
+			List<String> entity = entities.get(i);
+			try {
+				FlightTemplate flightTemplate = flightTemplateRepository
+						.getFlightTemplateThatHasACode(entity.get(positionOfFields.get("TemplateCode")));
+				Plane plane = planeRepository.getPlaneThatHasACode(entity.get(positionOfFields.get("PlaneCode")));
+
+				Flight flight = new Flight();
+				flight.setCode(entity.get(positionOfFields.get("Code")));
+				String[] dateAsListOfStrings = entity.get(positionOfFields.get("Date")).split("-");
+				LocalDate localDate = LocalDate.of(Integer.valueOf(dateAsListOfStrings[0]),
+						Integer.valueOf(dateAsListOfStrings[1]), Integer.valueOf(dateAsListOfStrings[2]));
+				Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+				flight.setDate(date);
+				flight.setDeleted(Boolean.valueOf(entity.get(positionOfFields.get("Deleted"))));
+				flight.setPassed(Boolean.valueOf(entity.get(positionOfFields.get("Passed"))));
+				flight.setPlane(plane);
+				flight.setTemplate(flightTemplate);
+				flightRepository.insert(flight);
+
+				numberOfSuccessfulInserts++;
+			} catch (RepositoryException e) {
+				numberOfUnsuccessfulInserts++;
+			} catch (NullPointerException e) {
+				numberOfUnsuccessfulInserts++;
+			} catch (IndexOutOfBoundsException e) {
+				numberOfUnsuccessfulInserts++;
+			} catch (IllegalArgumentException e) {
+				numberOfUnsuccessfulInserts++;
+			}
+
+		}
+		Map<String, Integer> numberOfInserts = new HashMap<>();
+		numberOfInserts.put("successful", numberOfSuccessfulInserts);
+		numberOfInserts.put("unsuccessful", numberOfUnsuccessfulInserts);
+		return numberOfInserts;
+	}
+
+	@Override
+	public List<FlightDto> getAvailableFlight() throws ServiceException {
+		try {
+			List<FlightDto> flights = new ArrayList<FlightDto>();
+			for (Flight flight : flightRepository.getAvailableFlights()) {
+				flights.add(FlightAssembler.modelToDto(flight));
+			}
+			return flights;
+		} catch (RepositoryException e) {
+			throw new ServiceException("The flights available selection failed");
+		}
+	}
+
+	@Override
+	public Map<UserDto, Long> reportWithAllFlightHoursOfAllCrewMembers(Date startDate, Date endDate) {
+		Map<String, Long> flightHoursForAllCrewMembers = new HashMap<>();
+		// get all the users from the database that are crew members (pilots or
+		// stewards)
+		List<User> crewMembers = userRepository.getAllCrewMembers();
+		// initialize for all crew members the flight hours to 0
+		for (User crewMember : crewMembers) {
+			flightHoursForAllCrewMembers.put(crewMember.getUserName(), 0L);
+		}
+		List<Flight> flights = flightRepository.getFlightsBetweenTwoDates(startDate, endDate);
+		for (Flight flight : flights) {
+
+			Date flightDate = flight.getDate();
+			LocalDate startLocalDate = new java.sql.Date(flightDate.getTime()).toLocalDate();
+			@SuppressWarnings("deprecation")
+			LocalTime startLocalTime = LocalTime.of(flight.getTemplate().getItinerary().getStartTime().getHours(),
+					flight.getTemplate().getItinerary().getStartTime().getMinutes());
+			LocalDateTime startDateTime = LocalDateTime.of(startLocalDate, startLocalTime);
+			ZonedDateTime startZonedDate = ZonedDateTime.of(startDateTime,
+					TimeZone.getTimeZone(flight.getTemplate().getDeparture().getTimezone()).toZoneId());
+
+			LocalDate endLocalDate = new java.sql.Date(flightDate.getTime()).toLocalDate();
+			if (flight.getTemplate().getItinerary().isNextDay()) {
+				endLocalDate = endLocalDate.plus(1, ChronoUnit.DAYS);
+			}
+			@SuppressWarnings("deprecation")
+			LocalTime endLocalTime = LocalTime.of(flight.getTemplate().getItinerary().getEndTime().getHours(),
+					flight.getTemplate().getItinerary().getEndTime().getMinutes());
+			LocalDateTime endDateTime = LocalDateTime.of(endLocalDate, endLocalTime);
+			ZonedDateTime endZonedDate = ZonedDateTime.of(endDateTime,
+					TimeZone.getTimeZone(flight.getTemplate().getArrival().getTimezone()).toZoneId());
+			// convert to the zone of the departure
+			ZonedDateTime convertZone = endZonedDate.withZoneSameInstant(
+					TimeZone.getTimeZone(flight.getTemplate().getDeparture().getTimezone()).toZoneId());
+			// System.out.println("end zone convert: " + convertZone.getHour() +
+			// " " + convertZone.getZone());
+
+			// long diffInMonths = ChronoUnit.MONTHS.between(sinceGraduation,
+			// currentDate);
+			Long duration = ChronoUnit.MINUTES.between(startZonedDate, convertZone);
+
+			// add the duration to the hours of all crew members of that flight
+			for (User crewMember : flight.getAircrewUsers()) {
+				Long newHours = flightHoursForAllCrewMembers.get(crewMember.getUserName()) + duration;
+				flightHoursForAllCrewMembers.put(crewMember.getUserName(), newHours);
+			}
+		}
+
+		Map<UserDto, Long> reportHours = new HashMap<>();
+		for (String userName : flightHoursForAllCrewMembers.keySet()) {
+			reportHours.put(UserAssembler.modelToDto(userRepository.getByUserName(userName)),
+					flightHoursForAllCrewMembers.get(userName));
+		}
+		return reportHours;
+	}
+
+	@Override
+	public List<FlightDto> getTheFlightsOfAUser(UserDto userDto) throws ServiceException {
+		User user = UserAssembler.dtoToModel(userDto);
+		try {
+			List<Flight> flightsOfAUser = flightRepository.getTheFlightsOfAUser(user);
+			List<FlightDto> flightsDtoOfAUser = new ArrayList<>();
+			for (Flight flight : flightsOfAUser) {
+				FlightDto flightDto = FlightAssembler.modelToDto(flight);
+				flightsDtoOfAUser.add(flightDto);
+			}
+			return flightsDtoOfAUser;
+		} catch (RepositoryException e) {
+			throw new ServiceException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<FlightDto> getFlightsOfACompany(String companyName) throws ServiceException {
+		try {
+			Company company = companyRepository.getByName(companyName);
+			List<Flight> flights = flightRepository.getFlightsOfACompany(company);
+			List<FlightDto> flightDtos = new ArrayList<>();
+			for (Flight flight : flights) {
+				FlightDto flightDto = FlightAssembler.modelToDto(flight);
+				flightDtos.add(flightDto);
+			}
+			return flightDtos;
+		} catch (ServiceException e) {
+			throw new ServiceException(e.getMessage());
+		}
+	}
+
+}

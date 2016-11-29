@@ -1,0 +1,90 @@
+package edu.msg.flightmanager.backend.repository.bean;
+
+import java.util.List;
+
+import javax.ejb.Stateless;
+import javax.persistence.PersistenceException;
+import javax.persistence.TypedQuery;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.msg.flightmanager.backend.model.User;
+import edu.msg.flightmanager.backend.model.UserType;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.repository.UserRepository;
+
+@Stateless(name = "UserRepository", mappedName = "ejb/UserRepository")
+public class UserRepositoryBean extends BaseRepositoryBean<User, Long> implements UserRepository {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserRepositoryBean.class);
+
+	public UserRepositoryBean() {
+		super(User.class);
+	}
+
+	@Override
+	public User getByUserName(String userName) throws RepositoryException {
+		try {
+			LOGGER.info("Try to select an user by its user name.");
+			TypedQuery<User> users = entityManager.createQuery("SELECT u FROM User u WHERE u.userName= :userName",
+					User.class);
+			users.setParameter("userName", userName);
+			User user = users.getSingleResult();
+			LOGGER.info("User selection by user name successful.");
+			return user;
+		} catch (PersistenceException e) {
+			LOGGER.error("User selection by user name failed.", e);
+			throw new RepositoryException("User selection by user name failed.");
+		}
+	}
+
+	@Override
+	public List<User> getByTypeAndCompany(UserType type, String companyName) throws RepositoryException {
+		try {
+			LOGGER.info("Try to select an user by its type and company");
+			TypedQuery<User> users = entityManager.createQuery(
+					"SELECT u FROM User u WHERE u.type= :type and u.company.name = :companyName", User.class);
+			users.setParameter("type", type);
+			users.setParameter("companyName", companyName);
+			LOGGER.info("Users selection by type and company successful.");
+			return users.getResultList();
+		} catch (PersistenceException e) {
+			LOGGER.error("Users selection by type and company failed.", e);
+			throw new RepositoryException("Users selection by type and company failed.");
+		}
+	}
+
+	@Override
+	public List<User> getAllCrewMembers() throws RepositoryException {
+		try {
+			LOGGER.info("Try to select all users that are crew members.");
+			TypedQuery<User> users = entityManager
+					.createQuery("SELECT u FROM User u WHERE u.type= :type1 OR u.type = :type2", User.class);
+			users.setParameter("type1", UserType.PILOT);
+			users.setParameter("type2", UserType.STEWARD);
+			List<User> queryResult = users.getResultList();
+			LOGGER.info("Users that are crew members selection successful.");
+			return queryResult;
+		} catch (PersistenceException e) {
+			LOGGER.error("Users selection by type and company failed.", e);
+			throw new RepositoryException("Users selection by type and company failed.");
+		}
+	}
+
+	@Override
+	public List<User> getByCompany(String companyName) throws RepositoryException {
+		try {
+			LOGGER.info("Try to select all users that have the given company name.");
+			TypedQuery<User> users = entityManager
+					.createQuery("SELECT u FROM User u WHERE u.company.name = :companyName", User.class);
+			users.setParameter("companyName", companyName);
+			List<User> queryResult = users.getResultList();
+			LOGGER.info("Users that have the given company name selection successful.");
+			return queryResult;
+		} catch (PersistenceException e) {
+			LOGGER.error("Users selection by company name failed.", e);
+			throw new RepositoryException("Users selection by company name failed.");
+		}
+	}
+}

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html">
+    <body>
+	    <ui:composition>
+		<h:form >
+	<p:megaMenu orientation="vertical" style="margin-top:20px">
+
+		<p:submenu label="Flights" icon="ui-icon-document" >
+
+			<p:column>
+				<p:submenu label="Operations">
+					<p:menuitem value="View" action="#{homeBean.flightPage}" />
+					<p:menuitem value="Manage" action="#" rendered="#{userRights.flightManAdminRight}"/>
+					<p:menuitem value="History" action="#" rendered="#{userRights.flightHistory}"/>
+				</p:submenu>
+
+			</p:column>
+
+		</p:submenu>
+
+		<p:submenu label="Flight Templates" icon="ui-icon-pencil" rendered="#{userRights.flightManAdminRight}">
+
+			<p:column>
+				<p:submenu label="Operations">
+					<p:menuitem value="View" action="#{homeBean.flightTemplatesPage}" />
+					<p:menuitem value="Manage" action="#" />
+				</p:submenu>
+			</p:column>
+		</p:submenu>
+
+		<p:submenu label="Itineraries" icon="ui-icon-contact" rendered="#{userRights.compManAdminRight}">
+			<p:column>
+				<p:submenu label="Operations">
+					<p:menuitem value="View" action="#{homeBean.itineraryPage}" />
+					<p:menuitem value="Manage" action="#" />
+				</p:submenu>
+
+			</p:column>
+		</p:submenu>
+
+		<p:submenu label="Planes" icon="ui-icon-contact" rendered="#{userRights.compManAdminRight}">
+			<p:column>
+				<p:submenu label="Operations">
+					<p:menuitem value="View" action="#{homeBean.planePage}" />
+					<p:menuitem value="Manage" action="#" />
+				</p:submenu>
+			</p:column>
+		</p:submenu>
+
+		<p:submenu label="Users" icon="ui-icon-contact" rendered="#{userRights.compManAdminRight}">
+			<p:column>
+				<p:submenu label="Operations">
+					<p:menuitem value="View" action="#{homeBean.usersPage}" />
+					<p:menuitem value="New Employee" action="#" rendered="#{userRights.compManAdminRight}"/>
+					<p:menuitem value= "Manage Admins or Manager" rendered="#{userRights.adminRight}" />
+				</p:submenu>
+
+			</p:column>
+
+		</p:submenu>
+		
+		<p:submenu label="Airports" icon="ui-icon-contact" rendered="#{userRights.compManAdminRight}">
+			<p:column>
+				<p:submenu label="Operations">
+					<p:menuitem value="View" action="#{homeBean.airportPage}" />
+				</p:submenu>
+
+			</p:column>
+
+		</p:submenu>
+
+		<p:submenu label="Companies" icon="ui-icon-contact" rendered="#{userRights.adminRight}">
+			<p:column>
+				<p:submenu label="Operations">
+					<p:menuitem value="View" action="#{homeBean.compamyPage}" />
+					<p:menuitem value="Manage" />
+				</p:submenu>
+			</p:column>
+		</p:submenu>
+
+
+
+		<p:submenu label="Personal Data" icon="ui-icon-contact">
+			<p:column>
+				<p:submenu label="Operations">
+					<p:menuitem value="Details" action="#{homeBean.userDetails}" />
+					
+				</p:submenu>
+			</p:column>
+		</p:submenu>
+		
+		<p:submenu label="Manage Data" icon="ui-icon-contact" rendered="#{userRights.adminRight}">
+			<p:column>
+					<p:submenu label="Operations">
+					<p:menuitem value="Import Data"  />
+					<p:menuitem value="Export Data"  />
+					
+				</p:submenu>
+			</p:column>
+		</p:submenu>
+		
+		<p:menuitem id="logout" value="Log out" action="#{loginBean.logoutXHTML}" icon="ui-icon-close" />
+		
+	</p:megaMenu>
+</h:form>
+	    </ui:composition>
+    </body>
+</html>
+
+

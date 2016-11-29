@@ -1,0 +1,338 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<f:view locale="#{languageBean.currentLocale}"></f:view>
+<h:head>
+	<title>Flights</title>
+</h:head>
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+
+		<h:form id="formId">
+			<div class="valign-wrapper" id="Flights-page" style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="row">
+							<div class="card">
+								<div class="card-content"
+									style="font-family: Helvetica; border: 1px solid black;">
+									<p:dataTable value="#{flightsBean.allFlights}" var="flight"
+										paginator="true"
+										paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+										<f:facet name="header">
+											<h:outputText value="#{msg['home.flights']}"></h:outputText>
+										</f:facet>
+
+										<p:column headerText="#{msg['airport.code']}"
+											filterBy="#{flight.code}" filterMatchMode="contains">
+											<!-- Code -->
+											<p:commandLink id="flightLink"
+												update="formId:crewMembersField">
+												<f:setPropertyActionListener value="#{flight}"
+													target="#{flightsBean.selectedFlightByCode}" />
+												<h:outputText value="#{flight.code}" />
+											</p:commandLink>
+										</p:column>
+
+										<p:column headerText="#{msg['flights.date']}">
+											<h:outputText value="#{flight.date}">
+												<f:convertDateTime pattern="d-M-yyyy" />
+											</h:outputText>
+										</p:column>
+
+										<p:column headerText="#{msg['itineraries.startTime']}">
+											<!-- Start time -->
+											<h:outputText value="#{flight.template.itinerary.startTime}">
+												<f:converter converterId="timeConvertor" />
+											</h:outputText>
+										</p:column>
+
+										<p:column headerText="#{msg['itineraries.endTime']}">
+											<!-- End time -->
+											<h:outputText value="#{flight.template.itinerary.endTime}">
+												<f:converter converterId="timeConvertor" />
+											</h:outputText>
+										</p:column>
+
+										<p:column headerText="#{msg['flights.company']}">
+											<h:outputText value="#{flight.plane.companyName}" />
+										</p:column>
+
+										<p:column headerText="#{msg['flights.departure']}">
+											<h:outputText value="#{flight.template.departure.name}" />
+										</p:column>
+
+
+										<p:column headerText="#{msg['flights.arrival']}">
+											<h:outputText value="#{flight.template.arrival.name}" />
+										</p:column>
+
+										<p:column headerText="#{msg['airport.code']}">
+											<!-- Plane -->
+											<p:commandLink id="planeLink" update=":formId:planeDetail"
+												oncomplete="PF('planeDialog').show()">
+												<f:setPropertyActionListener value="#{flight}"
+													target="#{flightsBean.selectedFlightByPlane}" />
+												<h:outputText value="#{flight.plane.code}" />
+											</p:commandLink>
+										</p:column>
+
+										<p:column headerText="#{msg['general.delete']}"
+											style="width:130px">
+											<p:commandButton icon="ui-icon-trash" id="delete"
+												actionListener="#{flightsBean.deleteFlight(flight)}"
+												update="formId" rendered="#{!flight.deleted}">
+												<p:confirm header="#{msg['general.confirmDelete']}"
+													message="#{msg['general.sureDeleteFl']}" icon="ui-icon-alert" />
+											</p:commandButton>
+										</p:column>
+
+										<p:column headerText="#{msg['pers.edit']}" style="width:130px">
+											<p:commandButton update=":formId:flightDetail"
+												oncomplete="PF('flightDialog').show()" icon="ui-icon-pencil"
+												title="#{msg['general.view']}">
+												<f:setPropertyActionListener value="#{flight}"
+													target="#{flightsBean.flightToUpdate}" />
+											</p:commandButton>
+										</p:column>
+										<!--Map-->
+										<p:column headerText="#{msg['general.map']}" >
+											<p:commandButton 
+												oncomplete="PF('mapDialog').show()" icon="ui-icon-pencil" 
+												title="#{msg['general.view']}"  action="#{addMarkersView.addMarkers}" update="formId:gmap"> 
+													<f:setPropertyActionListener value="#{flight}" target="#{addMarkersView.flightDto}"/>
+												</p:commandButton>
+										</p:column>
+									</p:dataTable>
+
+									<!-- Crew members -->
+									<p:fieldset id="crewMembersField"
+										legend="#{msg['flights.members']}"
+										style="margin-bottom:20px">
+										<p:panelGrid columns="2" cellpadding="5">
+											<p:dataTable value="#{flightsBean.pilots}" var="pilot"
+												rows="5" paginator="true"
+												paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+												<f:facet name="header">
+													<h:outputText value="#{msg['flights.pilots']}"></h:outputText>
+													<!-- Pilots -->
+												</f:facet>
+
+												<p:column headerText="#{msg['pers.firstName']}">
+													<h:outputText value="#{pilot.firstName}" />
+												</p:column>
+
+												<p:column headerText="#{msg['pers.lastName']}">
+													<h:outputText value="#{pilot.lastName}" />
+												</p:column>
+											</p:dataTable>
+
+											<p:dataTable value="#{flightsBean.stewards}" var="steward"
+												rows="5" paginator="true"
+												paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+												<f:facet name="header">
+													<h:outputText value="#{msg['flights.stewards']}"></h:outputText>
+													<!-- Stewards -->
+												</f:facet>
+
+												<p:column headerText="#{msg['pers.firstName']}">
+													<h:outputText value="#{steward.firstName}" />
+												</p:column>
+
+												<p:column headerText="#{msg['pers.lastName']}">
+													<h:outputText value="#{steward.lastName}" />
+												</p:column>
+											</p:dataTable>
+										</p:panelGrid>
+									</p:fieldset>
+
+
+									<!-- Plane details -->
+									<p:dialog header="#{msg['flights.planeDetails']}"
+										widgetVar="planeDialog" modal="true" showEffect="fade"
+										hideEffect="fade" resizable="false">
+										<p:outputPanel id="planeDetail" style="text-align:center;">
+											<p:panelGrid columns="2"
+												rendered="#{not empty flightsBean.selectedFlightByPlane}"
+												columnClasses="label,value">
+												<p:outputLabel for="code" value="Code" />
+												<h:outputText id="code"
+													value="#{flightsBean.selectedFlightByPlane.plane.code}" />
+
+												<p:outputLabel for="company" value="Company" />
+												<h:outputText id="company"
+													value="#{flightsBean.selectedFlightByPlane.plane.companyName}" />
+
+												<p:outputLabel for="numberOfPlaces" value="Number of places" />
+												<h:outputText id="numberOfPlaces"
+													value="#{flightsBean.selectedFlightByPlane.plane.numberOfPlaces}" />
+
+												<p:outputLabel for="make" value="Make" />
+												<h:outputText id="make"
+													value="#{flightsBean.selectedFlightByPlane.plane.make}" />
+
+												<p:outputLabel for="type" value="Type" />
+												<h:outputText id="type"
+													value="#{flightsBean.selectedFlightByPlane.plane.type}" />
+											</p:panelGrid>
+										</p:outputPanel>
+									</p:dialog>
+
+									<!-- Edit flight -->
+									<p:dialog header="#{msg['flights.info']}"
+										widgetVar="flightDialog" modal="true" showEffect="fade"
+										hideEffect="fade" resizable="false">
+										<p:outputPanel id="flightDetail" style="text-align:center;">
+											<p:scrollPanel style="height:600px">
+												<p:panelGrid columns="2" cellpadding="5">
+													<p:dataTable id="checkboxDTPilots" var="pilot"
+														value="#{flightsBean.pilotsByCompany}"
+														selection="#{flightsBean.selectedPilotsForUpdate}"
+														rowKey="#{pilot.id}" style="margin-bottom:0">
+														<f:facet name="header">
+															<h:outputText value="#{msg['pers.pilot']}"></h:outputText>
+														</f:facet>
+
+														<p:column selectionMode="multiple"
+															style="width:50px;text-align:center" />
+														<p:column headerText="#{msg['pers.firstName']}">
+															<h:outputText value="#{pilot.firstName}" />
+														</p:column>
+														<p:column headerText="#{msg['pers.lastName']}">
+															<h:outputText value="#{pilot.lastName}" />
+														</p:column>
+														<p:column headerText="#{msg['flights.company']}">
+															<h:outputText value="#{pilot.companyName}" />
+														</p:column>
+													</p:dataTable>
+
+													<p:dataTable id="checkboxDTStewards" var="steward"
+														value="#{flightsBean.stewardsByCompany}"
+														selection="#{flightsBean.selectedStewardsForUpdate}"
+														rowKey="#{steward.id}" style="margin-bottom:0">
+														<f:facet name="header">
+															<h:outputText value="#{msg['pers.steward']}"></h:outputText>
+														</f:facet>
+														<p:column selectionMode="multiple"
+															style="width:50px;text-align:center" />
+														<p:column headerText="#{msg['pers.firstName']}">
+															<h:outputText value="#{steward.firstName}" />
+														</p:column>
+														<p:column headerText="#{msg['pers.lastName']}">
+															<h:outputText value="#{steward.lastName}" />
+														</p:column>
+														<p:column headerText="#{msg['flights.company']}">
+															<h:outputText value="#{steward.companyName}" />
+														</p:column>
+													</p:dataTable>
+												</p:panelGrid>
+
+												<p:dataTable id="checkboxDTPlane" var="plane"
+													value="#{flightsBean.planesByCompany}"
+													selection="#{flightsBean.flightToUpdate.plane}"
+													rowKey="#{plane.id}" style="margin-bottom:0">
+													<f:facet name="header">
+														<h:outputText value="#{msg['general.plane']}"></h:outputText>
+													</f:facet>
+
+													<p:column selectionMode="single"
+														style="width:50px;text-align:center" />
+													<p:column headerText="#{msg['airport.code']}">
+														<h:outputText value="#{plane.code}" />
+													</p:column>
+													<p:column headerText="#{msg['flights.company']}">
+														<h:outputText value="#{plane.companyName}" />
+													</p:column>
+													<p:column headerText="#{msg['planes.nrOfPlaces']}">
+														<h:outputText value="#{plane.numberOfPlaces}" />
+													</p:column>
+
+													<p:column headerText="#{msg['plane.make']}">
+														<h:outputText value="#{plane.make}" />
+													</p:column>
+
+													<p:column headerText="#{msg['planes.type']}">
+														<h:outputText value="#{plane.type}" />
+													</p:column>
+												</p:dataTable>
+
+												<h:form id="form">
+													<p:growl id="msgs" showDetail="true" />
+
+													<h:panelGrid columns="2" cellpadding="5">
+
+														<p:outputLabel for="mask" value="#{msg['flights.date']}" />
+														<p:calendar id="mask"
+															value="#{flightsBean.flightToUpdate.date}"
+															pattern="dd-MM-yyyy" mask="true" />
+													</h:panelGrid>
+
+
+													<p:dialog modal="true" resizable="false"
+														header="#{msg['general.values']}" widgetVar="dlg"
+														showEffect="fold">
+														<p:panelGrid id="display" columns="2"
+															columnClasses="label,value">
+
+															<h:outputText value="#{msg['general.mask']}" />
+															<h:outputText value="#{flightsBean.flightToUpdate.date}">
+																<f:convertDateTime pattern="MM/dd/yyyy" />
+															</h:outputText>
+														</p:panelGrid>
+													</p:dialog>
+												</h:form>
+
+												<p:outputLabel for="activateFlight"
+													value="#{msg['general.deactivated']}"
+													rendered="#{flightsBean.flightToUpdate.deleted}" />
+												<p:selectBooleanCheckbox id="activateFlight"
+													value="#{flightsBean.flightToUpdate.deleted}"
+													rendered="#{flightsBean.flightToUpdate.deleted}" />
+
+											</p:scrollPanel>
+											<p:commandButton value="#{msg['general.update']}"
+												icon="ui-icon-pencil" id="update"
+												actionListener="#{flightsBean.updateFlight()}"
+												update="formId" />
+										</p:outputPanel>
+										</p:dialog>
+									<p:dialog  header="#{msg['general.map']}" id="mapDlg"
+										widgetVar="mapDialog" modal="true" showEffect="fade" style="width: 1024px;height:768px;"
+										hideEffect="fade" resizable="false">
+										<h:head>
+											<script src="//maps.googleapis.com/maps/api/js?v=3.exp&amp;sensor=false&amp;key=AIzaSyCn-4s7Q6SMRne4Ze8Tpt_eeh5eo5kAqSw"  defer="defer" type="text/javascript"/>
+										</h:head>
+										
+										<p:gmap id="gmap" center="45,25" zoom="5" 
+											type="HYBRID" style="width:1024px;height:768px"
+											model="#{addMarkersView.model}" 
+											 widgetVar="map" >
+										</p:gmap>
+
+									</p:dialog>
+	
+									
+									<p:confirmDialog global="true" showEffect="fade"
+										hideEffect="fade">
+										<p:commandButton value="#{msg['general.yes']}" type="button"
+											styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+										<p:commandButton value="#{msg['general.no']}" type="button"
+											styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+									</p:confirmDialog>
+								</div>
+								<br />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+</html>

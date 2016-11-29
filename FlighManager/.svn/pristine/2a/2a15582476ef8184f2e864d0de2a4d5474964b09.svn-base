@@ -1,0 +1,233 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.ejb.EJB;
+import javax.ejb.Schedule;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+
+import edu.msg.flightmanager.backend.assembler.FlightAssembler;
+import edu.msg.flightmanager.backend.dto.FlightDto;
+import edu.msg.flightmanager.backend.model.Flight;
+import edu.msg.flightmanager.backend.model.FlightTemplate;
+import edu.msg.flightmanager.backend.model.Itinerary;
+import edu.msg.flightmanager.backend.model.Plane;
+import edu.msg.flightmanager.backend.repository.FlightRepository;
+import edu.msg.flightmanager.backend.repository.FlightTemplateRepository;
+import edu.msg.flightmanager.backend.repository.PlaneRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.service.FlightService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.util.CsvFileReader;
+import edu.msg.flightmanager.backend.util.CsvFileWriter;
+import edu.msg.flightmanager.backend.util.FlightValidator;
+import edu.msg.flightmanager.backend.util.ValidationException;
+
+@Stateless(name = "FlightService", mappedName = "ejb/FlightService")
+public class FlightServiceBean implements FlightService {
+
+	@EJB
+	private FlightRepository flightRepository;
+
+	private static List<FlightDto> flightsHistory;
+
+	@EJB
+	private FlightTemplateRepository flightTemplateRepository;
+
+	@EJB
+	private PlaneRepository planeRepository;
+
+	@Override
+	public List<FlightDto> getAll() throws ServiceException {
+		try {
+			List<FlightDto> flights = new ArrayList<FlightDto>();
+			for (Flight flight : flightRepository.getAll()) {
+				flights.add(FlightAssembler.modelToDto(flight));
+			}
+			return flights;
+		} catch (RepositoryException e) {
+			throw new ServiceException("The flights selection failed");
+		}
+	}
+
+	@Override
+	public FlightDto update(FlightDto flightDto) throws ServiceException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public FlightDto insert(FlightDto flightDto) throws ServiceException {
+		Flight flight = FlightAssembler.dtoToModel(flightDto);
+		try {
+			FlightValidator.validateFlight(flight);
+			flight = flightRepository.insert(flight);
+			FlightDto insertedflight = FlightAssembler.modelToDto(flight);
+			return insertedflight;
+		} catch (ValidationException e) {
+			throw new ServiceException(e.getMessage());
+		} catch (RepositoryException e) {
+			throw new ServiceException("Flight insertion failed.");
+		}
+	}
+
+	@Override
+	public void delete(FlightDto flightDto) throws ServiceException {
+		Flight flight = FlightAssembler.dtoToModel(flightDto);
+		try {
+			flight.setAircrewUsers(new ArrayList<>());
+			flightRepository.delete(flight);
+		} catch (RepositoryException e) {
+			throw new ServiceException("Flight deletion failed.");
+		}
+	}
+
+	@Override
+	public void activate(FlightDto flightDto) throws ServiceException {
+		Flight flight = FlightAssembler.dtoToModel(flightDto);
+		try {
+			flightRepository.activate(flight);
+		} catch (RepositoryException e) {
+			throw new ServiceException("Flight activate failed.");
+		}
+	}
+
+	@Override
+	public List<FlightDto> getHistory() throws ServiceException {
+		System.out.println(flightsHistory.size());
+		return flightsHistory;
+
+	}
+
+	@Schedule(second = "*/1", minute = "*", hour = "*", persistent = false)
+	public void generateHistory() {
+		try {
+			List<Flight> allFlights = flightRepository.getAll();
+			List<FlightDto> generatedHistory = new ArrayList<FlightDto>();
+			for (Flight flight : allFlights) {
+				Itinerary itinerary = flight.getTemplate().getItinerary();
+				Date flightDate = flight.getDate();
+				Calendar flightCalendar = Calendar.getInstance();
+				Calendar itineraryCalendar = Calendar.getInstance();
+				flightCalendar.setTime(flightDate);
+				itineraryCalendar.setTime(itinerary.getEndTime());
+				flightCalendar.add(Calendar.DATE, 1);
+				flightCalendar.set(Calendar.HOUR_OF_DAY, itineraryCalendar.get(Calendar.HOUR_OF_DAY));
+				flightCalendar.set(Calendar.MINUTE, itineraryCalendar.get(Calendar.MINUTE));
+				flightDate = flightCalendar.getTime();
+				Date now = new Date();
+				if (flightDate.before(now)) {
+					generatedHistory.add(FlightAssembler.modelToDto(flight));
+				}
+			}
+			flightsHistory = generatedHistory;
+		} catch (RepositoryException e) {
+			throw new ServiceException("Flight history failed.");
+		}
+	}
+
+	@Override
+	public File getCsvFileWithFlights(Date startDate, Date endDate) throws ServiceException {
+		List<Flight> flights = flightRepository.getFlightsBetweenTwoDates(startDate, endDate);
+		List<List<String>> flightsAsListsOfStrings = new ArrayList<>();
+		for (Flight flight : flights) {
+			List<String> flightAsString = new ArrayList<>();
+			flightAsString.add(flight.getCode());
+			flightAsString.add(new SimpleDateFormat("yyyy-MM-dd").format(flight.getDate()));
+			flightAsString.add(String.valueOf(flight.isDeleted()));
+			flightAsString.add(flight.getPlane().getCode().toString());
+			flightAsString.add(flight.getTemplate().getCode().toString());
+
+			flightsAsListsOfStrings.add(flightAsString);
+		}
+		String fileHeader = "Code,Date,Deleted,PlaneCode,TemplateCode";
+
+		File csvFile = new File("fligts.csv");
+		try {
+			FileWriter fileWriter = new FileWriter(csvFile);
+			CsvFileWriter.writeCsvFile(fileWriter, fileHeader, flightsAsListsOfStrings);
+			return csvFile;
+		} catch (IOException e) {
+			throw new ServiceException(e.getMessage());
+		}
+
+	}
+
+	@Override
+	@TransactionAttribute(TransactionAttributeType.NEVER)
+	public Map<String, Integer> readFromCsvFile(InputStream inputStream) {
+		List<List<String>> entities = CsvFileReader.readCsvFile(inputStream);
+		// first read the header
+		List<String> header = entities.get(0);
+		// get the position of each field from the header
+		Map<String, Integer> positionOfFields = new HashMap<>();
+		for (int i=0;i<header.size();i++) {
+			System.out.println(header.get(i));
+			if(header.get(i).equals("Code")) {
+				positionOfFields.put("code", i);
+			}
+			if(header.get(i).equals("Date")) {
+				positionOfFields.put("date", i);
+			}
+			if(header.get(i).equals("Deleted")) {
+				positionOfFields.put("deleted", i);
+			}
+			if(header.get(i).equals("PlaneCode")) {
+				positionOfFields.put("plane", i);
+			}
+			if(header.get(i).equals("TemplateCode")) {
+				positionOfFields.put("template", i);
+			}
+		}
+
+		// read the entities, which start from position 2
+		Integer numberOfSuccessfulInserts = 0;
+		Integer numberOfUnsuccessfulInserts = 0;
+		for (int i = 1; i < entities.size(); i++) {
+			List<String> entity = entities.get(i);
+			try {
+				FlightTemplate flightTemplate = flightTemplateRepository.getFlightTemplateThatHasACode(entity.get(positionOfFields.get("template")));
+				Plane plane = planeRepository.getPlaneThatHasACode(entity.get(positionOfFields.get("plane")));
+
+				Flight flight = new Flight();
+				flight.setCode(entity.get(positionOfFields.get("code")));
+				String[] dateAsListOfStrings = entity.get(positionOfFields.get("date")).split("-");
+				LocalDate localDate = LocalDate.of(Integer.valueOf(dateAsListOfStrings[0]), Integer.valueOf(dateAsListOfStrings[1]), Integer.valueOf(dateAsListOfStrings[2]));
+				Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+				flight.setDate(date);
+				flight.setDeleted(Boolean.valueOf(entity.get(positionOfFields.get("deleted"))));
+				flight.setPlane(plane);
+				flight.setTemplate(flightTemplate);
+				flightRepository.insert(flight);
+
+				numberOfSuccessfulInserts++;
+			} catch (RepositoryException e) {
+				numberOfUnsuccessfulInserts++;
+			} catch (NullPointerException e) {
+				numberOfUnsuccessfulInserts++;
+			} catch (IndexOutOfBoundsException e) {
+				numberOfUnsuccessfulInserts++;
+			}
+
+		}
+		Map<String, Integer> numberOfInserts = new HashMap<>();
+		numberOfInserts.put("successful", numberOfSuccessfulInserts);
+		numberOfInserts.put("unsuccessful", numberOfUnsuccessfulInserts);
+		return numberOfInserts;
+	}
+
+}

@@ -1,0 +1,29 @@
+package edu.msg.flightmanager.backend.service.beans;
+
+import java.util.List;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+
+import edu.msg.flightmanager.backend.model.Itinerary;
+import edu.msg.flightmanager.backend.repository.ItineraryRepository;
+import edu.msg.flightmanager.backend.repository.RepositoryException;
+import edu.msg.flightmanager.backend.service.ItineraryService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+
+@Stateless(name = "ItineraryService", mappedName = "ejb/ItineraryService")
+public class ItineraryServiceBean implements ItineraryService {
+
+	@EJB
+	private ItineraryRepository itineraryRepository;
+
+	@Override
+	public List<Itinerary> getAll() throws ServiceException {
+		try {
+			return itineraryRepository.getAll();
+		} catch (RepositoryException e) {
+			throw new ServiceException("The itineraries selection failed", e);
+		}
+	}
+
+}

@@ -1,0 +1,302 @@
+package edu.msg.flightmanager.web.beans;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+
+import edu.msg.flightmanager.backend.dto.FlightDto;
+import edu.msg.flightmanager.backend.dto.FlightTemplateDto;
+import edu.msg.flightmanager.backend.dto.PlaneDto;
+import edu.msg.flightmanager.backend.dto.UserDto;
+import edu.msg.flightmanager.backend.service.FlightService;
+import edu.msg.flightmanager.backend.service.PlaneService;
+import edu.msg.flightmanager.backend.service.ServiceException;
+import edu.msg.flightmanager.backend.service.UserService;
+
+@ManagedBean
+@ViewScoped
+public class FlightsBean implements Serializable {
+
+	private static final long serialVersionUID = 5005644721756962091L;
+	private static final String PILOT = "PILOT";
+	private static final String STEWARD = "STEWARD";
+
+	@EJB
+	private FlightService flightService;
+	@EJB
+	private UserService userService;
+	@EJB
+	private PlaneService planeService;
+
+	private FlightDto flightToInsert = new FlightDto();
+	private FlightDto selectedFlight = new FlightDto();
+	private Date time;
+
+	private List<UserDto> selectedPilots = new ArrayList<>();
+	private List<UserDto> selectedStewards = new ArrayList<>();
+	private List<PlaneDto> planesByCompany = new ArrayList<PlaneDto>();
+
+	/**
+	 * verified code
+	 */
+	private FlightDto selectedFlightByCode = new FlightDto();
+	private FlightDto selectedFlightByPlane = new FlightDto();
+	private FlightDto flightToUpdate = new FlightDto();
+	private List<UserDto> pilots = new ArrayList<UserDto>();
+	private List<UserDto> stewards = new ArrayList<UserDto>();
+	private List<UserDto> selectedPilotsForUpdate = new ArrayList<UserDto>();
+	private List<UserDto> selectedStewardsForUpdate = new ArrayList<UserDto>();
+	/**
+	 * verified code
+	 */
+
+	private FlightTemplateDto selectedFlightTemplate = new FlightTemplateDto();
+	private PlaneDto selectedPlane = new PlaneDto();
+
+	@PostConstruct
+	private void initValues() {
+		flightToInsert = new FlightDto();
+		Calendar now = Calendar.getInstance();
+		now.set(Calendar.HOUR_OF_DAY, 0);
+		now.set(Calendar.HOUR, 0);
+		now.set(Calendar.MINUTE, 0);
+		now.set(Calendar.SECOND, 0);
+		flightToInsert.setDate(now.getTime());
+		selectedFlight.setAircrewUsers(new ArrayList<>());
+
+		/**
+		 * verified code
+		 */
+		selectedFlightByCode.setAircrewUsers(new ArrayList<UserDto>());
+		selectedFlightByPlane.setAircrewUsers(new ArrayList<UserDto>());
+		flightToUpdate.setPlane(new PlaneDto());
+		flightToUpdate.getPlane().setCompanyName("");
+
+		/**
+		 * verified code
+		 */
+	}
+
+	public PlaneDto getSelectedPlane() {
+		return selectedPlane;
+	}
+
+	public void setSelectedPlane(PlaneDto selectedPlane) {
+		this.selectedPlane = selectedPlane;
+	}
+
+	public FlightTemplateDto getSelectedFlightTemplate() {
+		return selectedFlightTemplate;
+	}
+
+	public void setSelectedFlightTemplate(FlightTemplateDto selectedFlightTemplate) {
+		this.selectedFlightTemplate = selectedFlightTemplate;
+	}
+
+	public List<FlightDto> getAllFlights() {
+		return flightService.getAll();
+	}
+
+	public void selectAction(FlightDto flight) {
+		selectedFlight = flight;
+	}
+
+	public void deleteFlight(FlightDto flightDto) {
+		try {
+			flightService.delete(flightDto);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Delete Successful.",
+					"The flight was deleted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Delete Failed.",
+					"The flight was not deleted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+	}
+
+	public void updateFlight() {
+		List<UserDto> crewMembers = new ArrayList<UserDto>();
+		crewMembers.addAll(selectedPilotsForUpdate);
+		crewMembers.addAll(selectedStewardsForUpdate);
+		flightToUpdate.setAircrewUsers(crewMembers);
+		try {
+			flightService.update(flightToUpdate);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Update Successful.",
+					"The flight was updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Update Failed.",
+					"The flight was not updated.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		}
+
+	}
+
+	public void setSelectedPilots(List<UserDto> selectedPilots) {
+		this.selectedPilots = selectedPilots;
+	}
+
+	public void setSelectedStewards(List<UserDto> selectedStewards) {
+		this.selectedStewards = selectedStewards;
+	}
+
+	public List<UserDto> getSelectedPilots() {
+		return selectedPilots;
+	}
+
+	public List<UserDto> getSelectedStewards() {
+		return selectedStewards;
+	}
+
+	public FlightDto getFlightToInsert() {
+		return flightToInsert;
+	}
+
+	public void setFlightToInsert(FlightDto flightToInsert) {
+		this.flightToInsert = flightToInsert;
+	}
+
+	public String addFlight() {
+		List<UserDto> airCrewUsers = new ArrayList<UserDto>();
+		airCrewUsers.addAll(selectedPilots);
+		airCrewUsers.addAll(selectedStewards);
+		flightToInsert.setAircrewUsers(airCrewUsers);
+		flightToInsert.setTemplate(selectedFlightTemplate);
+		flightToInsert.setPlane(selectedPlane);
+
+		try {
+			flightService.insert(flightToInsert);
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Insert Successful.",
+					"The flight was inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+		} catch (ServiceException e) {
+			FacesMessage errorMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Insert Failed.",
+					"The flight was not inserted.");
+			FacesContext.getCurrentInstance().addMessage(null, errorMessage);
+			return "addFlight";
+		}
+		return "addFlight";
+	}
+
+	public Date getTime() {
+		return time;
+	}
+
+	public void setTime(Date time) {
+		this.time = time;
+	}
+
+	public FlightDto getSelectedFlight() {
+		return selectedFlight;
+	}
+
+	public void setSelectedFlight(FlightDto selectedFlight) {
+		this.selectedFlight = selectedFlight;
+	}
+
+	public List<UserDto> getPilots() {
+		List<UserDto> pilots = new ArrayList<UserDto>();
+		for (UserDto userDto : selectedFlightByCode.getAircrewUsers()) {
+			if (userDto.getType().equals("PILOT")) {
+				pilots.add(userDto);
+			}
+		}
+		return pilots;
+	}
+
+	public List<UserDto> getStewards() {
+		List<UserDto> stewards = new ArrayList<UserDto>();
+		for (UserDto userDto : selectedFlightByCode.getAircrewUsers()) {
+			if (userDto.getType().equals("STEWARD")) {
+				stewards.add(userDto);
+			}
+		}
+		return stewards;
+	}
+
+	public FlightDto getFlightToUpdate() {
+		return flightToUpdate;
+	}
+
+	public void setFlightToUpdate(FlightDto flightToUpdate) {
+		this.flightToUpdate = flightToUpdate;
+	}
+
+	public List<UserDto> getPilotsByCompany() {
+		pilots = new ArrayList<UserDto>();
+		if (flightToUpdate.getPlane() != null) {
+			pilots = userService.getByTypeAndCompany(PILOT, flightToUpdate.getPlane().getCompanyName());
+		} else if (selectedFlightByCode.getPlane() != null) {
+			pilots = userService.getByTypeAndCompany(PILOT, selectedFlightByCode.getPlane().getCompanyName());
+		} else if (selectedFlightByPlane.getPlane() != null) {
+			pilots = userService.getByTypeAndCompany(PILOT, selectedFlightByPlane.getPlane().getCompanyName());
+		}
+		return pilots;
+	}
+
+	public List<UserDto> getStewardsByCompany() {
+		stewards = new ArrayList<UserDto>();
+		if (flightToUpdate.getPlane() != null) {
+			stewards = userService.getByTypeAndCompany(STEWARD, flightToUpdate.getPlane().getCompanyName());
+		} else if (selectedFlightByCode.getPlane() != null) {
+			stewards = userService.getByTypeAndCompany(STEWARD, selectedFlightByCode.getPlane().getCompanyName());
+		} else if (selectedFlightByPlane.getPlane() != null) {
+			stewards = userService.getByTypeAndCompany(STEWARD, selectedFlightByPlane.getPlane().getCompanyName());
+		}
+		return stewards;
+	}
+
+	public List<PlaneDto> getPlanesByCompany() {
+		planesByCompany = new ArrayList<PlaneDto>();
+		if (flightToUpdate.getPlane() != null) {
+			planesByCompany = planeService.getByCompany(flightToUpdate.getPlane().getCompanyName());
+		} else if (selectedFlightByCode.getPlane() != null) {
+			planesByCompany = planeService.getByCompany(selectedFlightByCode.getPlane().getCompanyName());
+		} else if (selectedFlightByPlane.getPlane() != null) {
+			planesByCompany = planeService.getByCompany(selectedFlightByPlane.getPlane().getCompanyName());
+		}
+		return planesByCompany;
+	}
+
+	public FlightDto getSelectedFlightByCode() {
+		return selectedFlightByCode;
+	}
+
+	public void setSelectedFlightByCode(FlightDto selectedFlightByCode) {
+		this.selectedFlightByCode = selectedFlightByCode;
+	}
+
+	public FlightDto getSelectedFlightByPlane() {
+		return selectedFlightByPlane;
+	}
+
+	public void setSelectedFlightByPlane(FlightDto selectedFlightByPlane) {
+		this.selectedFlightByPlane = selectedFlightByPlane;
+	}
+
+	public List<UserDto> getSelectedPilotsForUpdate() {
+		return selectedPilotsForUpdate;
+	}
+
+	public void setSelectedPilotsForUpdate(List<UserDto> selectedPilotsForUpdate) {
+		this.selectedPilotsForUpdate = selectedPilotsForUpdate;
+	}
+
+	public List<UserDto> getSelectedStewardsForUpdate() {
+		return selectedStewardsForUpdate;
+	}
+
+	public void setSelectedStewardsForUpdate(List<UserDto> selectedStewardsForUpdate) {
+		this.selectedStewardsForUpdate = selectedStewardsForUpdate;
+	}
+
+}

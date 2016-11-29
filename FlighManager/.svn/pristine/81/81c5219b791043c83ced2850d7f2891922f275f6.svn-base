@@ -1,0 +1,4 @@
+#center {
+	magrin: auto;
+	vertical-align: middle;
+} 

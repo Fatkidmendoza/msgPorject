@@ -1,0 +1,32 @@
+package edu.msg.flightmanager.backend.assembler;
+
+import edu.msg.flightmanager.backend.dto.FlightTemplateDto;
+import edu.msg.flightmanager.backend.model.FlightTemplate;
+
+/**
+ * The class converts from flight template model object to dto object, and reverse
+ */
+
+public class FlightTemplateAssembler {
+
+	public static FlightTemplateDto modelToDto(FlightTemplate flightTemplate){
+		FlightTemplateDto flightTemplateDto = new FlightTemplateDto();
+		flightTemplateDto.setUuid(flightTemplate.getUuid());
+		flightTemplateDto.setId(flightTemplate.getId());
+		flightTemplateDto.setDeparture(AirportAssembler.modelToDto(flightTemplate.getDeparture()));
+		flightTemplateDto.setArrival(AirportAssembler.modelToDto(flightTemplate.getArrival()));
+		flightTemplateDto.setItinerary(ItineraryAssembler.modelToDto(flightTemplate.getItinerary()));
+		return flightTemplateDto;
+	}
+
+
+	public static FlightTemplate dtoToModel(FlightTemplateDto flightTemplateDto) {
+		FlightTemplate flightTemplate = new FlightTemplate();
+		flightTemplate.setUuid(flightTemplateDto.getUuid());
+		flightTemplate.setId(flightTemplateDto.getId());
+		flightTemplate.setDeparture(AirportAssembler.dtoToModel(flightTemplateDto.getDeparture()));
+		flightTemplate.setArrival(AirportAssembler.dtoToModel(flightTemplateDto.getArrival()));
+		flightTemplate.setItinerary(ItineraryAssembler.dtoToModel(flightTemplateDto.getItinerary()));
+		return flightTemplate;
+	}
+}

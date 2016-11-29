@@ -1,0 +1,6 @@
+Code,Deleted,ArrivalCode,DepartureCode,ItineraryCode,AvailableFrom,CompanyName
+CF1,false,LYS,AMS,ID1,2016-10-03,AmericanAirlines
+CF6,false,LYS,OTP,IO1,2016-10-05,AmericanAirlines
+CP,false,OTP,IO1,2016-10-05,AmericanAirlines
+CP1,false,CMN,OTP,2016-10-05,AmericanAirlin
+CFE,false,CMN,OTP,IO1,2016-10-05

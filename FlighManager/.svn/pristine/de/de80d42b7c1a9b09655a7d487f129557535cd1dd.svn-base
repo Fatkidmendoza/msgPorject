@@ -1,0 +1,15 @@
+package edu.msg.flightmanager.backend.repository.bean;
+
+import javax.ejb.Stateless;
+
+import edu.msg.flightmanager.backend.model.Flight;
+import edu.msg.flightmanager.backend.repository.FlightRepository;
+
+@Stateless(name = "FlightRepository", mappedName = "ejb/FlightRepository")
+public class FlightRepositoryBean extends BaseRepositoryBean<Flight, Long> implements FlightRepository {
+
+	public FlightRepositoryBean() {
+		super(Flight.class);
+	}
+
+}

@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<f:view locale="#{languageBean.currentLocale}"></f:view>
+<h:head>
+	<title>Flights</title>
+</h:head>
+<ui:composition template="/template/commonLayout.xhtml">
+
+	<ui:define name="dynamicContent">
+
+		<h:form id="flightData">
+			<div class="valign-wrapper" id="Flights-page" style="margin: 0 auto;">
+				<div class="container">
+					<div class="corner-align">
+						<div class="row">
+							<div class="card">
+								<div class="card-content"
+									style="font-family: Helvetica; border: 1px solid black;">
+
+									<p:dataList value="#{flightsBean.flightData}" var="flight"
+										type="unordered" itemType="none" paginator="true" rows="10"
+										styleClass="paginated">
+										<f:facet name="header">
+								            Flights
+								        </f:facet>
+										<p:commandLink update=":flightData:flightDetail"
+											oncomplete="PF('flightDialog').show()" title="Flight Details"
+											styleClass="ui-icon ui-icon-search"
+											style="float:left;margin-right:10px">
+											<f:setPropertyActionListener value="#{flight}"
+												target="#{flightsBean.flightDataSelectedFlight}" />
+											<h:outputText
+												value="#{flight.code} : #{flight.template.departure.name} - #{flight.template.arrival.name}" />
+										</p:commandLink>
+										<h:outputText
+											value="#{flight.code} : #{flight.template.departure.name} - #{flight.template.arrival.name}"
+											style="display:inline-block" />
+									</p:dataList>
+
+									<p:dialog header="#{msg['flight.info']}"
+										widgetVar="flightDialog" modal="true" showEffect="fade"
+										hideEffect="fade" resizable="false">
+										<p:outputPanel id="flightDetail" style="text-align:center;">
+											<p:panelGrid columns="2"
+												rendered="#{not empty flightsBean.flightDataSelectedFlight}"
+												columnClasses="label,value">
+												<f:facet name="header">
+													<p:outputLabel value="Flight details" />
+												</f:facet>
+
+												<p:outputLabel for="code" value="Code" />
+												<p:outputLabel id="code"
+													value="#{flightsBean.flightDataSelectedFlight.code}" />
+													
+												<p:outputLabel for="company" value="Company" />
+												<p:outputLabel id="company"
+													value="#{flightsBean.flightDataSelectedFlight.plane.companyName}" />
+												
+												<p:outputLabel for="date" value="Date" />
+												<p:outputLabel id="date"
+													value="#{flightsBean.flightDataSelectedFlight.date}">
+													<f:convertDateTime pattern="d-M-yyyy" />
+												</p:outputLabel>
+
+												<p:outputLabel for="plane" value="Plane" />
+												<p:outputLabel id="plane"
+													value="#{flightsBean.flightDataSelectedFlight.plane.code} - #{flightsBean.flightDataSelectedFlight.plane.make}  #{flightsBean.flightDataSelectedFlight.plane.type}" />
+
+												<p:outputLabel for="departure" value="Departure"/>
+												<p:outputLabel id="departure" value="#{flightsBean.flightDataSelectedFlight.template.departure.code} - #{flightsBean.flightDataSelectedFlight.template.departure.name}" />
+												
+												<p:outputLabel for="startTime" value="Start time"/>
+												<p:outputLabel id="startTime" value="#{flightsBean.flightDataSelectedFlight.template.itinerary.startTime}">
+													<f:converter converterId="timeConvertor" />
+												</p:outputLabel>
+												
+												<p:outputLabel for="arrival" value="Arrival"/>
+												<p:outputLabel id="arrival" value="#{flightsBean.flightDataSelectedFlight.template.arrival.code} - #{flightsBean.flightDataSelectedFlight.template.arrival.name}" />
+												
+												<p:outputLabel for="endTime" value="End time"/>
+												<p:outputLabel id="endTime" value="#{flightsBean.flightDataSelectedFlight.template.itinerary.endTime}">
+													<f:converter converterId="timeConvertor" />
+												</p:outputLabel>
+												
+											</p:panelGrid>
+										</p:outputPanel>
+									</p:dialog>
+
+								</div>
+								<br />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
+
+</html>
